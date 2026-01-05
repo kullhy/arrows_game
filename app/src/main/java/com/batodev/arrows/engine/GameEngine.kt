@@ -1,6 +1,5 @@
 package com.batodev.arrows.engine
 
-import java.util.Stack
 import kotlin.random.Random
 
 // --- Data Models ---
@@ -36,7 +35,7 @@ class GameEngine {
      * @param fillDensity Target percentage of grid to fill (0.0 to 1.0)
      */
     fun generateSolvableLevel(width: Int, height: Int, fillDensity: Double = 0.95): GameLevel {
-        val grid = Array(width) { IntArray(height) { 0 } } // 0 = empty, >0 = snake ID
+        val grid = Array(width) { IntArray(height) } // 0 = empty, >0 = snake ID
         val snakes = mutableListOf<Snake>()
         var nextId = 1
 
@@ -48,8 +47,8 @@ class GameEngine {
 
         while (filledCells < targetFilledCells && failures < maxFailures) {
             // 1. Pick a random empty start point
-            val startPoint = findRandomEmptyCell(width, height, grid)
-            if (startPoint == null) break // Board is full
+            val startPoint = findRandomEmptyCell(width, height, grid) ?: break
+            // Board is full
 
             // 2. Grow a random snake shape
             val candidateBody = growRandomSnake(startPoint, width, height, grid)
@@ -61,7 +60,7 @@ class GameEngine {
                 val preHead = candidateBody[candidateBody.size - 2]
                 getDirection(preHead, head)
             } else {
-                Direction.values().random()
+                Direction.entries.toTypedArray().random()
             }
 
             val candidateSnake = Snake(nextId, candidateBody, direction)
@@ -187,9 +186,10 @@ class GameEngine {
         var current = start
         val maxLen = Random.nextInt(4, 12) // Random length between 2 and 5 segments
 
-        for (i in 0 until maxLen) {
+        @Suppress("UNUSED_VARIABLE", "UNUSED_PARAMETER")
+        for (unused in 0 until maxLen) {
             // Find valid neighbors (inside bounds, empty in grid, not in current snake)
-            val neighbors = Direction.values()
+            val neighbors = Direction.entries
                 .map { current + it }
                 .filter { p ->
                     p.x in 0 until w &&
