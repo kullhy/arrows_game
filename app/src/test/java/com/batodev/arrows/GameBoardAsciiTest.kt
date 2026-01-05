@@ -1,44 +1,26 @@
 package com.batodev.arrows
 
-import android.util.Log
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.batodev.arrows.engine.Direction
 import com.batodev.arrows.engine.GameEngine
 import com.batodev.arrows.engine.Point
-
 import org.junit.Test
-import org.junit.runner.RunWith
-
-import org.junit.Assert.*
 
 /**
- * Instrumented test, which will execute on an Android device.
- *
- * See [testing documentation](http://d.android.com/tools/testing).
+ * Unit test to generate and print game board as ASCII art
  */
-@RunWith(AndroidJUnit4::class)
-class ExampleInstrumentedTest {
-    @Test
-    fun useAppContext() {
-        // Context of the app under test.
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.batodev.arrows", appContext.packageName)
-        Log.d("TAG", "test")
-        println("Works!")
-    }
+class GameBoardAsciiTest {
 
     @Test
-    fun testPrintGameBoard() {
+    fun printGameBoardAsAsciiArt() {
         val engine = GameEngine()
         val level = engine.generateSolvableLevel(width = 7, height = 10, fillDensity = 0.95)
 
-        println("\n" + "=".repeat(50))
+        println("\n" + "=".repeat(60))
         println("Generated Arrows Puzzle - ASCII Art")
-        println("=".repeat(50))
+        println("=".repeat(60))
         println("Board Size: ${level.width} x ${level.height}")
         println("Number of Snakes: ${level.snakes.size}")
-        println("=".repeat(50) + "\n")
+        println("=".repeat(60) + "\n")
 
         // Create a 2D grid to map positions to snakes
         val grid = Array(level.width) { IntArray(level.height) { 0 } }
@@ -81,12 +63,12 @@ class ExampleInstrumentedTest {
             println()
         }
 
-        println("\n" + "=".repeat(50))
+        println("\n" + "=".repeat(60))
         println("Legend:")
-        println("  .  = Empty cell")
-        println(" ↑↓←→ = Snake head with direction")
+        println("  .   = Empty cell")
+        println(" ↑↓←→ = Snake head with direction arrow")
         println("  ##  = Snake body segment (number = snake ID)")
-        println("=".repeat(50) + "\n")
+        println("=".repeat(60) + "\n")
 
         // Print snake details
         println("Snake Details:")
@@ -95,4 +77,58 @@ class ExampleInstrumentedTest {
         }
         println()
     }
+
+    @Test
+    fun printMultipleBoards() {
+        println("\n" + "█".repeat(60))
+        println("Generating 3 Different Puzzle Boards")
+        println("█".repeat(60))
+
+        for (i in 1..3) {
+            val engine = GameEngine()
+            val level = engine.generateSolvableLevel(width = 7, height = 10, fillDensity = 0.95)
+
+            println("\n" + "─".repeat(60))
+            println("Board #$i - ${level.width}x${level.height} with ${level.snakes.size} snakes")
+            println("─".repeat(60))
+
+            val grid = Array(level.width) { IntArray(level.height) { 0 } }
+            val snakeMap = mutableMapOf<Int, com.batodev.arrows.engine.Snake>()
+
+            for (snake in level.snakes) {
+                snakeMap[snake.id] = snake
+                for (point in snake.body) {
+                    grid[point.x][point.y] = snake.id
+                }
+            }
+
+            for (y in 0 until level.height) {
+                for (x in 0 until level.width) {
+                    val snakeId = grid[x][y]
+                    if (snakeId == 0) {
+                        print(" . ")
+                    } else {
+                        val snake = snakeMap[snakeId]!!
+                        val point = Point(x, y)
+
+                        if (snake.body.last() == point) {
+                            val arrow = when (snake.headDirection) {
+                                Direction.UP -> " ↑ "
+                                Direction.DOWN -> " ↓ "
+                                Direction.LEFT -> " ← "
+                                Direction.RIGHT -> " → "
+                            }
+                            print(arrow)
+                        } else {
+                            print(String.format("%2d ", snakeId % 100))
+                        }
+                    }
+                }
+                println()
+            }
+        }
+
+        println("\n" + "█".repeat(60) + "\n")
+    }
 }
+
