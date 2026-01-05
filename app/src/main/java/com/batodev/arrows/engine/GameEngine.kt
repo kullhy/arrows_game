@@ -185,7 +185,7 @@ class GameEngine {
         val tempVisited = mutableSetOf(start)
 
         var current = start
-        val maxLen = Random.nextInt(2, 6) // Random length between 2 and 5 segments
+        val maxLen = Random.nextInt(4, 12) // Random length between 2 and 5 segments
 
         for (i in 0 until maxLen) {
             // Find valid neighbors (inside bounds, empty in grid, not in current snake)

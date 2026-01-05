@@ -4,26 +4,29 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.batodev.arrows.engine.Direction
 import com.batodev.arrows.engine.GameEngine
 import com.batodev.arrows.engine.GameLevel
 import com.batodev.arrows.engine.Point
 import com.batodev.arrows.ui.theme.ArrowsTheme
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,9 +35,15 @@ class MainActivity : ComponentActivity() {
         setContent {
             ArrowsTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    GameBoardScreen(
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
+                            .background(Color.White), // Clean white background like the image
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ArrowsGameView()
+                    }
                 }
             }
         }
@@ -42,146 +51,97 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun GameBoardScreen(modifier: Modifier = Modifier) {
+fun ArrowsGameView() {
     val engine = remember { GameEngine() }
-    val level by remember {
-        mutableStateOf(engine.generateSolvableLevel(width = 7, height = 10, fillDensity = 0.95))
-    }
+    val level = remember { engine.generateSolvableLevel(7, 17, 0.90) }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "Arrows Puzzle",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        Text(
-            text = "Board: ${level.width}×${level.height} | Snakes: ${level.snakes.size}",
-            style = MaterialTheme.typography.bodyMedium,
-            color = Color.Gray,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        GameBoard(level = level)
-    }
-}
-
-@Composable
-fun GameBoard(level: GameLevel) {
-    // Create a map from positions to snake info
-    val grid = remember(level) {
-        val g = Array(level.width) { IntArray(level.height) { 0 } }
-        for (snake in level.snakes) {
-            for (point in snake.body) {
-                g[point.x][point.y] = snake.id
-            }
-        }
-        g
-    }
-
-    val snakeMap = remember(level) {
-        level.snakes.associateBy { it.id }
-    }
-
-    // Calculate cell size to fit the screen
-    val cellSize = 40.dp
-
-    Column(
-        modifier = Modifier
-            .border(2.dp, Color.Black)
-            .padding(4.dp)
-    ) {
-        for (y in 0 until level.height) {
-            Row {
-                for (x in 0 until level.width) {
-                    val snakeId = grid[x][y]
-                    GameCell(
-                        snakeId = snakeId,
-                        point = Point(x, y),
-                        snakeMap = snakeMap,
-                        cellSize = cellSize
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun GameCell(
-    snakeId: Int,
-    point: Point,
-    snakeMap: Map<Int, com.batodev.arrows.engine.Snake>,
-    cellSize: androidx.compose.ui.unit.Dp
-) {
-    val snake = snakeMap[snakeId]
-    val isHead = snake?.body?.last() == point
-
-    // Generate a color for each snake based on its ID
-    val backgroundColor = if (snakeId == 0) {
-        Color.White
-    } else {
-        val hue = (snakeId * 137.5f) % 360f // Golden angle for nice color distribution
-        Color.hsv(hue, 0.5f, 0.95f)
-    }
-
+    // Board container
     Box(
         modifier = Modifier
-            .size(cellSize)
-            .border(0.5.dp, Color.LightGray)
-            .background(backgroundColor),
-        contentAlignment = Alignment.Center
+            .fillMaxWidth()
+            .aspectRatio(7f / 11f)
+            .padding(16.dp)
     ) {
-        when {
-            snakeId == 0 -> {
-                // Empty cell - show a dot
-                Text(
-                    text = "·",
-                    fontSize = 8.sp,
-                    color = Color.LightGray
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val cellWidth = size.width / level.width
+            val cellHeight = size.height / level.height
+            val strokeWidth = cellWidth * 0.2f // Thick lines like the image
+
+            level.snakes.forEach { snake ->
+                val path = Path()
+
+                // 1. Move to the center of the first segment (tail)
+                val first = snake.body.first()
+                path.moveTo(
+                    first.x * cellWidth + cellWidth / 2,
+                    first.y * cellHeight + cellHeight / 2
                 )
-            }
-            isHead -> {
-                // Head - show arrow
-                val arrow = when (snake.headDirection) {
-                    Direction.UP -> "↑"
-                    Direction.DOWN -> "↓"
-                    Direction.LEFT -> "←"
-                    Direction.RIGHT -> "→"
+
+                // 2. Draw lines through all segments
+                for (i in 1 until snake.body.size) {
+                    val p = snake.body[i]
+                    path.lineTo(
+                        p.x * cellWidth + cellWidth / 2,
+                        p.y * cellHeight + cellHeight / 2
+                    )
                 }
-                Text(
-                    text = arrow,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
+
+                // 3. Draw the snake body
+                drawPath(
+                    path = path,
                     color = Color.Black,
-                    textAlign = TextAlign.Center
+                    style = Stroke(
+                        width = strokeWidth,
+                        cap = StrokeCap.Round,
+                        join = StrokeJoin.Round
+                    )
                 )
-            }
-            else -> {
-                // Body segment - show snake ID
-                Text(
-                    text = snakeId.toString(),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.Black,
-                    textAlign = TextAlign.Center
+
+                // 4. Draw the Arrow Head at the last segment
+                val head = snake.body.last()
+                drawArrowHead(
+                    centerX = head.x * cellWidth + cellWidth / 2,
+                    centerY = head.y * cellHeight + cellHeight / 2,
+                    direction = snake.headDirection,
+                    size = strokeWidth * 1.5f,
+                    color = Color.Black
                 )
             }
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GameBoardPreview() {
-    ArrowsTheme {
-        GameBoardScreen()
+private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawArrowHead(
+    centerX: Float,
+    centerY: Float,
+    direction: Direction,
+    size: Float,
+    color: Color
+) {
+    val angle = when (direction) {
+        Direction.UP -> 270.0
+        Direction.DOWN -> 90.0
+        Direction.LEFT -> 180.0
+        Direction.RIGHT -> 0.0
+    } * (PI / 180.0)
+
+    val path = Path().apply {
+        // Tip of the arrow
+        moveTo(
+            centerX + (size * cos(angle)).toFloat(),
+            centerY + (size * sin(angle)).toFloat()
+        )
+        // Back left wing
+        lineTo(
+            centerX + (size * cos(angle + 2.5)).toFloat(),
+            centerY + (size * sin(angle + 2.5)).toFloat()
+        )
+        // Back right wing
+        lineTo(
+            centerX + (size * cos(angle - 2.5)).toFloat(),
+            centerY + (size * sin(angle - 2.5)).toFloat()
+        )
+        close()
     }
+    drawPath(path, color)
 }
