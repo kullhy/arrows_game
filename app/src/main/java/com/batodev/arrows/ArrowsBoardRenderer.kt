@@ -117,6 +117,19 @@ object ArrowsBoardRenderer {
             )
             close()
         }
+
+        // Draw filled triangle
         drawPath(path, color)
+
+        // Draw rounded stroke over the edges for rounded corners
+        drawPath(
+            path = path,
+            color = color,
+            style = Stroke(
+                width = size * 0.3f,
+                cap = StrokeCap.Round,
+                join = StrokeJoin.Round
+            )
+        )
     }
 }
