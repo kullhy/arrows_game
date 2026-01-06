@@ -53,60 +53,71 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ArrowsGameView() {
     val engine = remember { GameEngine() }
-    val level = remember { engine.generateSolvableLevel(7, 17, 0.90) }
+    var level by remember { mutableStateOf(engine.generateSolvableLevel(7, 17, 1.0)) }
 
-    // Board container
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(7f / 11f)
-            .padding(16.dp)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val cellWidth = size.width / level.width
-            val cellHeight = size.height / level.height
-            val strokeWidth = cellWidth * 0.2f // Thick lines like the image
+        // Board container
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(7f / 11f)
+                .padding(16.dp)
+        ) {
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val cellWidth = size.width / level.width
+                val cellHeight = size.height / level.height
+                val strokeWidth = cellWidth * 0.15f // Thick lines like the image
 
-            level.snakes.forEach { snake ->
-                val path = Path()
+                level.snakes.forEach { snake ->
+                    val path = Path()
 
-                // 1. Move to the center of the first segment (tail)
-                val first = snake.body.first()
-                path.moveTo(
-                    first.x * cellWidth + cellWidth / 2,
-                    first.y * cellHeight + cellHeight / 2
-                )
+                    // 1. Move to the center of the first segment (tail)
+                    val first = snake.body.first()
+                    path.moveTo(
+                        first.x * cellWidth + cellWidth / 2,
+                        first.y * cellHeight + cellHeight / 2
+                    )
 
-                // 2. Draw lines through all segments
-                for (i in 1 until snake.body.size) {
-                    val p = snake.body[i]
-                    path.lineTo(
-                        p.x * cellWidth + cellWidth / 2,
-                        p.y * cellHeight + cellHeight / 2
+                    // 2. Draw lines through all segments
+                    for (i in 1 until snake.body.size) {
+                        val p = snake.body[i]
+                        path.lineTo(
+                            p.x * cellWidth + cellWidth / 2,
+                            p.y * cellHeight + cellHeight / 2
+                        )
+                    }
+
+                    // 3. Draw the snake body
+                    drawPath(
+                        path = path,
+                        color = Color.Black,
+                        style = Stroke(
+                            width = strokeWidth,
+                            cap = StrokeCap.Round,
+                            join = StrokeJoin.Round
+                        )
+                    )
+
+                    // 4. Draw the Arrow Head at the last segment
+                    val head = snake.body.last()
+                    drawArrowHead(
+                        centerX = head.x * cellWidth + cellWidth / 2,
+                        centerY = head.y * cellHeight + cellHeight / 2,
+                        direction = snake.headDirection,
+                        size = strokeWidth * 1.5f,
+                        color = Color.Black
                     )
                 }
-
-                // 3. Draw the snake body
-                drawPath(
-                    path = path,
-                    color = Color.Black,
-                    style = Stroke(
-                        width = strokeWidth,
-                        cap = StrokeCap.Round,
-                        join = StrokeJoin.Round
-                    )
-                )
-
-                // 4. Draw the Arrow Head at the last segment
-                val head = snake.body.last()
-                drawArrowHead(
-                    centerX = head.x * cellWidth + cellWidth / 2,
-                    centerY = head.y * cellHeight + cellHeight / 2,
-                    direction = snake.headDirection,
-                    size = strokeWidth * 1.5f,
-                    color = Color.Black
-                )
             }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        androidx.compose.material3.Button(onClick = {
+            level = engine.generateSolvableLevel(7, 17, 0.90)
+        }) {
+            androidx.compose.material3.Text("Regenerate Board")
         }
     }
 }
