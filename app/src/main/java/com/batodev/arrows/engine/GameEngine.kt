@@ -86,6 +86,7 @@ class GameEngine {
     /**
      * Checks if adding [newSnake] creates a dependency cycle in the graph.
      * Returns true if the board remains solvable (DAG).
+     * Uses full line-of-sight checking: traces the entire path from head to board edge.
      */
     private fun isSafeToAdd(
         newSnake: Snake,
@@ -93,6 +94,21 @@ class GameEngine {
         grid: Array<IntArray>,
         w: Int, h: Int
     ): Boolean {
+        // Create a set of points occupied by the new snake for quick lookup
+        val newSnakeBody = newSnake.body.toSet()
+
+        // First, check if the new snake blocks itself (body in its own line of sight)
+        if (isSnakeSelfBlocked(newSnake, newSnakeBody, w, h)) {
+            return false
+        }
+
+        // Check if any existing snake blocks itself (shouldn't happen, but defensive)
+        for (snake in existingSnakes) {
+            if (isSnakeSelfBlocked(snake, snake.body.toSet(), w, h)) {
+                return false
+            }
+        }
+
         // We build a temporary dependency graph including the new snake
         // Adjacency list: Node ID -> List of IDs it depends on (blocks it)
         val graph = mutableMapOf<Int, MutableList<Int>>()
@@ -101,40 +117,60 @@ class GameEngine {
         val allSnakes = existingSnakes + newSnake
         allSnakes.forEach { graph[it.id] = mutableListOf() }
 
-        // Build Edges
+        // Build Edges using full line-of-sight - track ALL blockers, not just the first
         for (snake in allSnakes) {
-            val target = snake.body.last() + snake.headDirection
+            var pos = snake.body.last()
+            val dir = snake.headDirection
 
-            // Check bounds
-            if (target.x in 0 until w && target.y in 0 until h) {
-                val blockerId = grid[target.x][target.y]
+            // Trace the entire line of sight from head to board edge
+            while (true) {
+                pos = Point(pos.x + dir.dx, pos.y + dir.dy)
 
-                // If the target cell is occupied by ANOTHER snake, add dependency.
-                // Note: If blockerId is 0 (empty), it might be filled later,
-                // but for this snapshot, it's not a block.
-                // Crucial: check if the newSnake ITSELF is the blocker (self-collision is impossible in this logic
-                // because we only check grid, and newSnake isn't on grid yet,
-                // BUT we must check if newSnake blocks an EXISTING snake).
-
-                if (blockerId != 0 && blockerId != snake.id) {
-                    // "snake" depends on "blockerId"
-                    graph[snake.id]?.add(blockerId)
+                // If we reach outside the board, done checking this snake
+                if (pos.x !in 0 until w || pos.y !in 0 until h) {
+                    break
                 }
 
-                // Special Check: The new snake isn't on the 'grid' array yet.
-                // We must check if any EXISTING snake is blocked by the NEW snake's body.
-                if (snake != newSnake) {
-                    // Does this existing snake point to a cell now occupied by the new snake?
-                    val isBlockedByNewSnake = newSnake.body.contains(target)
-                    if (isBlockedByNewSnake) {
-                        graph[snake.id]?.add(newSnake.id)
-                    }
+                // Check if blocked by existing snake on grid (not the new snake)
+                val blockerId = grid[pos.x][pos.y]
+                if (blockerId != 0 && blockerId != snake.id) {
+                    // "snake" depends on "blockerId" - add ALL blockers
+                    graph[snake.id]?.add(blockerId)
+                    // Don't break - continue checking for more blockers
+                }
+
+                // Check if blocked by the new snake (not yet on grid)
+                if (snake != newSnake && newSnakeBody.contains(pos)) {
+                    graph[snake.id]?.add(newSnake.id)
+                    // Don't break - continue checking for more blockers
                 }
             }
         }
 
         // Run Cycle Detection (DFS)
         return !hasCycle(graph)
+    }
+
+    /**
+     * Checks if a snake's own body is in its line of sight (self-blocking).
+     */
+    private fun isSnakeSelfBlocked(snake: Snake, snakeBody: Set<Point>, w: Int, h: Int): Boolean {
+        var pos = snake.body.last()
+        val dir = snake.headDirection
+
+        while (true) {
+            pos = Point(pos.x + dir.dx, pos.y + dir.dy)
+
+            // If we reach outside the board, not self-blocked
+            if (pos.x !in 0 until w || pos.y !in 0 until h) {
+                return false
+            }
+
+            // If own body is in line of sight, self-blocked
+            if (snakeBody.contains(pos)) {
+                return true
+            }
+        }
     }
 
     /**
