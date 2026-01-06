@@ -58,7 +58,7 @@ fun ArrowsGameView() {
         }
         Spacer(modifier = Modifier.height(16.dp))
         androidx.compose.material3.Button(onClick = {
-            level = engine.generateSolvableLevel(7, 17, 0.90)
+            level = engine.generateSolvableLevel(7, 17, 1.0)
         }) {
             androidx.compose.material3.Text("Regenerate Board")
         }

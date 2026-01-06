@@ -35,52 +35,60 @@ class GameEngine {
      * @param fillDensity Target percentage of grid to fill (0.0 to 1.0)
      */
     fun generateSolvableLevel(width: Int, height: Int, fillDensity: Double = 0.95): GameLevel {
-        val grid = Array(width) { IntArray(height) } // 0 = empty, >0 = snake ID
-        val snakes = mutableListOf<Snake>()
-        var nextId = 1
+        while (true) {
+            val grid = Array(width) { IntArray(height) } // 0 = empty, >0 = snake ID
+            val snakes = mutableListOf<Snake>()
+            var nextId = 1
 
-        // Try to fill the board until we hit density or run out of attempts
-        var failures = 0
-        val maxFailures = 200
-        val targetFilledCells = (width * height * fillDensity).toInt()
-        var filledCells = 0
+            // Try to fill the board until we hit density or run out of attempts
+            var failures = 0
+            val maxFailures = 200 // Increased maxFailures to allow more attempts
+            val targetFilledCells = (width * height * fillDensity).toInt()
+            var filledCells = 0
 
-        while (filledCells < targetFilledCells && failures < maxFailures) {
-            // 1. Pick a random empty start point
-            val startPoint = findRandomEmptyCell(width, height, grid) ?: break
-            // Board is full
+            while (filledCells < targetFilledCells && failures < maxFailures) {
+                // 1. Pick a random empty start point
+                val startPoint = findRandomEmptyCell(width, height, grid) ?: break
+                // Board is full
 
-            // 2. Grow a random snake shape
-            val candidateBody = growRandomSnake(startPoint, width, height, grid)
+                // 2. Grow a random snake shape
+                val candidateBody = growRandomSnake(startPoint, width, height, grid)
 
-            // 3. Determine direction (align with last segment)
-            // If snake is length 1, pick random. Otherwise, flow from 2nd-to-last to last.
-            val head = candidateBody.last()
-            val direction = if (candidateBody.size > 1) {
-                val preHead = candidateBody[candidateBody.size - 2]
-                getDirection(preHead, head)
-            } else {
-                Direction.entries.toTypedArray().random()
-            }
-
-            val candidateSnake = Snake(nextId, candidateBody, direction)
-
-            // 4. Critical: Check if adding this snake creates a Deadlock (Cycle)
-            if (isSafeToAdd(candidateSnake, snakes, grid, width, height)) {
-                // Success: Commit to board
-                snakes.add(candidateSnake)
-                for (p in candidateBody) {
-                    grid[p.x][p.y] = nextId
+                // 3. Determine direction (align with last segment)
+                val head = candidateBody.last()
+                val direction = if (candidateBody.size > 1) {
+                    val preHead = candidateBody[candidateBody.size - 2]
+                    getDirection(preHead, head)
+                } else {
+                    Direction.entries.toTypedArray().random()
                 }
-                filledCells += candidateBody.size
-                nextId++
-                failures = 0
-            } else {
-                failures++
-            }
-        }
 
-        return GameLevel(width, height, snakes)
+                val candidateSnake = Snake(nextId, candidateBody, direction)
+
+                // 4. Critical: Check if adding this snake creates a Deadlock (Cycle)
+                if (isSafeToAdd(candidateSnake, snakes, grid, width, height)) {
+                    // Success: Commit to board
+                    snakes.add(candidateSnake)
+                    for (p in candidateBody) {
+                        grid[p.x][p.y] = nextId
+                    }
+                    filledCells += candidateBody.size
+                    nextId++
+                    failures = 0 // Reset failures on success
+                } else {
+                    failures++
+                }
+            }
+
+            // If we are aiming for a full board but failed, retry the entire generation.
+            if (fillDensity == 1.0 && filledCells < targetFilledCells) {
+                println("Generation failed to fill the board completely, retrying...")
+                continue
+            }
+
+            // If we've reached this point, generation is successful.
+            return GameLevel(width, height, snakes)
+        }
     }
 
     /**
