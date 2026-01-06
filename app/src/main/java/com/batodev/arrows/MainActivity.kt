@@ -46,9 +46,9 @@ fun ArrowsGameView() {
     var level by remember { mutableStateOf(engine.generateSolvableLevel(7, 17, 1.0)) }
 
     // State for zoom and pan
-    var scale by remember { mutableStateOf(1f) }
-    var offsetX by remember { mutableStateOf(0f) }
-    var offsetY by remember { mutableStateOf(0f) }
+    var scale by remember { mutableFloatStateOf(1f) }
+    var offsetX by remember { mutableFloatStateOf(0f) }
+    var offsetY by remember { mutableFloatStateOf(0f) }
 
     // Fixed board size - make it square and larger than typical screen
     val boardSize = 1000.dp
