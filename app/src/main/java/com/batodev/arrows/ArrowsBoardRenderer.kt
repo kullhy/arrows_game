@@ -15,6 +15,8 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
+const val singleBlockTailFactor: Float = 0.2f
+
 object ArrowsBoardRenderer {
     @Composable
     fun Board(
@@ -57,7 +59,7 @@ object ArrowsBoardRenderer {
                 val headY = head.y * cellHeight + cellHeight / 2
                 if (snake.body.size == 1) {
                     // Draw a short tail for 1-block arrows
-                    val tailLength = cellWidth * 0.4f
+                    val tailLength = cellWidth * singleBlockTailFactor
                     val tailX = headX - snake.headDirection.dx * tailLength
                     val tailY = headY - snake.headDirection.dy * tailLength
                     drawLine(
@@ -72,7 +74,7 @@ object ArrowsBoardRenderer {
                     centerX = headX,
                     centerY = headY,
                     direction = snake.headDirection,
-                    size = strokeWidth * 1.5f,
+                    size = strokeWidth,
                     color = Color.Black
                 )
             }
@@ -93,6 +95,10 @@ object ArrowsBoardRenderer {
             Direction.RIGHT -> 0.0
         } * (PI / 180.0)
 
+        // Create equilateral triangle with equal sides
+        // 120 degrees (2.094 radians) between each vertex for equal sides
+        val angleOffset = 2.094 // ~120 degrees in radians
+
         val path = Path().apply {
             // Tip of the arrow
             moveTo(
@@ -101,13 +107,13 @@ object ArrowsBoardRenderer {
             )
             // Back left wing
             lineTo(
-                centerX + (size * cos(angle + 2.5)).toFloat(),
-                centerY + (size * sin(angle + 2.5)).toFloat()
+                centerX + (size * cos(angle + angleOffset)).toFloat(),
+                centerY + (size * sin(angle + angleOffset)).toFloat()
             )
             // Back right wing
             lineTo(
-                centerX + (size * cos(angle - 2.5)).toFloat(),
-                centerY + (size * sin(angle - 2.5)).toFloat()
+                centerX + (size * cos(angle - angleOffset)).toFloat(),
+                centerY + (size * sin(angle - angleOffset)).toFloat()
             )
             close()
         }
