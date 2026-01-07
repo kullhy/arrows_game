@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.batodev.arrows.engine.Direction
-import com.batodev.arrows.engine.GameEngine
+import com.batodev.arrows.engine.GameGenerator
 import com.batodev.arrows.engine.Point
 
 import org.junit.Test
@@ -30,7 +30,7 @@ class PrintGameBoard {
 
     @Test
     fun testPrintGameBoard() {
-        val engine = GameEngine()
+        val engine = GameGenerator()
         val level = engine.generateSolvableLevel(width = 7, height = 10, 10)
 
         println("\n" + "=".repeat(50))

@@ -1,7 +1,7 @@
 package com.batodev.arrows
 
 import com.batodev.arrows.engine.Direction
-import com.batodev.arrows.engine.GameEngine
+import com.batodev.arrows.engine.GameGenerator
 import com.batodev.arrows.engine.Point
 import org.junit.Test
 
@@ -12,7 +12,7 @@ class GameBoardAsciiTest {
 
     @Test
     fun printGameBoardAsAsciiArt() {
-        val engine = GameEngine()
+        val engine = GameGenerator()
         val level = engine.generateSolvableLevel(width = 7, height = 10, maxSnakeLength = 5)
 
         println("\n" + "=".repeat(60))
@@ -85,7 +85,7 @@ class GameBoardAsciiTest {
         println("█".repeat(60))
 
         for (i in 1..3) {
-            val engine = GameEngine()
+            val engine = GameGenerator()
             val level = engine.generateSolvableLevel(width = 7, height = 10, maxSnakeLength = 5)
 
             println("\n" + "─".repeat(60))

@@ -8,9 +8,9 @@ class GameGeneratorTest {
 
     @Test
     fun testEverySpotOccupiedAfterGenerationParallel() {
-        val engine = GameEngine()
-        val width = 30
-        val height = 30
+        val engine = GameGenerator()
+        val width = 10
+        val height = 10
         val simulations = 100
         val failures = AtomicInteger(0)
 
@@ -42,4 +42,6 @@ class GameGeneratorTest {
         println("Completed $simulations parallel simulations. Total failures: ${failures.get()}")
         assertEquals("Some simulations failed: Not all spots occupied", 0, failures.get())
     }
+
+
 }

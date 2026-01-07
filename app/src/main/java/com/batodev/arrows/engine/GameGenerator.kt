@@ -24,7 +24,7 @@ data class GameLevel(
     val snakes: List<Snake>
 )
 
-class GameEngine {
+class GameGenerator {
 
     /**
      * Generates a guaranteed solvable Arrows puzzle.
@@ -41,13 +41,12 @@ class GameEngine {
      * 2. Pick one row or column at random. Pick one reachable field in that row or column at random.
      * 3. Put an arrowhead pointing to the edge. The line of sight must be clear of snakes.
      * 4. Put in a random snake body, but mind that it cannot obstruct it's own heads line of sight.
-     * 5. Repeat until the board is full.
-     *
+     * 5. Repeat point 1 until possible.
+     * 6. Fill in the rest of the board with random snakes.
      * @param width Width of the grid (e.g., 7)
      * @param height Height of the grid (e.g., 10)
      */
     fun generateSolvableLevel(width: Int, height: Int, maxSnakeLength: Int): GameLevel {
-
         val snakes = mutableListOf<Snake>()
         return GameLevel(width, height, snakes)
     }

@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import com.batodev.arrows.engine.GameEngine
+import com.batodev.arrows.engine.GameGenerator
 import com.batodev.arrows.ui.theme.ArrowsTheme
 
 class MainActivity : ComponentActivity() {
@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun ArrowsGameView() {
-    val engine = remember { GameEngine() }
+    val engine = remember { GameGenerator() }
     var level by remember { mutableStateOf(engine.generateSolvableLevel(7, 17, 10)) }
 
     // State for zoom and pan
