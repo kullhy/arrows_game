@@ -31,7 +31,7 @@ class PrintGameBoard {
     @Test
     fun testPrintGameBoard() {
         val engine = GameEngine()
-        val level = engine.generateSolvableLevel(width = 7, height = 10, fillDensity = 0.95)
+        val level = engine.generateSolvableLevel(width = 7, height = 10, 10)
 
         println("\n" + "=".repeat(50))
         println("Generated Arrows Puzzle - ASCII Art")

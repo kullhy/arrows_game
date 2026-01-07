@@ -9,8 +9,8 @@ class GameGeneratorTest {
     @Test
     fun testEverySpotOccupiedAfterGenerationParallel() {
         val engine = GameEngine()
-        val width = 10
-        val height = 10
+        val width = 30
+        val height = 30
         val simulations = 100
         val failures = AtomicInteger(0)
 
@@ -18,7 +18,7 @@ class GameGeneratorTest {
 
         for (sim in 1..simulations) {
             val t = Thread {
-                val level = engine.generateSolvableLevel(width, height, 1.0) // Fill 100%
+                val level = engine.generateSolvableLevel(width, height, 10)
                 var occupiedCount = 0
                 val grid = Array(width) { IntArray(height) { 0 } }
                 for (snake in level.snakes) {

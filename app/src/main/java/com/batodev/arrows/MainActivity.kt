@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ArrowsGameView() {
     val engine = remember { GameEngine() }
-    var level by remember { mutableStateOf(engine.generateSolvableLevel(7, 17, 1.0)) }
+    var level by remember { mutableStateOf(engine.generateSolvableLevel(7, 17, 10)) }
 
     // State for zoom and pan
     var scale by remember { mutableFloatStateOf(1f) }
@@ -86,7 +86,7 @@ fun ArrowsGameView() {
         }
         Spacer(modifier = Modifier.height(16.dp))
         androidx.compose.material3.Button(onClick = {
-            level = engine.generateSolvableLevel(7, 17, 1.0)
+            level = engine.generateSolvableLevel(7, 17, 10)
             // Reset zoom and pan on new level
             scale = 1f
             offsetX = 0f
