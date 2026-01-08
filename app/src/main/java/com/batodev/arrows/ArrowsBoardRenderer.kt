@@ -54,7 +54,7 @@ object ArrowsBoardRenderer {
                         )
                     )
                 }
-                val head = snake.body.last()
+                val head = snake.body.first()
                 val headX = head.x * cellWidth + cellWidth / 2
                 val headY = head.y * cellHeight + cellHeight / 2
                 if (snake.body.size == 1) {

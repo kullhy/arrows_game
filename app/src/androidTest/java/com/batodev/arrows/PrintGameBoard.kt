@@ -63,7 +63,7 @@ class PrintGameBoard {
                     val point = Point(x, y)
 
                     // Check if this is the head (last element in body)
-                    if (snake.body.last() == point) {
+                    if (snake.body.first() == point) {
                         // Print arrow based on direction
                         val arrow = when (snake.headDirection) {
                             Direction.UP -> " ↑ "
@@ -91,7 +91,7 @@ class PrintGameBoard {
         // Print snake details
         println("Snake Details:")
         for (snake in level.snakes) {
-            println("Snake ${snake.id}: Length = ${snake.body.size}, Head at ${snake.body.last()}, Direction = ${snake.headDirection}")
+            println("Snake ${snake.id}: Length = ${snake.body.size}, Head at ${snake.body.first()}, Direction = ${snake.headDirection}")
         }
         println()
     }

@@ -12,7 +12,7 @@ enum class Direction(val dx: Int, val dy: Int) {
 
 data class Snake(
     val id: Int,
-    val body: List<Point>, // Ordered list: Tail -> ... -> Head
+    val body: List<Point>, // Ordered list: Head -> ... -> Tail
     val headDirection: Direction
 )
 
@@ -23,7 +23,8 @@ data class GameLevel(
 )
 
 class GameGenerator {
-    private var ids = 1
+    private val ids = java.util.concurrent.atomic.AtomicInteger(0)
+    private val rnd = java.util.Random()
 
     /**
      * Generates a guaranteed solvable Arrows puzzle.
@@ -35,230 +36,153 @@ class GameGenerator {
      * without hitting a snake.
      * Arrowhead - the head of the snake, pointing to a direction: up, down, left, right.
      *
-     *
-     * 1. Gather all rows and columns that have at least one field free and reachable from the edge.
-     * 2. Pick one row or column at random. Pick one reachable field in that row or column at random.
-     * 3. Put an arrowhead pointing to the edge. The line of sight must be clear of snakes.
-     * 4. Put in a random snake body, but mind that it cannot obstruct it's own heads line of sight.
-     * 5. Repeat point 1 until possible.
-     * 6. Fill in the rest of the board with random snakes.
+     * Algorithm:
+     * 1. Put in a random snake, it can turn it's body.
+     * 2. The snake cannot obstruct it's head, it's head should point to the edge of the board with clear line of sight.
+     * 3. Put in another snakes head next to any segment (head, body) of an existing snake. The head has to have a clear line of sight to the edge.
+     * 4. Generate the snakes body, it can and likely will turn, abiding two rules:
+     *    - every new segment has to be next to an existing snake segment (body or head, it can be self),
+     *    apart from being next to the previous segment of the same snake
+     *    - the snakes arrowhead always has clear line of sight to the boards edge
+     * 5. Repeat until board is full.
      * @param width Width of the grid (e.g., 7)
      * @param height Height of the grid (e.g., 10)
+     * @param maxSnakeLength Maximum length of the snake (e.g., 5)
+     * @return A GameLevel object representing the puzzle
      */
     fun generateSolvableLevel(width: Int, height: Int, maxSnakeLength: Int): GameLevel {
-        val snakes = mutableListOf<Snake>()
-        var freePoints = allFreePoints(width, height)
-        var result = copyAndPickRandomUnobstructed(freePoints, width, height)
-        while (result != null) {
-            val snake = buildSnake(result, freePoints, maxSnakeLength)
-            freePoints = freePoints.minus(snake.body)
-            snakes.add(snake)
-            result = copyAndPickRandomUnobstructed(freePoints, width, height)
+        require(width > 0 && height > 0) { "Board must be non-empty" }
+        require(maxSnakeLength >= 1) { "maxSnakeLength must be at least 1" }
+
+        val snakes = ArrayList<Snake>(width * height)
+
+        val firstSnake = buildFirstSnake(width, height, maxSnakeLength)
+        snakes.add(firstSnake)
+
+        var nextSnake: Snake? = buildNextSnake(width, height, maxSnakeLength, snakes)
+        while (nextSnake != null) {
+            snakes.add(nextSnake)
+            nextSnake = buildNextSnake(width, height, maxSnakeLength, snakes)
         }
+
         return GameLevel(width, height, snakes)
     }
 
-    /**
-     * Builds a snake starting from the given head position and direction.
-     * The snake body can turn and grow in any direction.
-     * Ensures the snake body doesn't obstruct its own line of sight to the edge.
-     *
-     * @param start Pair of (head position, direction pointing to edge)
-     * @param freePoints Set of free points available on the board
-     * @param maxSnakeLength Maximum length of the snake
-     * @return A Snake with body starting from tail to head
-     */
-    fun buildSnake(
-        start: Pair<Point, Direction>,
-        freePoints: Set<Point>,
-        maxSnakeLength: Int
-    ): Snake {
-        val (head, headDirection) = start
-
-        val body = mutableListOf<Point>()
-        val snakePoints = mutableSetOf<Point>()
-        var current = head
-
-        body.add(current)
-        snakePoints.add(current)
-
-        // Start building the snake body from head, growing in available directions
-        val targetLength = kotlin.random.Random.nextInt(2, maxSnakeLength + 1).coerceAtMost(maxSnakeLength)
-
-        // First segment MUST be in the opposite direction from the head
-        if (targetLength > 1) {
-            val oppositeDirection = getOppositeDirection(headDirection)
-            val firstSegment = current + oppositeDirection
-
-            // Verify the first segment is valid
-            if (firstSegment in freePoints &&
-                !wouldObstructLineOfSight(firstSegment, head, headDirection)) {
-                current = firstSegment
-                body.add(current)
-                snakePoints.add(current)
-            } else {
-                // Can't place first segment, return just the head
-                return Snake(ids++, body, headDirection)
-            }
-        }
-
-        // Now continue building with random turns
-        @Suppress("UNUSED_VARIABLE", "UNUSED_PARAMETER")
-        for (_step in 2 until targetLength) {
-            // Find all valid neighbors for the next segment
-            val validNeighbors = mutableListOf<Point>()
-
-            for (direction in Direction.entries) {
-                val next = current + direction
-
-                // Check if next position is valid:
-                // 1. Must be in freePoints
-                // 2. Must not already be part of this snake
-                // 3. Must not obstruct the head's line of sight to the edge
-                if (next in freePoints &&
-                    next !in snakePoints &&
-                    !wouldObstructLineOfSight(next, head, headDirection)) {
-                    validNeighbors.add(next)
-                }
-            }
-
-            // If no valid neighbors, stop growing
-            if (validNeighbors.isEmpty()) {
-                break
-            }
-
-            // Pick a random valid neighbor
-            current = validNeighbors.random()
-            body.add(current)
-            snakePoints.add(current)
-        }
-
-        // Body is built from head to tail, reverse it to get tail -> ... -> head order
-        body.reverse()
-
-        return Snake(ids++, body, headDirection)
-    }
-
-    /**
-     * Checks if placing a body segment at 'bodyPoint' would obstruct the line of sight
-     * from 'head' in 'headDirection' to the edge.
-     * This checks if the bodyPoint is directly in the path from head towards the edge.
-     */
-    private fun wouldObstructLineOfSight(
-        bodyPoint: Point,
-        head: Point,
-        headDirection: Direction
-    ): Boolean {
-        // Check if bodyPoint is in the line of sight from head to edge
-        var current = head + headDirection
-
-        // Walk in the direction the head is pointing
-        // If we encounter the bodyPoint, it would obstruct the line of sight
-        @Suppress("UNUSED_VARIABLE", "UNUSED_PARAMETER")
-        for (_step in 0..100) { // Reasonable max distance
-            if (current == bodyPoint) {
-                return true // This body point would obstruct the line of sight
-            }
-            current += headDirection
-        }
-
-        return false
-    }
-
-    /**
-     * All free points on the board.
-     */
-    private fun allFreePoints(width: Int, height: Int): Set<Point> {
-        val freePoints =  mutableSetOf<Point>()
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                freePoints.add(Point(x, y))
-            }
-        }
-        return freePoints
-    }
-
-    /**
-     * Picks a random point from freePoints that:
-     * 1. Has a clear line of sight to the edge of the board in at least one direction
-     * 2. Has at least one free point in the opposite direction (for snake body)
-     *
-     * @return A pair of (Point, Direction) where Direction points to the edge, or null if no valid point exists
-     */
-    private fun copyAndPickRandomUnobstructed(freePoints: Set<Point>, width: Int, height: Int): Pair<Point, Direction>? {
-        val copy = freePoints.toMutableSet()
-
-        while (copy.isNotEmpty()) {
-            val randomPoint = copy.random()
-
-            // Check all four directions
-            for (direction in Direction.entries) {
-                // Check if this direction has clear line of sight to edge
-                if (hasCleanLineOfSightToEdge(randomPoint, direction, freePoints, width, height)) {
-                    // Check if opposite direction has at least one free point
-                    val oppositeDirection = getOppositeDirection(direction)
-                    if (hasFreePointInDirection(randomPoint, oppositeDirection, freePoints, width, height)) {
-                        return Pair(randomPoint, direction)
-                    }
-                }
-            }
-
-            // This point doesn't meet criteria, remove it and try another
-            copy.remove(randomPoint)
-        }
+    private fun buildNextSnake(width: Int, height: Int, maxSnakeLength: Int, snakes: List<Snake>): Snake? {
+        val possibleHeads = possibleNextHeads(width, height, snakes)
 
         return null
     }
 
-    /**
-     * Checks if there's a clear line of sight from the point to the edge in the given direction.
-     * All points between the starting point and the edge must be in freePoints.
-     */
-    private fun hasCleanLineOfSightToEdge(
-        point: Point,
+    private fun possibleNextHeads(
+        width: Int,
+        height: Int,
+        snakes: List<Snake>
+    ) : Set<Point> {
+        val possibleHeads = mutableSetOf<Point>()
+        snakes.forEach { existingSnake ->
+            existingSnake.body.forEach { existingSnakeSegment ->
+                Direction.entries.forEach { direction ->
+                    val possibleHead = existingSnakeSegment + direction
+                    if (isNotOutOfBounds(possibleHead, width, height) &&
+                        isNotPartOfAnySnake(snakes, possibleHead) &&
+                        hasClearLineOfSightToEdgeOfBoard(possibleHead, direction, snakes, width, height)
+                    ) {
+                        possibleHeads.add(possibleHead)
+                    }
+                 }
+            }
+        }
+        return possibleHeads
+    }
+
+    private fun hasClearLineOfSightToEdgeOfBoard(
+        possibleHead: Point,
         direction: Direction,
-        freePoints: Set<Point>,
+        snakes: List<Snake>,
         width: Int,
         height: Int
-    ): Boolean {
-        var current = point + direction
-
-        while (current.x in 0 until width && current.y in 0 until height) {
-            if (current !in freePoints) {
+    ) : Boolean {
+        var current = possibleHead
+        while (true) {
+            current = current.copy(x = current.x + direction.dx, y = current.y + direction.dy)
+            if (current.x !in 0..<width || current.y !in 0..<height) {
+                break
+            }
+            if (!isNotPartOfAnySnake(snakes, possibleHead)) {
                 return false
             }
-            current += direction
         }
-
         return true
     }
 
-    /**
-     * Checks if there's at least one free point in the given direction from the starting point.
-     */
-    private fun hasFreePointInDirection(
-        point: Point,
-        direction: Direction,
-        freePoints: Set<Point>,
+    private fun isNotPartOfAnySnake(
+        snakes: List<Snake>,
+        possibleHead: Point
+    ): Boolean = !snakes.any { snake -> snake.body.contains(possibleHead) }
+
+    private fun buildFirstSnake(width: Int, height: Int, maxSnakeLength: Int): Snake {
+        val headX = rnd.nextInt(width)
+        val headY = rnd.nextInt(height)
+        val head = Point(headX, headY)
+        val direction = Direction.entries.toTypedArray().random()
+        val forbiddenPoints = forbiddenPoints(head, direction, width, height)
+        val body = buildFirstSnakeRecursive(listOf(head), maxSnakeLength, forbiddenPoints, width, height)
+        return Snake(ids.incrementAndGet(), body, direction)
+    }
+
+    private fun buildFirstSnakeRecursive(
+        body: List<Point>,
+        maxSnakeLength: Int,
+        forbiddenPoints: Set<Point>,
         width: Int,
         height: Int
-    ): Boolean {
-        val next = point + direction
-        return next.x in 0 until width &&
-               next.y in 0 until height &&
-               next in freePoints
+    ) : List<Point> {
+        if (body.size >= maxSnakeLength) {
+            return body
+        }
+        val tail = body.last()
+        val shuffledDirections = directionsShuffled()
+        val possibleNextSegments = mutableSetOf<Point>()
+        shuffledDirections.forEach { direction ->
+            val next = tail + direction
+            // not in line of sight, not in body, in board bounds
+            if (next !in forbiddenPoints && next !in body && isNotOutOfBounds(next, width, height)) {
+                possibleNextSegments.add(next)
+            }
+        }
+        if (possibleNextSegments.isEmpty()) { // no more ways to go
+            return body
+        } else {
+            return possibleNextSegments
+                .map { nextSegment ->
+                    // append after current tail so head stays at index 0
+                    buildFirstSnakeRecursive(body + nextSegment, maxSnakeLength, forbiddenPoints, width, height)
+                }
+                .maxByOrNull { it.size } ?: body
+         }
+     }
+
+    private fun isNotOutOfBounds(point: Point, width: Int, height: Int): Boolean {
+        return point.x in 0..<width && point.y in 0..<height
     }
 
-    /**
-     * Returns the opposite direction.
-     */
-    private fun getOppositeDirection(direction: Direction): Direction {
-        return when (direction) {
-            Direction.UP -> Direction.DOWN
-            Direction.DOWN -> Direction.UP
-            Direction.LEFT -> Direction.RIGHT
-            Direction.RIGHT -> Direction.LEFT
+    private fun directionsShuffled(): Array<Direction> {
+        val shuffledDirections = Direction.entries.toTypedArray()
+        shuffledDirections.shuffle()
+        return shuffledDirections
+    }
+
+    private fun forbiddenPoints(head: Point, direction: Direction, width: Int, height: Int): Set<Point> {
+        val points = mutableSetOf<Point>()
+        var current = head
+        while (true) {
+            current = current.copy(x = current.x + direction.dx, y = current.y + direction.dy)
+            if (current.x !in 0..<width || current.y !in 0..<height) {
+                break
+            }
+            points.add(current)
         }
+        return points
     }
 }
-

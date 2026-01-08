@@ -55,8 +55,8 @@ class GameGeneratorTest {
     @Test
     fun testEveryPuzzleIsSolvable() {
         val engine = GameGenerator()
-        val width = 30
-        val height = 30
+        val width = 70
+        val height = 70
         val simulations = 50
         val failures = AtomicInteger(0)
 
@@ -136,7 +136,7 @@ class GameGeneratorTest {
     ): Int? {
         for (snakeId in remainingSnakes) {
             val snake = snakeMap[snakeId]!!
-            val head = snake.body.last()
+            val head = snake.body.first()
             val direction = snake.headDirection
 
             // Check if the line of sight to the edge is clear
@@ -189,7 +189,7 @@ class GameGeneratorTest {
                 } else {
                     val snake = snakeMap[snakeId]!!
                     val point = Point(x, y)
-                    if (snake.body.last() == point) {
+                    if (snake.body.first() == point) {
                         val arrow = when (snake.headDirection) {
                             Direction.UP -> " ↑ "
                             Direction.DOWN -> " ↓ "

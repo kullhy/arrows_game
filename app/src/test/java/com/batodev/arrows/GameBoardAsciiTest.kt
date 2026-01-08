@@ -13,7 +13,7 @@ class GameBoardAsciiTest {
     @Test
     fun printGameBoardAsAsciiArt() {
         val engine = GameGenerator()
-        val level = engine.generateSolvableLevel(width = 7, height = 10, maxSnakeLength = 5)
+        val level = engine.generateSolvableLevel(width = 5, height = 5, maxSnakeLength = 2)
 
         println("\n" + "=".repeat(60))
         println("Generated Arrows Puzzle - ASCII Art")
@@ -44,8 +44,8 @@ class GameBoardAsciiTest {
                     val snake = snakeMap[snakeId]!!
                     val point = Point(x, y)
 
-                    // Check if this is the head (last element in body)
-                    if (snake.body.last() == point) {
+                    // Head is the first element of body
+                    if (snake.body.first() == point) {
                         // Print arrow based on direction
                         val arrow = when (snake.headDirection) {
                             Direction.UP -> " ↑ "
@@ -73,7 +73,7 @@ class GameBoardAsciiTest {
         // Print snake details
         println("Snake Details:")
         for (snake in level.snakes) {
-            println("Snake ${snake.id}: Length = ${snake.body.size}, Head at ${snake.body.last()}, Direction = ${snake.headDirection}")
+            println("Snake ${snake.id}: Length = ${snake.body.size}, Head at ${snake.body.first()}, Direction = ${snake.headDirection}")
         }
         println()
     }
@@ -111,7 +111,7 @@ class GameBoardAsciiTest {
                         val snake = snakeMap[snakeId]!!
                         val point = Point(x, y)
 
-                        if (snake.body.last() == point) {
+                        if (snake.body.first() == point) {
                             val arrow = when (snake.headDirection) {
                                 Direction.UP -> " ↑ "
                                 Direction.DOWN -> " ↓ "
