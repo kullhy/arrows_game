@@ -23,27 +23,50 @@ data class GameLevel(
 )
 
 interface Criterion {
-    fun isSatisfied(point: Point, snakes: List<Snake>, width: Int, height: Int, forbiddenPoints: Set<Point>): Boolean
+    fun isSatisfied(body: List<Point>,
+                    point: Point,
+                    snakes: List<Snake>,
+                    width: Int,
+                    height: Int,
+                    forbiddenPoints: Set<Point>): Boolean
 }
 
 class NextToExistingSnakeCriterion : Criterion {
+    // 8-connected directions: orthogonal + diagonal
+    private val allDirections = listOf(
+        Pair(-1, -1), Pair(0, -1),
+        Pair(1, -1), Pair(-1, 0),
+        Pair(1, 0), Pair(-1, 1),
+        Pair(0, 1),  Pair(1, 1)
+    )
+
     override fun isSatisfied(
+        body: List<Point>,
         point: Point,
         snakes: List<Snake>,
         width: Int,
         height: Int,
         forbiddenPoints: Set<Point>
     ): Boolean {
-        return snakes.any { snake ->
-            snake.body.any { segment ->
-                Direction.entries.any { dir -> point == segment + dir }
-            }
+        // Check adjacency to existing snakes (8-connected)
+        val adjacentToExistingSnake = snakes.any { snake ->
+            snake.body.any { segment -> isAdjacent(point, segment) }
         }
+        if (adjacentToExistingSnake) return true
+
+        // Check adjacency to current snake's body, excluding the last segment (8-connected)
+        val bodyWithoutLast = if (body.size > 1) body.dropLast(1) else emptyList()
+        return bodyWithoutLast.any { segment -> isAdjacent(point, segment) }
+    }
+
+    private fun isAdjacent(p1: Point, p2: Point): Boolean {
+        return allDirections.any { (dx, dy) -> p1.x + dx == p2.x && p1.y + dy == p2.y }
     }
 }
 
 class AlwaysTrueCriterion : Criterion {
     override fun isSatisfied(
+        body: List<Point>,
         point: Point,
         snakes: List<Snake>,
         width: Int,
@@ -92,14 +115,14 @@ class GameGenerator {
         snakes.add(firstSnake)
 
         var nextSnake: Snake? = buildNextSnake(width, height, maxSnakeLength, snakes)
-        nextSnake?.let {
-            snakes.add(nextSnake)
-        }
-
-//        while (nextSnake != null) {
+//        nextSnake?.let {
 //            snakes.add(nextSnake)
-//            nextSnake = buildNextSnake(width, height, maxSnakeLength, snakes)
 //        }
+
+        while (nextSnake != null) {
+            snakes.add(nextSnake)
+            nextSnake = buildNextSnake(width, height, maxSnakeLength, snakes)
+        }
 
         return GameLevel(width, height, snakes)
     }
@@ -188,7 +211,7 @@ class GameGenerator {
         val direction = Direction.entries.toTypedArray().random()
         val forbiddenPoints = forbiddenPoints(head, direction, width, height)
         val body = buildSnakeRecursive(
-            listOf<Snake>(),
+            listOf(),
             listOf(head),
             maxSnakeLength,
             forbiddenPoints,
@@ -220,7 +243,7 @@ class GameGenerator {
                 next !in body &&
                 isNotOutOfBounds(next, width, height) &&
                 isNotPartOfAnySnake(snakes, next) &&
-                criterion.isSatisfied(next, snakes, width, height, forbiddenPoints)) {
+                criterion.isSatisfied(body, next, snakes, width, height, forbiddenPoints)) {
                 possibleNextSegments.add(next)
             }
         }
