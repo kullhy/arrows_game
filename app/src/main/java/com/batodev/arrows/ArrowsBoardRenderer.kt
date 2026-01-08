@@ -21,6 +21,7 @@ object ArrowsBoardRenderer {
     @Composable
     fun Board(
         level: GameLevel,
+        selectedSnakeId: Int? = null,
         modifier: Modifier = Modifier
     ) {
         Canvas(modifier = modifier) {
@@ -37,6 +38,7 @@ object ArrowsBoardRenderer {
             level.snakes.forEach { snake ->
                 val path = Path()
                 val body = snake.body
+                val snakeColor = if (snake.id == selectedSnakeId) Color.Red else Color.Black
 
                 // Calculate common coordinates for the head
                 val head = body.first()
@@ -87,7 +89,7 @@ object ArrowsBoardRenderer {
 
                     drawPath(
                         path = path,
-                        color = Color.Black,
+                        color = snakeColor,
                         style = Stroke(
                             width = strokeWidth,
                             cap = StrokeCap.Round,
@@ -105,7 +107,7 @@ object ArrowsBoardRenderer {
                     val tailStartY = lineEndY - snake.headDirection.dy * (tailLength + cornerRadius)
 
                     drawLine(
-                        color = Color.Black,
+                        color = snakeColor,
                         start = Offset(tailStartX, tailStartY),
                         end = Offset(lineEndX, lineEndY),
                         strokeWidth = strokeWidth,
@@ -125,7 +127,7 @@ object ArrowsBoardRenderer {
                     centerY = triangleCenterY,
                     direction = snake.headDirection,
                     size = arrowSize,
-                    color = Color.Black
+                    color = snakeColor
                 )
             }
         }

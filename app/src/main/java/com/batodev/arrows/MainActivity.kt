@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Scaffold
@@ -51,6 +52,9 @@ fun ArrowsGameView() {
     var offsetX by remember { mutableFloatStateOf(0f) }
     var offsetY by remember { mutableFloatStateOf(0f) }
 
+    // State for selected snake
+    var selectedSnakeId by remember { mutableStateOf<Int?>(null) }
+
     // Fixed board size - make it square and larger than typical screen
     val boardSize = 1000.dp
 
@@ -75,6 +79,37 @@ fun ArrowsGameView() {
                             offsetY += pan.y
                         }
                     }
+                    .pointerInput(scale, offsetX, offsetY, level) {
+                        detectTapGestures { tapOffset ->
+                            // Use actual element size from PointerInputScope
+                            val boardSizePx = size.width.toFloat()
+
+                            // Transform tap coordinates to content coordinates
+                            // graphicsLayer applies: scale around center, then translate
+                            // Inverse: subtract translation, then unscale around center
+                            val center = boardSizePx / 2
+                            val contentX = (tapOffset.x - offsetX - center) / scale + center
+                            val contentY = (tapOffset.y - offsetY - center) / scale + center
+
+                            // Convert to grid cell coordinates
+                            val cellWidth = boardSizePx / level.width
+                            val cellHeight = boardSizePx / level.height
+                            val cellX = (contentX / cellWidth).toInt()
+                            val cellY = (contentY / cellHeight).toInt()
+
+                            // Check if tapped cell contains a snake head
+                            val tappedSnake = level.snakes.find { snake ->
+                                val head = snake.body.first()
+                                head.x == cellX && head.y == cellY
+                            }
+
+                            selectedSnakeId = if (tappedSnake != null) {
+                                if (selectedSnakeId == tappedSnake.id) null else tappedSnake.id
+                            } else {
+                                null // Deselect when tapping empty space
+                            }
+                        }
+                    }
                     .graphicsLayer(
                         scaleX = scale,
                         scaleY = scale,
@@ -82,7 +117,11 @@ fun ArrowsGameView() {
                         translationY = offsetY
                     )
             ) {
-                ArrowsBoardRenderer.Board(level = level, modifier = Modifier.fillMaxSize())
+                ArrowsBoardRenderer.Board(
+                    level = level,
+                    selectedSnakeId = selectedSnakeId,
+                    modifier = Modifier.fillMaxSize()
+                )
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
@@ -92,6 +131,7 @@ fun ArrowsGameView() {
             scale = 1f
             offsetX = 0f
             offsetY = 0f
+            selectedSnakeId = null
         }) {
             androidx.compose.material3.Text("Regenerate Board")
         }
