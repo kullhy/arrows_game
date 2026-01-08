@@ -28,22 +28,63 @@ object ArrowsBoardRenderer {
             val cellHeight = size.height / level.height
             val strokeWidth = cellWidth * 0.15f
 
+            // Radius for the curved corners
+            val cornerRadius = cellWidth * 0.3f
+
+            // The visual size of the arrow head
+            val arrowSize = strokeWidth
+
             level.snakes.forEach { snake ->
                 val path = Path()
-                val first = snake.body.first()
-                path.moveTo(
-                    first.x * cellWidth + cellWidth / 2,
-                    first.y * cellHeight + cellHeight / 2
-                )
-                for (i in 1 until snake.body.size) {
-                    val p = snake.body[i]
-                    path.lineTo(
-                        p.x * cellWidth + cellWidth / 2,
-                        p.y * cellHeight + cellHeight / 2
+                val body = snake.body
+
+                // Calculate common coordinates for the head
+                val head = body.first()
+                val headCx = head.x * cellWidth + cellWidth / 2
+                val headCy = head.y * cellHeight + cellHeight / 2
+
+                // 1. Determine where the line should end (The Base of the Arrow)
+                // We push the "end" of the line forward by cornerRadius so the curve happens *at* the cell center
+                val lineEndX = headCx + snake.headDirection.dx * cornerRadius
+                val lineEndY = headCy + snake.headDirection.dy * cornerRadius
+
+                if (body.size > 1) {
+                    // Start at the tail
+                    val last = body.last()
+                    path.moveTo(
+                        last.x * cellWidth + cellWidth / 2,
+                        last.y * cellHeight + cellHeight / 2
                     )
-                }
-                // Draw the snake body (for multi-segment only)
-                if (snake.body.size > 1) {
+
+                    // Draw segments up to the block *before* the head
+                    for (i in body.size - 2 downTo 1) {
+                        val prev = body[i + 1]
+                        val current = body[i]
+                        val next = body[i - 1]
+
+                        val currX = current.x * cellWidth + cellWidth / 2
+                        val currY = current.y * cellHeight + cellHeight / 2
+
+                        val entryX = currX + (prev.x - current.x).coerceIn(-1, 1) * cornerRadius
+                        val entryY = currY + (prev.y - current.y).coerceIn(-1, 1) * cornerRadius
+                        val exitX = currX + (next.x - current.x).coerceIn(-1, 1) * cornerRadius
+                        val exitY = currY + (next.y - current.y).coerceIn(-1, 1) * cornerRadius
+
+                        path.lineTo(entryX, entryY)
+                        path.quadraticBezierTo(currX, currY, exitX, exitY)
+                    }
+
+                    // 2. Connect the final segment to the Arrow Base with a curve
+                    val prev = body[1] // The block before head
+                    // Entry point into the head cell (from the previous block)
+                    // We look backwards from head to prev
+                    val headEntryX = headCx + (prev.x - head.x).coerceIn(-1, 1) * cornerRadius
+                    val headEntryY = headCy + (prev.y - head.y).coerceIn(-1, 1) * cornerRadius
+
+                    path.lineTo(headEntryX, headEntryY)
+                    // Curve from entry -> Center -> Arrow Base (lineEndX, lineEndY)
+                    path.quadraticBezierTo(headCx, headCy, lineEndX, lineEndY)
+
                     drawPath(
                         path = path,
                         color = Color.Black,
@@ -54,27 +95,36 @@ object ArrowsBoardRenderer {
                         )
                     )
                 }
-                val head = snake.body.first()
-                val headX = head.x * cellWidth + cellWidth / 2
-                val headY = head.y * cellHeight + cellHeight / 2
-                if (snake.body.size == 1) {
-                    // Draw a short tail for 1-block arrows
+
+                // 3. Handle Single Block Snakes
+                if (body.size == 1) {
                     val tailLength = cellWidth * singleBlockTailFactor
-                    val tailX = headX - snake.headDirection.dx * tailLength
-                    val tailY = headY - snake.headDirection.dy * tailLength
+                    // Tail starts behind the "line end"
+                    // We maintain the shift logic so single blocks look aligned with multi-blocks
+                    val tailStartX = lineEndX - snake.headDirection.dx * (tailLength + cornerRadius)
+                    val tailStartY = lineEndY - snake.headDirection.dy * (tailLength + cornerRadius)
+
                     drawLine(
                         color = Color.Black,
-                        start = Offset(tailX, tailY),
-                        end = Offset(headX, headY),
+                        start = Offset(tailStartX, tailStartY),
+                        end = Offset(lineEndX, lineEndY),
                         strokeWidth = strokeWidth,
                         cap = StrokeCap.Round
                     )
                 }
+
+                // 4. Draw Arrow Head
+                // The triangle's logical center needs to be shifted so its "Base" sits at lineEndX/Y
+                // Base is located at -0.5 * size from Center.
+                // So Center = Base + 0.5 * size
+                val triangleCenterX = lineEndX + snake.headDirection.dx * (arrowSize * 0.5f)
+                val triangleCenterY = lineEndY + snake.headDirection.dy * (arrowSize * 0.5f)
+
                 drawArrowHead(
-                    centerX = headX,
-                    centerY = headY,
+                    centerX = triangleCenterX,
+                    centerY = triangleCenterY,
                     direction = snake.headDirection,
-                    size = strokeWidth,
+                    size = arrowSize,
                     color = Color.Black
                 )
             }
@@ -95,22 +145,17 @@ object ArrowsBoardRenderer {
             Direction.RIGHT -> 0.0
         } * (PI / 180.0)
 
-        // Create equilateral triangle with equal sides
-        // 120 degrees (2.094 radians) between each vertex for equal sides
         val angleOffset = 2.094 // ~120 degrees in radians
 
         val path = Path().apply {
-            // Tip of the arrow
             moveTo(
                 centerX + (size * cos(angle)).toFloat(),
                 centerY + (size * sin(angle)).toFloat()
             )
-            // Back left wing
             lineTo(
                 centerX + (size * cos(angle + angleOffset)).toFloat(),
                 centerY + (size * sin(angle + angleOffset)).toFloat()
             )
-            // Back right wing
             lineTo(
                 centerX + (size * cos(angle - angleOffset)).toFloat(),
                 centerY + (size * sin(angle - angleOffset)).toFloat()
@@ -118,10 +163,8 @@ object ArrowsBoardRenderer {
             close()
         }
 
-        // Draw filled triangle
         drawPath(path, color)
 
-        // Draw rounded stroke over the edges for rounded corners
         drawPath(
             path = path,
             color = color,
