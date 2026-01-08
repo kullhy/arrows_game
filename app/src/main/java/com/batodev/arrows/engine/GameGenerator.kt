@@ -22,6 +22,38 @@ data class GameLevel(
     val snakes: List<Snake>
 )
 
+interface Criterion {
+    fun isSatisfied(point: Point, snakes: List<Snake>, width: Int, height: Int, forbiddenPoints: Set<Point>): Boolean
+}
+
+class NextToExistingSnakeCriterion : Criterion {
+    override fun isSatisfied(
+        point: Point,
+        snakes: List<Snake>,
+        width: Int,
+        height: Int,
+        forbiddenPoints: Set<Point>
+    ): Boolean {
+        return snakes.any { snake ->
+            snake.body.any { segment ->
+                Direction.entries.any { dir -> point == segment + dir }
+            }
+        }
+    }
+}
+
+class AlwaysTrueCriterion : Criterion {
+    override fun isSatisfied(
+        point: Point,
+        snakes: List<Snake>,
+        width: Int,
+        height: Int,
+        forbiddenPoints: Set<Point>
+    ): Boolean {
+        return true
+    }
+}
+
 class GameGenerator {
     private val ids = java.util.concurrent.atomic.AtomicInteger(0)
     private val rnd = java.util.Random()
@@ -44,7 +76,7 @@ class GameGenerator {
      *    - every new segment has to be next to an existing snake segment (body or head, it can be self),
      *    apart from being next to the previous segment of the same snake
      *    - the snakes arrowhead always has clear line of sight to the boards edge
-     * 5. Repeat until board is full.
+     * 5. Repeat 3 until board is full.
      * @param width Width of the grid (e.g., 7)
      * @param height Height of the grid (e.g., 10)
      * @param maxSnakeLength Maximum length of the snake (e.g., 5)
@@ -70,27 +102,41 @@ class GameGenerator {
 
     private fun buildNextSnake(width: Int, height: Int, maxSnakeLength: Int, snakes: List<Snake>): Snake? {
         val possibleHeads = possibleNextHeads(width, height, snakes)
+        if (possibleHeads.isEmpty()) return null
 
-        return null
+        val (head, direction) = possibleHeads.random()
+        val forbiddenPoints = forbiddenPoints(head, direction, width, height)
+
+        val body = buildSnakeRecursive(
+            snakes,
+            listOf(head),
+            maxSnakeLength,
+            forbiddenPoints,
+            width,
+            height,
+            NextToExistingSnakeCriterion()
+        )
+
+        return Snake(ids.incrementAndGet(), body, direction)
     }
 
     private fun possibleNextHeads(
         width: Int,
         height: Int,
         snakes: List<Snake>
-    ) : Set<Point> {
-        val possibleHeads = mutableSetOf<Point>()
+    ) : Set<Pair<Point, Direction>> {
+        val possibleHeads = mutableSetOf<Pair<Point, Direction>>()
         snakes.forEach { existingSnake ->
             existingSnake.body.forEach { existingSnakeSegment ->
                 Direction.entries.forEach { direction ->
                     val possibleHead = existingSnakeSegment + direction
                     if (isNotOutOfBounds(possibleHead, width, height) &&
-                        isNotPartOfAnySnake(snakes, possibleHead) &&
-                        hasClearLineOfSightToEdgeOfBoard(possibleHead, direction, snakes, width, height)
+                        hasClearLineOfSightToEdgeOfBoard(possibleHead, direction, snakes, width, height) &&
+                        isNotPartOfAnySnake(snakes, possibleHead)
                     ) {
-                        possibleHeads.add(possibleHead)
+                        possibleHeads.add(Pair(possibleHead, direction))
                     }
-                 }
+                }
             }
         }
         return possibleHeads
@@ -109,17 +155,24 @@ class GameGenerator {
             if (current.x !in 0..<width || current.y !in 0..<height) {
                 break
             }
-            if (!isNotPartOfAnySnake(snakes, current)) {
+            if (isPartOfAnySnake(snakes, current)) {
                 return false
             }
         }
         return true
     }
 
+    private fun isPartOfAnySnake(
+        snakes: List<Snake>,
+        current: Point
+    ): Boolean {
+        return !isNotPartOfAnySnake(snakes, current)
+    }
+
     private fun isNotPartOfAnySnake(
         snakes: List<Snake>,
-        possibleHead: Point
-    ): Boolean = !snakes.any { snake -> snake.body.contains(possibleHead) }
+        point: Point
+    ): Boolean = !snakes.any { snake -> snake.body.contains(point) }
 
     private fun buildFirstSnake(width: Int, height: Int, maxSnakeLength: Int): Snake {
         val headX = rnd.nextInt(width)
@@ -127,16 +180,25 @@ class GameGenerator {
         val head = Point(headX, headY)
         val direction = Direction.entries.toTypedArray().random()
         val forbiddenPoints = forbiddenPoints(head, direction, width, height)
-        val body = buildFirstSnakeRecursive(listOf(head), maxSnakeLength, forbiddenPoints, width, height)
+        val body = buildSnakeRecursive(
+            listOf<Snake>(),
+            listOf(head),
+            maxSnakeLength,
+            forbiddenPoints,
+            width,
+            height
+        )
         return Snake(ids.incrementAndGet(), body, direction)
     }
 
-    private fun buildFirstSnakeRecursive(
+    private fun buildSnakeRecursive(
+        snakes: List<Snake>,
         body: List<Point>,
         maxSnakeLength: Int,
         forbiddenPoints: Set<Point>,
         width: Int,
-        height: Int
+        height: Int,
+        criterion: Criterion = AlwaysTrueCriterion()
     ) : List<Point> {
         if (body.size >= maxSnakeLength) {
             return body
@@ -147,7 +209,11 @@ class GameGenerator {
         shuffledDirections.forEach { direction ->
             val next = tail + direction
             // not in line of sight, not in body, in board bounds
-            if (next !in forbiddenPoints && next !in body && isNotOutOfBounds(next, width, height)) {
+            if (next !in forbiddenPoints &&
+                next !in body &&
+                isNotOutOfBounds(next, width, height) &&
+                isNotPartOfAnySnake(snakes, next) &&
+                criterion.isSatisfied(next, snakes, width, height, forbiddenPoints)) {
                 possibleNextSegments.add(next)
             }
         }
@@ -157,7 +223,15 @@ class GameGenerator {
             return possibleNextSegments
                 .map { nextSegment ->
                     // append after current tail so head stays at index 0
-                    buildFirstSnakeRecursive(body + nextSegment, maxSnakeLength, forbiddenPoints, width, height)
+                    buildSnakeRecursive(
+                        snakes,
+                        body + nextSegment,
+                        maxSnakeLength,
+                        forbiddenPoints,
+                        width,
+                        height,
+                        criterion
+                    )
                 }
                 .maxByOrNull { it.size } ?: body
          }

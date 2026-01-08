@@ -13,7 +13,7 @@ class GameBoardAsciiTest {
     @Test
     fun printGameBoardAsAsciiArt() {
         val engine = GameGenerator()
-        val level = engine.generateSolvableLevel(width = 5, height = 5, maxSnakeLength = 2)
+        val level = engine.generateSolvableLevel(width = 5, height = 5, maxSnakeLength = 10)
 
         println("\n" + "=".repeat(60))
         println("Generated Arrows Puzzle - ASCII Art")
