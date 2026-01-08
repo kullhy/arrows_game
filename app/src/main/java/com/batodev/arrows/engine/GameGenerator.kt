@@ -109,7 +109,7 @@ class GameGenerator {
             if (current.x !in 0..<width || current.y !in 0..<height) {
                 break
             }
-            if (!isNotPartOfAnySnake(snakes, possibleHead)) {
+            if (!isNotPartOfAnySnake(snakes, current)) {
                 return false
             }
         }
