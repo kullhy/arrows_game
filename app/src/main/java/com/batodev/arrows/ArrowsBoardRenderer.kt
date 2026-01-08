@@ -73,7 +73,7 @@ object ArrowsBoardRenderer {
                         val exitY = currY + (next.y - current.y).coerceIn(-1, 1) * cornerRadius
 
                         path.lineTo(entryX, entryY)
-                        path.quadraticBezierTo(currX, currY, exitX, exitY)
+                        path.quadraticTo(currX, currY, exitX, exitY)
                     }
 
                     // 2. Connect the final segment to the Arrow Base with a curve
@@ -85,7 +85,7 @@ object ArrowsBoardRenderer {
 
                     path.lineTo(headEntryX, headEntryY)
                     // Curve from entry -> Center -> Arrow Base (lineEndX, lineEndY)
-                    path.quadraticBezierTo(headCx, headCy, lineEndX, lineEndY)
+                    path.quadraticTo(headCx, headCy, lineEndX, lineEndY)
 
                     drawPath(
                         path = path,
