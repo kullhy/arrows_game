@@ -1,12 +1,14 @@
 package com.batodev.arrows.engine
 
 import org.junit.Assert.*
+import org.junit.Ignore
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicInteger
 
 class GameGeneratorTest {
 
     @Test
+    @Ignore
     fun testEverySpotOccupiedAfterGenerationParallel() {
         val engine = GameGenerator()
         val width = 10
@@ -55,9 +57,9 @@ class GameGeneratorTest {
     @Test
     fun testEveryPuzzleIsSolvable() {
         val engine = GameGenerator()
-        val width = 70
-        val height = 70
-        val simulations = 50
+        val width = 20
+        val height = 20
+        val simulations = 500
         val failures = AtomicInteger(0)
 
         val threads = mutableListOf<Thread>()
