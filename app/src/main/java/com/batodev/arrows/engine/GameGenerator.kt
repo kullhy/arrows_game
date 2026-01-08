@@ -92,10 +92,14 @@ class GameGenerator {
         snakes.add(firstSnake)
 
         var nextSnake: Snake? = buildNextSnake(width, height, maxSnakeLength, snakes)
-        while (nextSnake != null) {
+        nextSnake?.let {
             snakes.add(nextSnake)
-            nextSnake = buildNextSnake(width, height, maxSnakeLength, snakes)
         }
+
+//        while (nextSnake != null) {
+//            snakes.add(nextSnake)
+//            nextSnake = buildNextSnake(width, height, maxSnakeLength, snakes)
+//        }
 
         return GameLevel(width, height, snakes)
     }
@@ -104,20 +108,23 @@ class GameGenerator {
         val possibleHeads = possibleNextHeads(width, height, snakes)
         if (possibleHeads.isEmpty()) return null
 
-        val (head, direction) = possibleHeads.random()
-        val forbiddenPoints = forbiddenPoints(head, direction, width, height)
+        val longest = possibleHeads
+            .map { (head, direction) ->
+                val forbiddenPoints = forbiddenPoints(head, direction, width, height)
+                val body = buildSnakeRecursive(
+                    snakes,
+                    listOf(head),
+                    maxSnakeLength,
+                    forbiddenPoints,
+                    width,
+                    height,
+                    NextToExistingSnakeCriterion()
+                )
+                Snake(ids.incrementAndGet(), body, direction)
+            }
+            .maxByOrNull { it.body.size }
 
-        val body = buildSnakeRecursive(
-            snakes,
-            listOf(head),
-            maxSnakeLength,
-            forbiddenPoints,
-            width,
-            height,
-            NextToExistingSnakeCriterion()
-        )
-
-        return Snake(ids.incrementAndGet(), body, direction)
+        return longest
     }
 
     private fun possibleNextHeads(
