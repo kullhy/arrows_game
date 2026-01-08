@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger
 class GameGeneratorTest {
 
     @Test
-    @Ignore
+    @Ignore("For now we generate boards which are not filled 100%")
     fun testEverySpotOccupiedAfterGenerationParallel() {
         val engine = GameGenerator()
         val width = 10
