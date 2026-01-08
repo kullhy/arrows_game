@@ -12,6 +12,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -68,6 +69,7 @@ fun ArrowsGameView() {
                 .fillMaxWidth()
                 .aspectRatio(1f) // Keep the viewport square
                 .padding(16.dp)
+                .clipToBounds() // Clip content that extends beyond viewport
         ) {
             Box(
                 modifier = Modifier
