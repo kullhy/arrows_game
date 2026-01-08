@@ -21,8 +21,8 @@ object ArrowsBoardRenderer {
     @Composable
     fun Board(
         level: GameLevel,
-        selectedSnakeId: Int? = null,
-        modifier: Modifier = Modifier
+        modifier: Modifier = Modifier,
+        selectedSnakeId: Int? = null
     ) {
         Canvas(modifier = modifier) {
             val cellWidth = size.width / level.width
