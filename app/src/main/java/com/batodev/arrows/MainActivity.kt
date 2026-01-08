@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ArrowsGameView() {
     val engine = remember { GameGenerator() }
-    val generateLevel = remember(engine) { { engine.generateSolvableLevel(25, 25, 12) } }
+    val generateLevel = remember(engine) { { engine.generateSolvableLevel(15, 15, 12) } }
     var level by remember { mutableStateOf(generateLevel()) }
 
     // State for zoom and pan
