@@ -22,7 +22,7 @@ object ArrowsBoardRenderer {
     fun Board(
         level: GameLevel,
         modifier: Modifier = Modifier,
-        selectedSnakeId: Int? = null
+        flashingSnakeId: Int? = null
     ) {
         Canvas(modifier = modifier) {
             val cellWidth = size.width / level.width
@@ -38,7 +38,7 @@ object ArrowsBoardRenderer {
             level.snakes.forEach { snake ->
                 val path = Path()
                 val body = snake.body
-                val snakeColor = if (snake.id == selectedSnakeId) Color.Red else Color.Black
+                val snakeColor = if (snake.id == flashingSnakeId) Color.Red else Color.Black
 
                 // Calculate common coordinates for the head
                 val head = body.first()

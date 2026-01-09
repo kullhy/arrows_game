@@ -18,7 +18,11 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.batodev.arrows.engine.GameGenerator
+import com.batodev.arrows.engine.Point
+import com.batodev.arrows.engine.Snake
 import com.batodev.arrows.ui.theme.ArrowsTheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,11 +57,31 @@ fun ArrowsGameView() {
     var offsetX by remember { mutableFloatStateOf(0f) }
     var offsetY by remember { mutableFloatStateOf(0f) }
 
-    // State for selected snake
-    var selectedSnakeId by remember { mutableStateOf<Int?>(null) }
+    // State for flashing snake
+    var flashingSnakeId by remember { mutableStateOf<Int?>(null) }
+    val coroutineScope = rememberCoroutineScope()
 
     // Fixed board size - make it square and larger than typical screen
     val boardSize = 1000.dp
+
+    // Helper function to check if line of sight is obstructed
+    fun isLineOfSightObstructed(snake: Snake): Boolean {
+        val head = snake.body.first()
+        val direction = snake.headDirection
+        var current = Point(head.x + direction.dx, head.y + direction.dy)
+
+        while (current.x in 0 until level.width && current.y in 0 until level.height) {
+            // Check if any snake occupies this position
+            val occupied = level.snakes.any { otherSnake ->
+                otherSnake.body.any { segment -> segment == current }
+            }
+            if (occupied) {
+                return true
+            }
+            current = Point(current.x + direction.dx, current.y + direction.dy)
+        }
+        return false
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -105,10 +129,20 @@ fun ArrowsGameView() {
                                 head.x == cellX && head.y == cellY
                             }
 
-                            selectedSnakeId = if (tappedSnake != null) {
-                                if (selectedSnakeId == tappedSnake.id) null else tappedSnake.id
-                            } else {
-                                null // Deselect when tapping empty space
+                            if (tappedSnake != null) {
+                                if (isLineOfSightObstructed(tappedSnake)) {
+                                    // Flash red
+                                    flashingSnakeId = tappedSnake.id
+                                    coroutineScope.launch {
+                                        delay(500) // Flash duration
+                                        flashingSnakeId = null
+                                    }
+                                } else {
+                                    // Remove snake from board
+                                    level = level.copy(
+                                        snakes = level.snakes.filter { it.id != tappedSnake.id }
+                                    )
+                                }
                             }
                         }
                     }
@@ -121,7 +155,7 @@ fun ArrowsGameView() {
             ) {
                 ArrowsBoardRenderer.Board(
                     level = level,
-                    selectedSnakeId = selectedSnakeId,
+                    flashingSnakeId = flashingSnakeId,
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -133,7 +167,7 @@ fun ArrowsGameView() {
             scale = 1f
             offsetX = 0f
             offsetY = 0f
-            selectedSnakeId = null
+            flashingSnakeId = null
         }) {
             androidx.compose.material3.Text("Regenerate Board")
         }
