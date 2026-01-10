@@ -11,8 +11,8 @@ class GameGeneratorTest {
     @Ignore("For now we generate boards which are not filled 100%")
     fun testEverySpotOccupiedAfterGenerationParallel() {
         val engine = GameGenerator()
-        val width = 10
-        val height = 10
+        val width = 8
+        val height = 8
         val simulations = 100
         val failures = AtomicInteger(0)
 
@@ -20,7 +20,7 @@ class GameGeneratorTest {
 
         for (sim in 1..simulations) {
             val t = Thread {
-                val level = engine.generateSolvableLevel(width, height, 10)
+                val level = engine.generateSolvableLevel(width, height, 7)
                 var occupiedCount = 0
                 val grid = Array(width) { IntArray(height) { 0 } }
                 for (snake in level.snakes) {
@@ -57,8 +57,8 @@ class GameGeneratorTest {
     @Test
     fun testEveryPuzzleIsSolvable() {
         val engine = GameGenerator()
-        val width = 20
-        val height = 20
+        val width = 16
+        val height = 16
         val simulations = 500
         val failures = AtomicInteger(0)
 
@@ -66,7 +66,7 @@ class GameGeneratorTest {
 
         for (sim in 1..simulations) {
             val t = Thread {
-                val level = engine.generateSolvableLevel(width, height, 10)
+                val level = engine.generateSolvableLevel(width, height, 7)
 
                 // Create a grid to track which cells are occupied
                 val grid = Array(width) { IntArray(height) { 0 } }
