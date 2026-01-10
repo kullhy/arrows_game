@@ -17,6 +17,8 @@ import kotlin.math.sin
 
 const val singleBlockTailFactor: Float = 0.2f
 
+private const val ARROW_HEAD_SIZE_FACTOR = 0.2f
+
 object ArrowsBoardRenderer {
     @Composable
     fun Board(
@@ -33,7 +35,7 @@ object ArrowsBoardRenderer {
             val cornerRadius = cellWidth * 0.3f
 
             // The visual size of the arrow head
-            val arrowSize = strokeWidth
+            val arrowHeadSize = cellWidth * ARROW_HEAD_SIZE_FACTOR
 
             level.snakes.forEach { snake ->
                 val path = Path()
@@ -119,14 +121,14 @@ object ArrowsBoardRenderer {
                 // The triangle's logical center needs to be shifted so its "Base" sits at lineEndX/Y
                 // Base is located at -0.5 * size from Center.
                 // So Center = Base + 0.5 * size
-                val triangleCenterX = lineEndX + snake.headDirection.dx * (arrowSize * 0.5f)
-                val triangleCenterY = lineEndY + snake.headDirection.dy * (arrowSize * 0.5f)
+                val triangleCenterX = lineEndX + snake.headDirection.dx * (arrowHeadSize * 0.5f)
+                val triangleCenterY = lineEndY + snake.headDirection.dy * (arrowHeadSize * 0.5f)
 
                 drawArrowHead(
                     centerX = triangleCenterX,
                     centerY = triangleCenterY,
                     direction = snake.headDirection,
-                    size = arrowSize,
+                    arrowHeadSize = arrowHeadSize,
                     color = snakeColor
                 )
             }
@@ -137,7 +139,7 @@ object ArrowsBoardRenderer {
         centerX: Float,
         centerY: Float,
         direction: Direction,
-        size: Float,
+        arrowHeadSize: Float,
         color: Color
     ) {
         val angle = when (direction) {
@@ -151,16 +153,16 @@ object ArrowsBoardRenderer {
 
         val path = Path().apply {
             moveTo(
-                centerX + (size * cos(angle)).toFloat(),
-                centerY + (size * sin(angle)).toFloat()
+                centerX + (arrowHeadSize * cos(angle)).toFloat(),
+                centerY + (arrowHeadSize * sin(angle)).toFloat()
             )
             lineTo(
-                centerX + (size * cos(angle + angleOffset)).toFloat(),
-                centerY + (size * sin(angle + angleOffset)).toFloat()
+                centerX + (arrowHeadSize * cos(angle + angleOffset)).toFloat(),
+                centerY + (arrowHeadSize * sin(angle + angleOffset)).toFloat()
             )
             lineTo(
-                centerX + (size * cos(angle - angleOffset)).toFloat(),
-                centerY + (size * sin(angle - angleOffset)).toFloat()
+                centerX + (arrowHeadSize * cos(angle - angleOffset)).toFloat(),
+                centerY + (arrowHeadSize * sin(angle - angleOffset)).toFloat()
             )
             close()
         }
@@ -171,7 +173,7 @@ object ArrowsBoardRenderer {
             path = path,
             color = color,
             style = Stroke(
-                width = size * 0.3f,
+                width = arrowHeadSize * 0.3f,
                 cap = StrokeCap.Round,
                 join = StrokeJoin.Round
             )
