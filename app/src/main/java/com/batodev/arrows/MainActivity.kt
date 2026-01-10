@@ -64,6 +64,7 @@ fun ArrowsGameView() {
         ) {
             Box(
                 modifier = Modifier
+                    .padding(8.dp)
                     .size(boardSize)
                     .pointerInput(Unit) {
                         detectTransformGestures { _, pan, zoom, _ ->
