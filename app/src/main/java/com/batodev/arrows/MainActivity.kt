@@ -86,6 +86,7 @@ fun ArrowsGameView() {
                 ArrowsBoardRenderer.Board(
                     level = engine.level,
                     flashingSnakeId = engine.flashingSnakeId,
+                    removalProgress = engine.removalProgress,
                     modifier = Modifier.fillMaxSize()
                 )
             }

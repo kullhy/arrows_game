@@ -15,6 +15,7 @@ import com.batodev.arrows.engine.GameLevel
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.math.max
 import kotlin.system.measureTimeMillis
 
 const val singleBlockTailFactor: Float = 0.2f
@@ -26,46 +27,54 @@ object ArrowsBoardRenderer {
     fun Board(
         level: GameLevel,
         modifier: Modifier = Modifier,
-        flashingSnakeId: Int? = null
+        flashingSnakeId: Int? = null,
+        removalProgress: Map<Int, Float> = emptyMap()
     ) {
         Canvas(modifier = modifier) {
             val totalDrawTime = measureTimeMillis {
                 val cellWidth = size.width / level.width
                 val cellHeight = size.height / level.height
                 val strokeWidth = cellWidth * 0.15f
-
-                // Radius for the curved corners
                 val cornerRadius = cellWidth * 0.3f
-
-                // The visual size of the arrow head
                 val arrowHeadSize = cellWidth * ARROW_HEAD_SIZE_FACTOR
 
+                val moveDist = max(size.width, size.height) * 1.2f
+
                 level.snakes.forEach { snake ->
+                    val p = (removalProgress[snake.id] ?: 0f).coerceIn(0f, 1f)
+                    val shift = moveDist * p
+                    val alpha = 1f - p
+
                     val snakeDrawTime = measureTimeMillis {
                         val path = Path()
                         val body = snake.body
-                        val snakeColor =
-                            if (snake.id == flashingSnakeId) Color.Red else Color.Black
+                        val baseColor = if (snake.id == flashingSnakeId) Color.Red else Color.Black
+                        val snakeColor = baseColor.copy(alpha = alpha)
 
-                        // Calculate common coordinates for the head
                         val head = body.first()
-                        val headCx = head.x * cellWidth + cellWidth / 2
-                        val headCy = head.y * cellHeight + cellHeight / 2
+                        val headCx0 = head.x * cellWidth + cellWidth / 2
+                        val headCy0 = head.y * cellHeight + cellHeight / 2
 
-                        // 1. Determine where the line should end (The Base of the Arrow)
-                        // We push the "end" of the line forward by cornerRadius so the curve happens *at* the cell center
+                        // Head moves forward during removal
+                        val headCx = headCx0 + snake.headDirection.dx * shift
+                        val headCy = headCy0 + snake.headDirection.dy * shift
+
+                        // Arrow base (also moves with head)
                         val lineEndX = headCx + snake.headDirection.dx * cornerRadius
                         val lineEndY = headCy + snake.headDirection.dy * cornerRadius
 
+                        // Original (non-animated) arrow base. We'll draw the normal curved approach into this,
+                        // then extend with a straight segment to the moved arrow base.
+                        val baseLineEndX0 = headCx0 + snake.headDirection.dx * cornerRadius
+                        val baseLineEndY0 = headCy0 + snake.headDirection.dy * cornerRadius
+
                         if (body.size > 1) {
-                            // Start at the tail
                             val last = body.last()
                             path.moveTo(
                                 last.x * cellWidth + cellWidth / 2,
                                 last.y * cellHeight + cellHeight / 2
                             )
 
-                            // Draw segments up to the block *before* the head
                             for (i in body.size - 2 downTo 1) {
                                 val prev = body[i + 1]
                                 val current = body[i]
@@ -74,31 +83,28 @@ object ArrowsBoardRenderer {
                                 val currX = current.x * cellWidth + cellWidth / 2
                                 val currY = current.y * cellHeight + cellHeight / 2
 
-                                val entryX =
-                                    currX + (prev.x - current.x).coerceIn(-1, 1) * cornerRadius
-                                val entryY =
-                                    currY + (prev.y - current.y).coerceIn(-1, 1) * cornerRadius
-                                val exitX =
-                                    currX + (next.x - current.x).coerceIn(-1, 1) * cornerRadius
-                                val exitY =
-                                    currY + (next.y - current.y).coerceIn(-1, 1) * cornerRadius
+                                val entryX = currX + (prev.x - current.x).coerceIn(-1, 1) * cornerRadius
+                                val entryY = currY + (prev.y - current.y).coerceIn(-1, 1) * cornerRadius
+                                val exitX = currX + (next.x - current.x).coerceIn(-1, 1) * cornerRadius
+                                val exitY = currY + (next.y - current.y).coerceIn(-1, 1) * cornerRadius
 
                                 path.lineTo(entryX, entryY)
                                 path.quadraticTo(currX, currY, exitX, exitY)
                             }
 
-                            // 2. Connect the final segment to the Arrow Base with a curve
-                            val prev = body[1] // The block before head
-                            // Entry point into the head cell (from the previous block)
-                            // We look backwards from head to prev
-                            val headEntryX =
-                                headCx + (prev.x - head.x).coerceIn(-1, 1) * cornerRadius
-                            val headEntryY =
-                                headCy + (prev.y - head.y).coerceIn(-1, 1) * cornerRadius
+                            val prev = body[1]
+                            val headEntryX = headCx0 + (prev.x - head.x).coerceIn(-1, 1) * cornerRadius
+                            val headEntryY = headCy0 + (prev.y - head.y).coerceIn(-1, 1) * cornerRadius
 
                             path.lineTo(headEntryX, headEntryY)
-                            // Curve from entry -> Center -> Arrow Base (lineEndX, lineEndY)
-                            path.quadraticTo(headCx, headCy, lineEndX, lineEndY)
+
+                            // Keep the original curved approach into the head cell/arrow base.
+                            path.quadraticTo(headCx0, headCy0, baseLineEndX0, baseLineEndY0)
+
+                            // Then extend with a straight segment to the moved arrow base (the "link" line).
+                            if (p > 0f) {
+                                path.lineTo(lineEndX, lineEndY)
+                            }
 
                             drawPath(
                                 path = path,
@@ -111,15 +117,10 @@ object ArrowsBoardRenderer {
                             )
                         }
 
-                        // 3. Handle Single Block Snakes
                         if (body.size == 1) {
                             val tailLength = cellWidth * singleBlockTailFactor
-                            // Tail starts behind the "line end"
-                            // We maintain the shift logic so single blocks look aligned with multi-blocks
-                            val tailStartX =
-                                lineEndX - snake.headDirection.dx * (tailLength + cornerRadius)
-                            val tailStartY =
-                                lineEndY - snake.headDirection.dy * (tailLength + cornerRadius)
+                            val tailStartX = lineEndX - snake.headDirection.dx * (tailLength + cornerRadius)
+                            val tailStartY = lineEndY - snake.headDirection.dy * (tailLength + cornerRadius)
 
                             drawLine(
                                 color = snakeColor,
@@ -130,14 +131,8 @@ object ArrowsBoardRenderer {
                             )
                         }
 
-                        // 4. Draw Arrow Head
-                        // The triangle's logical center needs to be shifted so its "Base" sits at lineEndX/Y
-                        // Base is located at -0.5 * size from Center.
-                        // So Center = Base + 0.5 * size
-                        val triangleCenterX =
-                            lineEndX + snake.headDirection.dx * (arrowHeadSize * 0.5f)
-                        val triangleCenterY =
-                            lineEndY + snake.headDirection.dy * (arrowHeadSize * 0.5f)
+                        val triangleCenterX = lineEndX + snake.headDirection.dx * (arrowHeadSize * 0.5f)
+                        val triangleCenterY = lineEndY + snake.headDirection.dy * (arrowHeadSize * 0.5f)
 
                         drawArrowHead(
                             centerX = triangleCenterX,
@@ -147,7 +142,11 @@ object ArrowsBoardRenderer {
                             color = snakeColor
                         )
                     }
-                    Log.d(ArrowsBoardRenderer.javaClass.simpleName, "Snake ${snake.id} draw time: $snakeDrawTime ms")
+
+                    Log.d(
+                        ArrowsBoardRenderer.javaClass.simpleName,
+                        "Snake ${snake.id} draw time: $snakeDrawTime ms"
+                    )
                 }
             }
             Log.d(ArrowsBoardRenderer.javaClass.simpleName, "Total board draw time: $totalDrawTime ms")

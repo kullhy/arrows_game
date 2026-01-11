@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class GameEngine(
@@ -20,6 +21,9 @@ class GameEngine(
     var offsetY by mutableFloatStateOf(0f)
 
     var flashingSnakeId by mutableStateOf<Int?>(null)
+        private set
+
+    var removalProgress by mutableStateOf<Map<Int, Float>>(emptyMap())
         private set
 
     fun onTransform(pan: androidx.compose.ui.geometry.Offset, zoom: Float) {
@@ -58,10 +62,10 @@ class GameEngine(
                     flashingSnakeId = null
                 }
             } else {
-                // Remove snake from board
-                level = level.copy(
-                    snakes = level.snakes.filter { it.id != tappedSnake.id }
-                )
+                // Animate out, then remove
+                if (!removalProgress.containsKey(tappedSnake.id)) {
+                    animateRemoval(tappedSnake.id)
+                }
             }
         }
     }
@@ -72,6 +76,25 @@ class GameEngine(
         offsetX = 0f
         offsetY = 0f
         flashingSnakeId = null
+        removalProgress = emptyMap()
+    }
+
+    private fun animateRemoval(snakeId: Int) {
+        val durationMs = 450L
+        val frameDelayMs = 16L
+        coroutineScope.launch {
+            removalProgress = removalProgress.toMutableMap().apply { put(snakeId, 0f) }
+            var elapsed = 0L
+            while (elapsed < durationMs && isActive) {
+                delay(frameDelayMs)
+                elapsed += frameDelayMs
+                val p = (elapsed.toFloat() / durationMs).coerceIn(0f, 1f)
+                removalProgress = removalProgress.toMutableMap().apply { put(snakeId, p) }
+            }
+            removalProgress = removalProgress.toMutableMap().apply { put(snakeId, 1f) }
+            level = level.copy(snakes = level.snakes.filter { it.id != snakeId })
+            removalProgress = removalProgress.toMutableMap().apply { remove(snakeId) }
+        }
     }
 
     private fun isLineOfSightObstructed(snake: Snake): Boolean {
