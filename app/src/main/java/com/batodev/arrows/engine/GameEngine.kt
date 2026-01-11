@@ -13,7 +13,13 @@ class GameEngine(
     private val coroutineScope: CoroutineScope,
     private val gameGenerator: GameGenerator = GameGenerator()
 ) {
-    var level by mutableStateOf(gameGenerator.generateSolvableLevel(25, 25, 25))
+    var level by mutableStateOf(GameLevel(1, 1, emptyList()))
+        private set
+
+    var isLoading by mutableStateOf(true)
+        private set
+
+    var loadingProgress by mutableFloatStateOf(0f)
         private set
 
     var scale by mutableFloatStateOf(1f)
@@ -26,6 +32,10 @@ class GameEngine(
     var removalProgress by mutableStateOf<Map<Int, Float>>(emptyMap())
         private set
 
+    init {
+        regenerateLevel()
+    }
+
     fun onTransform(pan: androidx.compose.ui.geometry.Offset, zoom: Float) {
         scale = (scale * zoom).coerceIn(0.3f, 5f)
         offsetX += pan.x
@@ -36,6 +46,8 @@ class GameEngine(
         tapOffset: androidx.compose.ui.geometry.Offset,
         boardSizePx: Float
     ) {
+        if (isLoading) return
+
         // Transform tap coordinates to content coordinates
         val center = boardSizePx / 2
         val contentX = (tapOffset.x - offsetX - center) / scale + center
@@ -71,12 +83,22 @@ class GameEngine(
     }
 
     fun regenerateLevel() {
-        level = gameGenerator.generateSolvableLevel(25, 25, 25)
-        scale = 1f
-        offsetX = 0f
-        offsetY = 0f
-        flashingSnakeId = null
-        removalProgress = emptyMap()
+        isLoading = true
+        loadingProgress = 0f
+        coroutineScope.launch(kotlinx.coroutines.Dispatchers.Default) {
+            val newLevel = gameGenerator.generateSolvableLevel(25, 25, 25) { progress ->
+                loadingProgress = progress
+            }
+            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                level = newLevel
+                scale = 1f
+                offsetX = 0f
+                offsetY = 0f
+                flashingSnakeId = null
+                removalProgress = emptyMap()
+                isLoading = false
+            }
+        }
     }
 
     private fun animateRemoval(snakeId: Int) {

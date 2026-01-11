@@ -51,49 +51,68 @@ fun ArrowsGameView() {
 
     val boardSize = 1000.dp
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth()
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.fillMaxSize()
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
-                .padding(16.dp)
-                .clipToBounds()
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth()
         ) {
             Box(
                 modifier = Modifier
-                    .padding(8.dp)
-                    .size(boardSize)
-                    .pointerInput(Unit) {
-                        detectTransformGestures { _, pan, zoom, _ ->
-                            engine.onTransform(pan, zoom)
-                        }
-                    }
-                    .pointerInput(engine.scale, engine.offsetX, engine.offsetY, engine.level) {
-                        detectTapGestures { tapOffset ->
-                            engine.onTap(tapOffset, size.width.toFloat())
-                        }
-                    }
-                    .graphicsLayer(
-                        scaleX = engine.scale,
-                        scaleY = engine.scale,
-                        translationX = engine.offsetX,
-                        translationY = engine.offsetY
-                    )
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
+                    .padding(16.dp)
+                    .clipToBounds()
             ) {
-                ArrowsBoardRenderer.Board(
-                    level = engine.level,
-                    flashingSnakeId = engine.flashingSnakeId,
-                    removalProgress = engine.removalProgress,
-                    modifier = Modifier.fillMaxSize()
-                )
+                Box(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(boardSize)
+                        .pointerInput(Unit) {
+                            detectTransformGestures { _, pan, zoom, _ ->
+                                engine.onTransform(pan, zoom)
+                            }
+                        }
+                        .pointerInput(engine.scale, engine.offsetX, engine.offsetY, engine.level) {
+                            detectTapGestures { tapOffset ->
+                                engine.onTap(tapOffset, size.width.toFloat())
+                            }
+                        }
+                        .graphicsLayer(
+                            scaleX = engine.scale,
+                            scaleY = engine.scale,
+                            translationX = engine.offsetX,
+                            translationY = engine.offsetY
+                        )
+                ) {
+                    ArrowsBoardRenderer.Board(
+                        level = engine.level,
+                        flashingSnakeId = engine.flashingSnakeId,
+                        removalProgress = engine.removalProgress,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = { engine.regenerateLevel() },
+                enabled = !engine.isLoading
+            ) {
+                Text("Regenerate Board")
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { engine.regenerateLevel() }) {
-            Text("Regenerate Board")
+
+        if (engine.isLoading) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Generating... ${(engine.loadingProgress * 100).toInt()}%")
+                Spacer(modifier = Modifier.height(8.dp))
+                androidx.compose.material3.LinearProgressIndicator(
+                    progress = { engine.loadingProgress },
+                    modifier = Modifier.width(200.dp),
+                )
+            }
         }
     }
 }

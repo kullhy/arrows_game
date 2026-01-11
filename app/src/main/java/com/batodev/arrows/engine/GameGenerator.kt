@@ -84,7 +84,7 @@ class GameGenerator {
      * 0.0 = no bias (fully random among valid moves)
      * 1.0 = always choose straight if it is possible
      */
-    var straightPreference: Float = 0.60f
+    var straightPreference: Float = 0.90f
         set(value) {
             require(value in 0f..1f) { "straightPreference must be in [0, 1]" }
             field = value
@@ -117,14 +117,23 @@ class GameGenerator {
      * @param maxSnakeLength Maximum length of the snake (e.g., 5)
      * @return A GameLevel object representing the puzzle
      */
-    fun generateSolvableLevel(width: Int, height: Int, maxSnakeLength: Int): GameLevel {
+    fun generateSolvableLevel(
+        width: Int,
+        height: Int,
+        maxSnakeLength: Int,
+        onProgress: (Float) -> Unit = {}
+    ): GameLevel {
         require(width > 0 && height > 0) { "Board must be non-empty" }
         require(maxSnakeLength >= 1) { "maxSnakeLength must be at least 1" }
 
-        val snakes = ArrayList<Snake>(width * height)
+        val totalCells = width * height
+        val snakes = ArrayList<Snake>(totalCells)
 
         val firstSnake = buildFirstSnake(width, height, maxSnakeLength)
         snakes.add(firstSnake)
+
+        // Report progress
+        onProgress(calculateProgress(snakes, totalCells))
 
         var nextSnake: Snake? = buildNextSnake(width, height, maxSnakeLength, snakes)
 //        nextSnake?.let {
@@ -133,10 +142,16 @@ class GameGenerator {
 
         while (nextSnake != null) {
             snakes.add(nextSnake)
+            onProgress(calculateProgress(snakes, totalCells))
             nextSnake = buildNextSnake(width, height, maxSnakeLength, snakes)
         }
 
         return GameLevel(width, height, snakes)
+    }
+
+    private fun calculateProgress(snakes: List<Snake>, totalCells: Int): Float {
+        val occupied = snakes.sumOf { it.body.size }
+        return (occupied.toFloat() / totalCells).coerceIn(0f, 1f)
     }
 
     private fun buildNextSnake(width: Int, height: Int, maxSnakeLength: Int, snakes: List<Snake>): Snake? {
