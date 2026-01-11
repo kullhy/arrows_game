@@ -143,13 +143,13 @@ object ArrowsBoardRenderer {
                         )
                     }
 
-                    Log.d(
+                    Log.v(
                         ArrowsBoardRenderer.javaClass.simpleName,
                         "Snake ${snake.id} draw time: $snakeDrawTime ms"
                     )
                 }
             }
-            Log.d(ArrowsBoardRenderer.javaClass.simpleName, "Total board draw time: $totalDrawTime ms")
+            Log.v(ArrowsBoardRenderer.javaClass.simpleName, "Total board draw time: $totalDrawTime ms")
         }
     }
 

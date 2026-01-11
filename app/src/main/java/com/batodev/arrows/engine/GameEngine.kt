@@ -80,7 +80,7 @@ class GameEngine(
     }
 
     private fun animateRemoval(snakeId: Int) {
-        val durationMs = 450L
+        val durationMs = 600L
         val frameDelayMs = 16L
         coroutineScope.launch {
             removalProgress = removalProgress.toMutableMap().apply { put(snakeId, 0f) }
