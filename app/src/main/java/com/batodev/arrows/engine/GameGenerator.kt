@@ -1,5 +1,8 @@
 package com.batodev.arrows.engine
 
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.stream.Collectors
+
 // --- Data Models ---
 
 data class Point(val x: Int, val y: Int) {
@@ -90,7 +93,7 @@ class GameGenerator {
             field = value
         }
 
-    private val ids = java.util.concurrent.atomic.AtomicInteger(0)
+    private val ids = AtomicInteger(0)
     private val rnd = java.util.Random()
 
     /**
@@ -158,24 +161,37 @@ class GameGenerator {
         val possibleHeads = possibleNextHeads(width, height, snakes)
         if (possibleHeads.isEmpty()) return null
 
-        val longest = possibleHeads
+        // Parallelize expensive candidate evaluation. We generate deterministic, unique ids using a local counter,
+        // then apply them in a single sequential pass at the end.
+        val idSeed = ids.get()
+        val localId = AtomicInteger(0)
+
+        val candidates = possibleHeads
+            .parallelStream()
             .map { (head, direction) ->
                 val forbiddenPoints = forbiddenPoints(head, direction, width, height)
                 val body = buildSnakeRecursive(
-                    snakes,
-                    listOf(head),
-                    maxSnakeLength,
-                    forbiddenPoints,
-                    width,
-                    height,
-                    NextToExistingSnakeCriterion(),
+                    snakes = snakes,
+                    body = listOf(head),
+                    maxSnakeLength = maxSnakeLength,
+                    forbiddenPoints = forbiddenPoints,
+                    width = width,
+                    height = height,
+                    criterion = NextToExistingSnakeCriterion(),
                     previousMoveDir = null
                 )
-                Snake(ids.incrementAndGet(), body, direction)
+                val id = idSeed + localId.incrementAndGet()
+                Snake(id, body, direction)
             }
-            .maxByOrNull { it.body.size }
+            .collect(Collectors.toList())
 
-        return longest
+        // Ensure global ids move forward by the amount we used.
+        val used = localId.get()
+        if (used > 0) {
+            ids.addAndGet(used)
+        }
+
+        return candidates.maxByOrNull { it.body.size }
     }
 
     private fun possibleNextHeads(

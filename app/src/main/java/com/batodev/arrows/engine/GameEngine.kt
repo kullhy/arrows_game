@@ -86,7 +86,7 @@ class GameEngine(
         isLoading = true
         loadingProgress = 0f
         coroutineScope.launch(kotlinx.coroutines.Dispatchers.Default) {
-            val newLevel = gameGenerator.generateSolvableLevel(25, 25, 25) { progress ->
+            val newLevel = gameGenerator.generateSolvableLevel(50, 50, 25) { progress ->
                 loadingProgress = progress
             }
             kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
