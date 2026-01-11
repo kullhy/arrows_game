@@ -84,7 +84,7 @@ class GameGenerator {
      * 0.0 = no bias (fully random among valid moves)
      * 1.0 = always choose straight if it is possible
      */
-    var straightPreference: Float = 0.40f
+    var straightPreference: Float = 0.60f
         set(value) {
             require(value in 0f..1f) { "straightPreference must be in [0, 1]" }
             field = value
@@ -267,26 +267,35 @@ class GameGenerator {
 
         if (possibleDirections.isEmpty()) { // no more ways to go
             return body
-        } else {
-            val ordered = orderDirectionsWithStraightBias(possibleDirections, previousMoveDir)
+        }
 
-            return ordered
-                .map { direction ->
-                    val nextSegment = tail + direction
-                    buildSnakeRecursive(
-                        snakes = snakes,
-                        body = body + nextSegment,
-                        maxSnakeLength = maxSnakeLength,
-                        forbiddenPoints = forbiddenPoints,
-                        width = width,
-                        height = height,
-                        criterion = criterion,
-                        previousMoveDir = direction
-                    )
-                }
-                .maxByOrNull { it.size } ?: body
-         }
-     }
+        val ordered = orderDirectionsWithStraightBias(possibleDirections, previousMoveDir)
+
+        // Depth-first with short-circuit: if any branch reaches maxSnakeLength, return it immediately.
+        var best: List<Point> = body
+        for (direction in ordered) {
+            val nextSegment = tail + direction
+            val candidate = buildSnakeRecursive(
+                snakes = snakes,
+                body = body + nextSegment,
+                maxSnakeLength = maxSnakeLength,
+                forbiddenPoints = forbiddenPoints,
+                width = width,
+                height = height,
+                criterion = criterion,
+                previousMoveDir = direction
+            )
+
+            if (candidate.size >= maxSnakeLength) {
+                return candidate
+            }
+            if (candidate.size > best.size) {
+                best = candidate
+            }
+        }
+
+        return best
+    }
 
     private fun orderDirectionsWithStraightBias(
         directions: List<Direction>,

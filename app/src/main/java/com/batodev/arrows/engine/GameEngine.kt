@@ -13,7 +13,7 @@ class GameEngine(
     private val coroutineScope: CoroutineScope,
     private val gameGenerator: GameGenerator = GameGenerator()
 ) {
-    var level by mutableStateOf(gameGenerator.generateSolvableLevel(15, 15, 12))
+    var level by mutableStateOf(gameGenerator.generateSolvableLevel(25, 25, 25))
         private set
 
     var scale by mutableFloatStateOf(1f)
@@ -71,7 +71,7 @@ class GameEngine(
     }
 
     fun regenerateLevel() {
-        level = gameGenerator.generateSolvableLevel(15, 15, 12)
+        level = gameGenerator.generateSolvableLevel(25, 25, 25)
         scale = 1f
         offsetX = 0f
         offsetY = 0f

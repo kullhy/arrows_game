@@ -20,7 +20,7 @@ import kotlin.system.measureTimeMillis
 
 const val singleBlockTailFactor: Float = 0.2f
 
-private const val ARROW_HEAD_SIZE_FACTOR = 0.2f
+const val ARROW_HEAD_SIZE_FACTOR = 0.2f
 
 object ArrowsBoardRenderer {
     @Composable
