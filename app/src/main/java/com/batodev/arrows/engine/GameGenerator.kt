@@ -1,7 +1,6 @@
 package com.batodev.arrows.engine
 
 import java.util.concurrent.atomic.AtomicInteger
-import java.util.stream.Collectors
 
 // --- Data Models ---
 
@@ -31,7 +30,8 @@ interface Criterion {
                     snakes: List<Snake>,
                     width: Int,
                     height: Int,
-                    forbiddenPoints: Set<Point>): Boolean
+                    forbiddenPoints: Set<Point>,
+                    occupied: Array<BooleanArray>): Boolean
 }
 
 class NextToExistingSnakeCriterion : Criterion {
@@ -49,13 +49,17 @@ class NextToExistingSnakeCriterion : Criterion {
         snakes: List<Snake>,
         width: Int,
         height: Int,
-        forbiddenPoints: Set<Point>
+        forbiddenPoints: Set<Point>,
+        occupied: Array<BooleanArray>
     ): Boolean {
-        // Check adjacency to existing snakes (8-connected)
-        val adjacentToExistingSnake = snakes.any { snake ->
-            snake.body.any { segment -> isAdjacent(point, segment) }
+        // Check adjacency to existing snakes (8-connected) using occupied grid
+        for ((dx, dy) in allDirections) {
+            val nx = point.x + dx
+            val ny = point.y + dy
+            if (nx in 0 until width && ny in 0 until height) {
+                if (occupied[nx][ny]) return true
+            }
         }
-        if (adjacentToExistingSnake) return true
 
         // Check adjacency to current snake's body, excluding the last segment (8-connected)
         val bodyWithoutLast = if (body.size > 1) body.dropLast(1) else emptyList()
@@ -74,7 +78,8 @@ class AlwaysTrueCriterion : Criterion {
         snakes: List<Snake>,
         width: Int,
         height: Int,
-        forbiddenPoints: Set<Point>
+        forbiddenPoints: Set<Point>,
+        occupied: Array<BooleanArray>
     ): Boolean {
         return true
     }
@@ -98,27 +103,6 @@ class GameGenerator {
 
     /**
      * Generates a guaranteed solvable Arrows puzzle.
-     *
-     * Algorithm, assume 10x10 board:
-     *
-     * Definitions:
-     * Reachable field - a field that can be reached in a straight line from the edge of the board
-     * without hitting a snake.
-     * Arrowhead - the head of the snake, pointing to a direction: up, down, left, right.
-     *
-     * Algorithm:
-     * 1. Put in a random snake, it can turn it's body.
-     * 2. The snake cannot obstruct it's head, it's head should point to the edge of the board with clear line of sight.
-     * 3. Put in another snakes head next to any segment (head, body) of an existing snake. The head has to have a clear line of sight to the edge.
-     * 4. Generate the snakes body, it can and likely will turn, abiding two rules:
-     *    - every new segment has to be next to an existing snake segment (body or head, it can be self),
-     *    apart from being next to the previous segment of the same snake
-     *    - the snakes arrowhead always has clear line of sight to the boards edge
-     * 5. Repeat 3 until board is full.
-     * @param width Width of the grid (e.g., 7)
-     * @param height Height of the grid (e.g., 10)
-     * @param maxSnakeLength Maximum length of the snake (e.g., 5)
-     * @return A GameLevel object representing the puzzle
      */
     fun generateSolvableLevel(
         width: Int,
@@ -131,25 +115,66 @@ class GameGenerator {
 
         val totalCells = width * height
         val snakes = ArrayList<Snake>(totalCells)
+        val occupied = Array(width) { BooleanArray(height) }
+        val frontierCandidates = mutableSetOf<Pair<Point, Direction>>()
 
-        val firstSnake = buildFirstSnake(width, height, maxSnakeLength)
+        val firstSnake = buildFirstSnake(width, height, maxSnakeLength, occupied)
         snakes.add(firstSnake)
+        markOccupied(occupied, firstSnake)
+        updateFrontier(frontierCandidates, occupied, firstSnake, width, height)
 
         // Report progress
         onProgress(calculateProgress(snakes, totalCells))
 
-        var nextSnake: Snake? = buildNextSnake(width, height, maxSnakeLength, snakes)
-//        nextSnake?.let {
-//            snakes.add(nextSnake)
-//        }
+        var nextSnake: Snake? = buildNextSnake(width, height, maxSnakeLength, snakes, occupied, frontierCandidates)
 
         while (nextSnake != null) {
             snakes.add(nextSnake)
+            markOccupied(occupied, nextSnake)
+            updateFrontier(frontierCandidates, occupied, nextSnake, width, height)
+
             onProgress(calculateProgress(snakes, totalCells))
-            nextSnake = buildNextSnake(width, height, maxSnakeLength, snakes)
+
+            nextSnake = buildNextSnake(width, height, maxSnakeLength, snakes, occupied, frontierCandidates)
         }
 
         return GameLevel(width, height, snakes)
+    }
+
+    private fun updateFrontier(
+        frontier: MutableSet<Pair<Point, Direction>>,
+        occupied: Array<BooleanArray>,
+        newSnake: Snake,
+        width: Int,
+        height: Int
+    ) {
+        // Remove candidates that are now occupied
+        newSnake.body.forEach { p ->
+            Direction.entries.forEach { d ->
+                frontier.remove(Pair(p, d))
+            }
+        }
+
+        // Add new valid candidates around the new snake
+        newSnake.body.forEach { segment ->
+            Direction.entries.forEach { dir ->
+                val neighbor = segment + dir
+                if (isNotOutOfBounds(neighbor, width, height) && !occupied[neighbor.x][neighbor.y]) {
+                    // Check all possible head directions for this neighbor
+                    Direction.entries.forEach { headDir ->
+                        if (hasClearLineOfSightToEdgeOfBoard(neighbor, headDir, occupied, width, height)) {
+                            frontier.add(Pair(neighbor, headDir))
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun markOccupied(occupied: Array<BooleanArray>, snake: Snake) {
+        snake.body.forEach { point ->
+            occupied[point.x][point.y] = true
+        }
     }
 
     private fun calculateProgress(snakes: List<Snake>, totalCells: Int): Float {
@@ -157,69 +182,55 @@ class GameGenerator {
         return (occupied.toFloat() / totalCells).coerceIn(0f, 1f)
     }
 
-    private fun buildNextSnake(width: Int, height: Int, maxSnakeLength: Int, snakes: List<Snake>): Snake? {
-        val possibleHeads = possibleNextHeads(width, height, snakes)
-        if (possibleHeads.isEmpty()) return null
-
-        // Parallelize expensive candidate evaluation. We generate deterministic, unique ids using a local counter,
-        // then apply them in a single sequential pass at the end.
-        val idSeed = ids.get()
-        val localId = AtomicInteger(0)
-
-        val candidates = possibleHeads
-            .parallelStream()
-            .map { (head, direction) ->
-                val forbiddenPoints = forbiddenPoints(head, direction, width, height)
-                val body = buildSnakeRecursive(
-                    snakes = snakes,
-                    body = listOf(head),
-                    maxSnakeLength = maxSnakeLength,
-                    forbiddenPoints = forbiddenPoints,
-                    width = width,
-                    height = height,
-                    criterion = NextToExistingSnakeCriterion(),
-                    previousMoveDir = null
-                )
-                val id = idSeed + localId.incrementAndGet()
-                Snake(id, body, direction)
-            }
-            .collect(Collectors.toList())
-
-        // Ensure global ids move forward by the amount we used.
-        val used = localId.get()
-        if (used > 0) {
-            ids.addAndGet(used)
-        }
-
-        return candidates.maxByOrNull { it.body.size }
-    }
-
-    private fun possibleNextHeads(
+    private fun buildNextSnake(
         width: Int,
         height: Int,
-        snakes: List<Snake>
-    ) : Set<Pair<Point, Direction>> {
-        val possibleHeads = mutableSetOf<Pair<Point, Direction>>()
-        snakes.forEach { existingSnake ->
-            existingSnake.body.forEach { existingSnakeSegment ->
-                Direction.entries.forEach { direction ->
-                    val possibleHead = existingSnakeSegment + direction
-                    if (isNotOutOfBounds(possibleHead, width, height) &&
-                        hasClearLineOfSightToEdgeOfBoard(possibleHead, direction, snakes, width, height) &&
-                        isNotPartOfAnySnake(snakes, possibleHead)
-                    ) {
-                        possibleHeads.add(Pair(possibleHead, direction))
-                    }
-                }
+        maxSnakeLength: Int,
+        snakes: List<Snake>,
+        occupied: Array<BooleanArray>,
+        frontier: MutableSet<Pair<Point, Direction>>
+    ): Snake? {
+        if (frontier.isEmpty()) return null
+
+        val candidates = frontier.toList().shuffled(rnd)
+        var bestSnake: Snake? = null
+
+        for ((head, direction) in candidates) {
+            // Lazy check: Is the candidate still valid?
+            if (occupied[head.x][head.y]) continue
+            if (!hasClearLineOfSightToEdgeOfBoard(head, direction, occupied, width, height)) continue
+
+            val forbiddenPoints = forbiddenPoints(head, direction, width, height)
+            val body = buildSnakeRecursive(
+                snakes,
+                listOf(head),
+                maxSnakeLength,
+                forbiddenPoints,
+                width,
+                height,
+                NextToExistingSnakeCriterion(),
+                previousMoveDir = null,
+                occupied = occupied
+            )
+
+            val snake = Snake(ids.incrementAndGet(), body, direction)
+
+            if (snake.body.size >= maxSnakeLength) {
+                return snake // Early exit optimization
+            }
+
+            if (bestSnake == null || snake.body.size > bestSnake.body.size) {
+                bestSnake = snake
             }
         }
-        return possibleHeads
+
+        return bestSnake
     }
 
     private fun hasClearLineOfSightToEdgeOfBoard(
         possibleHead: Point,
         direction: Direction,
-        snakes: List<Snake>,
+        occupied: Array<BooleanArray>,
         width: Int,
         height: Int
     ) : Boolean {
@@ -229,26 +240,19 @@ class GameGenerator {
             if (current.x !in 0..<width || current.y !in 0..<height) {
                 break
             }
-            if (isPartOfAnySnake(snakes, current)) {
+            if (occupied[current.x][current.y]) {
                 return false
             }
         }
         return true
     }
 
-    private fun isPartOfAnySnake(
-        snakes: List<Snake>,
-        current: Point
-    ): Boolean {
-        return !isNotPartOfAnySnake(snakes, current)
-    }
-
-    private fun isNotPartOfAnySnake(
-        snakes: List<Snake>,
-        point: Point
-    ): Boolean = !snakes.any { snake -> snake.body.contains(point) }
-
-    private fun buildFirstSnake(width: Int, height: Int, maxSnakeLength: Int): Snake {
+    private fun buildFirstSnake(
+        width: Int,
+        height: Int,
+        maxSnakeLength: Int,
+        occupied: Array<BooleanArray>
+    ): Snake {
         val headX = rnd.nextInt(width)
         val headY = rnd.nextInt(height)
         val head = Point(headX, headY)
@@ -261,7 +265,8 @@ class GameGenerator {
             forbiddenPoints,
             width,
             height,
-            previousMoveDir = null
+            previousMoveDir = null,
+            occupied = occupied
         )
         return Snake(ids.incrementAndGet(), body, direction)
     }
@@ -274,7 +279,8 @@ class GameGenerator {
         width: Int,
         height: Int,
         criterion: Criterion = AlwaysTrueCriterion(),
-        previousMoveDir: Direction?
+        previousMoveDir: Direction?,
+        occupied: Array<BooleanArray>
     ) : List<Point> {
         if (body.size >= maxSnakeLength) {
             return body
@@ -289,8 +295,8 @@ class GameGenerator {
             if (next !in forbiddenPoints &&
                 next !in body &&
                 isNotOutOfBounds(next, width, height) &&
-                isNotPartOfAnySnake(snakes, next) &&
-                criterion.isSatisfied(body, next, snakes, width, height, forbiddenPoints)
+                !occupied[next.x][next.y] &&
+                criterion.isSatisfied(body, next, snakes, width, height, forbiddenPoints, occupied)
             ) {
                 possibleDirections.add(direction)
             }
@@ -314,7 +320,8 @@ class GameGenerator {
                 width = width,
                 height = height,
                 criterion = criterion,
-                previousMoveDir = direction
+                previousMoveDir = direction,
+                occupied = occupied
             )
 
             if (candidate.size >= maxSnakeLength) {
