@@ -78,6 +78,18 @@ class AlwaysTrueCriterion : Criterion {
 }
 
 class GameGenerator {
+    /**
+     * Bias for continuing in the same direction as the previous segment when growing a snake.
+     *
+     * 0.0 = no bias (fully random among valid moves)
+     * 1.0 = always choose straight if it is possible
+     */
+    var straightPreference: Float = 0.40f
+        set(value) {
+            require(value in 0f..1f) { "straightPreference must be in [0, 1]" }
+            field = value
+        }
+
     private val ids = java.util.concurrent.atomic.AtomicInteger(0)
     private val rnd = java.util.Random()
 
@@ -141,7 +153,8 @@ class GameGenerator {
                     forbiddenPoints,
                     width,
                     height,
-                    NextToExistingSnakeCriterion()
+                    NextToExistingSnakeCriterion(),
+                    previousMoveDir = null
                 )
                 Snake(ids.incrementAndGet(), body, direction)
             }
@@ -216,7 +229,8 @@ class GameGenerator {
             maxSnakeLength,
             forbiddenPoints,
             width,
-            height
+            height,
+            previousMoveDir = null
         )
         return Snake(ids.incrementAndGet(), body, direction)
     }
@@ -228,44 +242,68 @@ class GameGenerator {
         forbiddenPoints: Set<Point>,
         width: Int,
         height: Int,
-        criterion: Criterion = AlwaysTrueCriterion()
+        criterion: Criterion = AlwaysTrueCriterion(),
+        previousMoveDir: Direction?
     ) : List<Point> {
         if (body.size >= maxSnakeLength) {
             return body
         }
         val tail = body.last()
-        val shuffledDirections = directionsShuffled()
-        val possibleNextSegments = mutableSetOf<Point>()
+
+        // Collect possible directions (keeps validity rules unchanged)
+        val shuffledDirections = directionsShuffled().toList()
+        val possibleDirections = ArrayList<Direction>(4)
         shuffledDirections.forEach { direction ->
             val next = tail + direction
-            // not in line of sight, not in body, in board bounds
             if (next !in forbiddenPoints &&
                 next !in body &&
                 isNotOutOfBounds(next, width, height) &&
                 isNotPartOfAnySnake(snakes, next) &&
-                criterion.isSatisfied(body, next, snakes, width, height, forbiddenPoints)) {
-                possibleNextSegments.add(next)
+                criterion.isSatisfied(body, next, snakes, width, height, forbiddenPoints)
+            ) {
+                possibleDirections.add(direction)
             }
         }
-        if (possibleNextSegments.isEmpty()) { // no more ways to go
+
+        if (possibleDirections.isEmpty()) { // no more ways to go
             return body
         } else {
-            return possibleNextSegments
-                .map { nextSegment ->
-                    // append after current tail so head stays at index 0
+            val ordered = orderDirectionsWithStraightBias(possibleDirections, previousMoveDir)
+
+            return ordered
+                .map { direction ->
+                    val nextSegment = tail + direction
                     buildSnakeRecursive(
-                        snakes,
-                        body + nextSegment,
-                        maxSnakeLength,
-                        forbiddenPoints,
-                        width,
-                        height,
-                        criterion
+                        snakes = snakes,
+                        body = body + nextSegment,
+                        maxSnakeLength = maxSnakeLength,
+                        forbiddenPoints = forbiddenPoints,
+                        width = width,
+                        height = height,
+                        criterion = criterion,
+                        previousMoveDir = direction
                     )
                 }
                 .maxByOrNull { it.size } ?: body
          }
      }
+
+    private fun orderDirectionsWithStraightBias(
+        directions: List<Direction>,
+        previousMoveDir: Direction?
+    ): List<Direction> {
+        if (previousMoveDir == null) return directions
+        if (straightPreference <= 0f) return directions
+        if (!directions.contains(previousMoveDir)) return directions
+
+        // With probability straightPreference, try the straight direction first.
+        if (rnd.nextFloat() >= straightPreference) return directions
+
+        val reordered = ArrayList<Direction>(directions.size)
+        reordered.add(previousMoveDir)
+        directions.forEach { d -> if (d != previousMoveDir) reordered.add(d) }
+        return reordered
+    }
 
     private fun isNotOutOfBounds(point: Point, width: Int, height: Int): Boolean {
         return point.x in 0..<width && point.y in 0..<height
