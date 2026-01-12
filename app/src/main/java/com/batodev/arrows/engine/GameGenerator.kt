@@ -138,7 +138,32 @@ class GameGenerator {
             nextSnake = buildNextSnake(width, height, maxSnakeLength, snakes, occupied, frontierCandidates)
         }
 
+        var lastSnake: Snake? = buildLastSnake(width, height, maxSnakeLength, snakes, occupied)
+
+        while (lastSnake != null) {
+            snakes.add(lastSnake)
+            markOccupied(occupied, lastSnake)
+
+            lastSnake = buildLastSnake(width, height, maxSnakeLength, snakes, occupied)
+        }
+
         return GameLevel(width, height, snakes)
+    }
+
+    /**
+     * Pick a random free spot to start with, next to existing snake.
+     * Generate a random snake with only one rule: it cannot obstruct it own line of sight (forbiddenPoints).
+     * Use depth-first with short-circuit: if any branch reaches maxSnakeLength, return it immediately.
+     */
+    private fun buildLastSnake(
+        width: Int,
+        height: Int,
+        maxSnakeLength: Int,
+        snakes: ArrayList<Snake>,
+        occupied: Array<BooleanArray>
+    ): Snake? {
+        // TODO implement
+        return null
     }
 
     private fun updateFrontier(

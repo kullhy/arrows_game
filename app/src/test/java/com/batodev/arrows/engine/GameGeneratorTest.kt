@@ -14,7 +14,7 @@ class GameGeneratorTest {
     val timeout: Timeout = Timeout(30, TimeUnit.SECONDS)
 
     @Test
-    @Ignore("For now we generate boards which are not filled 100%")
+    //@Ignore("For now we generate boards which are not filled 100%")
     fun testEverySpotOccupiedAfterGenerationParallel() {
         val engine = GameGenerator()
         val width = 8
