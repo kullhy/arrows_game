@@ -3,12 +3,18 @@ package com.batodev.arrows
 import com.batodev.arrows.engine.Direction
 import com.batodev.arrows.engine.GameGenerator
 import com.batodev.arrows.engine.Point
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.Timeout
+import java.util.concurrent.TimeUnit
 
 /**
  * Unit test to generate and print game board as ASCII art
  */
 class GameBoardAsciiTest {
+
+    @get:Rule
+    val timeout: Timeout = Timeout(30, TimeUnit.SECONDS)
 
     @Test
     fun printGameBoardAsAsciiArt() {

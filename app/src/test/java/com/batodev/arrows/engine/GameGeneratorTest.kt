@@ -2,10 +2,16 @@ package com.batodev.arrows.engine
 
 import org.junit.Assert.*
 import org.junit.Ignore
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.Timeout
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
 class GameGeneratorTest {
+
+    @get:Rule
+    val timeout: Timeout = Timeout(30, TimeUnit.SECONDS)
 
     @Test
     @Ignore("For now we generate boards which are not filled 100%")
@@ -171,7 +177,7 @@ class GameGeneratorTest {
                 return false
             }
 
-            current = current + direction
+            current += direction
         }
 
         // We've reached the edge without obstruction
