@@ -15,23 +15,25 @@ enum class Direction(val dx: Int, val dy: Int) {
 data class Snake(
     val id: Int,
     val body: List<Point>, // Ordered list: Head -> ... -> Tail
-    val headDirection: Direction
+    val headDirection: Direction,
 )
 
 data class GameLevel(
     val width: Int,
     val height: Int,
-    val snakes: List<Snake>
+    val snakes: List<Snake>,
 )
 
 interface Criterion {
-    fun isSatisfied(body: List<Point>,
-                    point: Point,
-                    snakes: List<Snake>,
-                    width: Int,
-                    height: Int,
-                    forbiddenPoints: Set<Point>,
-                    occupied: Array<BooleanArray>): Boolean
+    fun isSatisfied(
+        body: List<Point>,
+        point: Point,
+        snakes: List<Snake>,
+        width: Int,
+        height: Int,
+        forbiddenPoints: Set<Point>,
+        occupied: Array<BooleanArray>,
+    ): Boolean
 }
 
 class NextToExistingSnakeCriterion : Criterion {
@@ -40,7 +42,7 @@ class NextToExistingSnakeCriterion : Criterion {
         Pair(-1, -1), Pair(0, -1),
         Pair(1, -1), Pair(-1, 0),
         Pair(1, 0), Pair(-1, 1),
-        Pair(0, 1),  Pair(1, 1)
+        Pair(0, 1), Pair(1, 1)
     )
 
     override fun isSatisfied(
@@ -50,7 +52,7 @@ class NextToExistingSnakeCriterion : Criterion {
         width: Int,
         height: Int,
         forbiddenPoints: Set<Point>,
-        occupied: Array<BooleanArray>
+        occupied: Array<BooleanArray>,
     ): Boolean {
         // Check adjacency to existing snakes (8-connected) using occupied grid
         for ((dx, dy) in allDirections) {
@@ -79,7 +81,7 @@ class AlwaysTrueCriterion : Criterion {
         width: Int,
         height: Int,
         forbiddenPoints: Set<Point>,
-        occupied: Array<BooleanArray>
+        occupied: Array<BooleanArray>,
     ): Boolean {
         return true
     }
@@ -108,7 +110,7 @@ class GameGenerator {
         width: Int,
         height: Int,
         maxSnakeLength: Int,
-        onProgress: (Float) -> Unit = {}
+        onProgress: (Float) -> Unit = {},
     ): GameLevel {
         require(width > 0 && height > 0) { "Board must be non-empty" }
         require(maxSnakeLength >= 1) { "maxSnakeLength must be at least 1" }
@@ -126,7 +128,8 @@ class GameGenerator {
         // Report progress
         onProgress(calculateProgress(snakes, totalCells))
 
-        var nextSnake: Snake? = buildNextSnake(width, height, maxSnakeLength, snakes, occupied, frontierCandidates)
+        var nextSnake: Snake? =
+            buildNextSnake(width, height, maxSnakeLength, snakes, occupied, frontierCandidates)
 
         while (nextSnake != null) {
             snakes.add(nextSnake)
@@ -135,7 +138,8 @@ class GameGenerator {
 
             onProgress(calculateProgress(snakes, totalCells))
 
-            nextSnake = buildNextSnake(width, height, maxSnakeLength, snakes, occupied, frontierCandidates)
+            nextSnake =
+                buildNextSnake(width, height, maxSnakeLength, snakes, occupied, frontierCandidates)
         }
 
         var lastSnake: Snake? = buildLastSnake(width, height, maxSnakeLength, snakes, occupied)
@@ -160,10 +164,54 @@ class GameGenerator {
         height: Int,
         maxSnakeLength: Int,
         snakes: ArrayList<Snake>,
-        occupied: Array<BooleanArray>
+        occupied: Array<BooleanArray>,
     ): Snake? {
-        // TODO implement
-        return null
+        val candidates = occupied.flatMapIndexed { x, row ->
+            row.withIndex()
+                .filter { !it.value }
+                .map { Point(x, it.index) }
+        }.filter { point ->
+            NextToExistingSnakeCriterion().isSatisfied(
+                listOf(), point, snakes, width, height, emptySet(), occupied
+            )
+        }.flatMap { point ->
+            Direction.entries.mapNotNull { direction ->
+                Pair(point, direction)
+            }
+        }
+        var bestSnake: Snake? = null
+
+        for ((head, direction) in candidates) {
+            // Lazy check: Is the candidate still valid?
+            if (occupied[head.x][head.y]) continue
+
+            val forbiddenPoints = forbiddenPoints(head, direction, width, height)
+            val body = buildSnakeRecursive(
+                snakes,
+                listOf(head),
+                maxSnakeLength,
+                forbiddenPoints,
+                width,
+                height,
+                NextToExistingSnakeCriterion(),
+                previousMoveDir = null,
+                occupied = occupied
+            )
+
+            val snake = Snake(ids.incrementAndGet(), body, direction)
+
+            if (snake.body.size >= maxSnakeLength && isResolvable(GameLevel(width, height, snakes + snake))) {
+                return snake // Early exit optimization
+            }
+
+            if (bestSnake == null || snake.body.size > bestSnake.body.size) {
+                if (isResolvable(GameLevel(width, height, snakes + snake))) {
+                    bestSnake = snake
+                }
+            }
+        }
+
+        return bestSnake
     }
 
     private fun updateFrontier(
@@ -171,7 +219,7 @@ class GameGenerator {
         occupied: Array<BooleanArray>,
         newSnake: Snake,
         width: Int,
-        height: Int
+        height: Int,
     ) {
         // Remove candidates that are now occupied
         newSnake.body.forEach { p ->
@@ -184,10 +232,22 @@ class GameGenerator {
         newSnake.body.forEach { segment ->
             Direction.entries.forEach { dir ->
                 val neighbor = segment + dir
-                if (isNotOutOfBounds(neighbor, width, height) && !occupied[neighbor.x][neighbor.y]) {
+                if (isNotOutOfBounds(
+                        neighbor,
+                        width,
+                        height
+                    ) && !occupied[neighbor.x][neighbor.y]
+                ) {
                     // Check all possible head directions for this neighbor
                     Direction.entries.forEach { headDir ->
-                        if (hasClearLineOfSightToEdgeOfBoard(neighbor, headDir, occupied, width, height)) {
+                        if (hasClearLineOfSightToEdgeOfBoard(
+                                neighbor,
+                                headDir,
+                                occupied,
+                                width,
+                                height
+                            )
+                        ) {
                             frontier.add(Pair(neighbor, headDir))
                         }
                     }
@@ -213,7 +273,7 @@ class GameGenerator {
         maxSnakeLength: Int,
         snakes: List<Snake>,
         occupied: Array<BooleanArray>,
-        frontier: MutableSet<Pair<Point, Direction>>
+        frontier: MutableSet<Pair<Point, Direction>>,
     ): Snake? {
         if (frontier.isEmpty()) return null
 
@@ -223,7 +283,14 @@ class GameGenerator {
         for ((head, direction) in candidates) {
             // Lazy check: Is the candidate still valid?
             if (occupied[head.x][head.y]) continue
-            if (!hasClearLineOfSightToEdgeOfBoard(head, direction, occupied, width, height)) continue
+            if (!hasClearLineOfSightToEdgeOfBoard(
+                    head,
+                    direction,
+                    occupied,
+                    width,
+                    height
+                )
+            ) continue
 
             val forbiddenPoints = forbiddenPoints(head, direction, width, height)
             val body = buildSnakeRecursive(
@@ -257,8 +324,8 @@ class GameGenerator {
         direction: Direction,
         occupied: Array<BooleanArray>,
         width: Int,
-        height: Int
-    ) : Boolean {
+        height: Int,
+    ): Boolean {
         var current = possibleHead
         while (true) {
             current = current.copy(x = current.x + direction.dx, y = current.y + direction.dy)
@@ -276,7 +343,7 @@ class GameGenerator {
         width: Int,
         height: Int,
         maxSnakeLength: Int,
-        occupied: Array<BooleanArray>
+        occupied: Array<BooleanArray>,
     ): Snake {
         val headX = rnd.nextInt(width)
         val headY = rnd.nextInt(height)
@@ -305,8 +372,8 @@ class GameGenerator {
         height: Int,
         criterion: Criterion = AlwaysTrueCriterion(),
         previousMoveDir: Direction?,
-        occupied: Array<BooleanArray>
-    ) : List<Point> {
+        occupied: Array<BooleanArray>,
+    ): List<Point> {
         if (body.size >= maxSnakeLength) {
             return body
         }
@@ -362,7 +429,7 @@ class GameGenerator {
 
     private fun orderDirectionsWithStraightBias(
         directions: List<Direction>,
-        previousMoveDir: Direction?
+        previousMoveDir: Direction?,
     ): List<Direction> {
         if (previousMoveDir == null) return directions
         if (straightPreference <= 0f) return directions
@@ -387,7 +454,12 @@ class GameGenerator {
         return shuffledDirections
     }
 
-    private fun forbiddenPoints(head: Point, direction: Direction, width: Int, height: Int): Set<Point> {
+    private fun forbiddenPoints(
+        head: Point,
+        direction: Direction,
+        width: Int,
+        height: Int,
+    ): Set<Point> {
         val points = mutableSetOf<Point>()
         var current = head
         while (true) {
@@ -398,5 +470,123 @@ class GameGenerator {
             points.add(current)
         }
         return points
+    }
+
+    /**
+     * Checks if a generated level is resolvable by simulating the puzzle-solving process.
+     * A level is resolvable if all snakes can be removed by repeatedly finding snakes
+     * with clear line of sight to the board edge and removing them.
+     *
+     * @param level The game level to check
+     * @return true if the level can be solved, false otherwise
+     */
+    private fun isResolvable(level: GameLevel): Boolean {
+        val width = level.width
+        val height = level.height
+
+        // Create a grid to track which cells are occupied
+        val grid = Array(width) { IntArray(height) { 0 } }
+        val snakeMap = mutableMapOf<Int, Snake>()
+
+        // Fill the grid with snake IDs
+        for (snake in level.snakes) {
+            snakeMap[snake.id] = snake
+            for (p in snake.body) {
+                grid[p.x][p.y] = snake.id
+            }
+        }
+
+        val remainingSnakes = snakeMap.keys.toMutableSet()
+        val maxIterations = level.snakes.size + 10 // Safety limit
+
+        var iterationCount = 0
+        while (remainingSnakes.isNotEmpty()) {
+            iterationCount++
+
+            if (iterationCount > maxIterations) {
+                // Infinite loop detected
+                return false
+            }
+
+            // Find a snake that can be removed (has clear line of sight to edge)
+            val removableSnake = findRemovableSnakeId(remainingSnakes, snakeMap, grid, width, height)
+
+            if (removableSnake == null) {
+                // No removable snake found, puzzle is unsolvable
+                return false
+            }
+
+            // Remove the snake from the grid
+            val snake = snakeMap[removableSnake]!!
+            for (p in snake.body) {
+                grid[p.x][p.y] = 0
+            }
+            remainingSnakes.remove(removableSnake)
+        }
+
+        // All snakes were successfully removed
+        return true
+    }
+
+    /**
+     * Finds a snake that has an unobstructed line of sight to the edge of the board.
+     *
+     * @return The snake ID or null if no such snake exists
+     */
+    private fun findRemovableSnakeId(
+        remainingSnakes: Set<Int>,
+        snakeMap: Map<Int, Snake>,
+        grid: Array<IntArray>,
+        width: Int,
+        height: Int
+    ): Int? {
+        for (snakeId in remainingSnakes) {
+            val snake = snakeMap[snakeId]!!
+            val head = snake.body.first()
+            val direction = snake.headDirection
+
+            // Check if the line of sight to the edge is clear
+            if (hasCleanLineOfSightToEdge(head, direction, snakeId, grid, width, height)) {
+                return snakeId
+            }
+        }
+        return null
+    }
+
+    /**
+     * Checks if a snake head has a clear line of sight to the edge of the board.
+     * The path must not contain any other snake parts (excluding its own body segments).
+     *
+     * @param head The snake head position
+     * @param direction The direction the snake is facing
+     * @param snakeId The ID of the current snake (to allow its own body in the path)
+     * @param grid The occupancy grid
+     * @param width Board width
+     * @param height Board height
+     * @return true if line of sight is clear, false otherwise
+     */
+    private fun hasCleanLineOfSightToEdge(
+        head: Point,
+        direction: Direction,
+        snakeId: Int,
+        grid: Array<IntArray>,
+        width: Int,
+        height: Int
+    ): Boolean {
+        var current = head + direction
+
+        while (current.x in 0 until width && current.y in 0 until height) {
+            val cellSnakeId = grid[current.x][current.y]
+
+            // If there's another snake (not this one) blocking the path
+            if (cellSnakeId != 0 && cellSnakeId != snakeId) {
+                return false
+            }
+
+            current = current + direction
+        }
+
+        // We've reached the edge without obstruction
+        return true
     }
 }

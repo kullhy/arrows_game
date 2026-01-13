@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger
 class GameGeneratorTest {
 
     @get:Rule
-    val timeout: Timeout = Timeout(30, TimeUnit.SECONDS)
+    val timeout: Timeout = Timeout(90, TimeUnit.SECONDS)
 
     @Test
     //@Ignore("For now we generate boards which are not filled 100%")
@@ -63,8 +63,8 @@ class GameGeneratorTest {
     @Test
     fun testEveryPuzzleIsSolvable() {
         val engine = GameGenerator()
-        val width = 16
-        val height = 16
+        val width = 30
+        val height = 30
         val simulations = 500
         val failures = AtomicInteger(0)
 
