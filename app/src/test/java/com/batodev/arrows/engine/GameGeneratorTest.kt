@@ -1,7 +1,6 @@
 package com.batodev.arrows.engine
 
 import org.junit.Assert.*
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.Timeout
@@ -14,7 +13,6 @@ class GameGeneratorTest {
     val timeout: Timeout = Timeout(90, TimeUnit.SECONDS)
 
     @Test
-    //@Ignore("For now we generate boards which are not filled 100%")
     fun testEverySpotOccupiedAfterGenerationParallel() {
         val engine = GameGenerator()
         val width = 8

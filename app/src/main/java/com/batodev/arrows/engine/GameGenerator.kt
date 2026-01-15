@@ -175,7 +175,7 @@ class GameGenerator {
                 listOf(), point, snakes, width, height, emptySet(), occupied
             )
         }.flatMap { point ->
-            Direction.entries.mapNotNull { direction ->
+            Direction.entries.map { direction ->
                 Pair(point, direction)
             }
         }
@@ -509,12 +509,10 @@ class GameGenerator {
             }
 
             // Find a snake that can be removed (has clear line of sight to edge)
-            val removableSnake = findRemovableSnakeId(remainingSnakes, snakeMap, grid, width, height)
-
-            if (removableSnake == null) {
-                // No removable snake found, puzzle is unsolvable
-                return false
-            }
+            val removableSnake =
+                findRemovableSnakeId(remainingSnakes, snakeMap, grid, width, height)
+                    ?: // No removable snake found, puzzle is unsolvable
+                    return false
 
             // Remove the snake from the grid
             val snake = snakeMap[removableSnake]!!
@@ -583,7 +581,7 @@ class GameGenerator {
                 return false
             }
 
-            current = current + direction
+            current += direction
         }
 
         // We've reached the edge without obstruction
