@@ -110,7 +110,9 @@ class GameEngine(
             while (elapsed < durationMs && isActive) {
                 delay(frameDelayMs)
                 elapsed += frameDelayMs
-                val p = (elapsed.toFloat() / durationMs).coerceIn(0f, 1f)
+                val linearP = (elapsed.toFloat() / durationMs).coerceIn(0f, 1f)
+                // Apply ease-in-cubic for acceleration (more progress per frame as time goes on)
+                val p = linearP * linearP * linearP
                 removalProgress = removalProgress.toMutableMap().apply { put(snakeId, p) }
             }
             removalProgress = removalProgress.toMutableMap().apply { put(snakeId, 1f) }
