@@ -68,13 +68,20 @@ object ArrowsBoardRenderer {
                     val baseLineEndY0 = headCy0 + snake.headDirection.dy * cornerRadius
 
                     if (body.size > 1) {
-                        val last = body.last()
+                        // Calculate how many body segments to draw (shrink tail during removal)
+                        // When p=0: draw all segments (lastSegmentIndex = body.size - 1)
+                        // When p=1: draw minimum segments (lastSegmentIndex = 1)
+                        val segmentsToDraw = ((body.size - 1) * (1f - p)).toInt().coerceAtLeast(0)
+                        val lastSegmentIndex = (1 + segmentsToDraw).coerceAtMost(body.size - 1)
+
+                        // Always start from the actual last segment
+                        val last = body[lastSegmentIndex]
                         path.moveTo(
                             last.x * cellWidth + cellWidth / 2,
                             last.y * cellHeight + cellHeight / 2
                         )
 
-                        for (i in body.size - 2 downTo 1) {
+                        for (i in lastSegmentIndex - 1 downTo 1) {
                             val prev = body[i + 1]
                             val current = body[i]
                             val next = body[i - 1]
