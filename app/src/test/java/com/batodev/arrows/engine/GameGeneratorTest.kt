@@ -1,5 +1,6 @@
 package com.batodev.arrows.engine
 
+import kotlinx.coroutines.*
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
@@ -12,18 +13,19 @@ class GameGeneratorTest {
     @get:Rule
     val timeout: Timeout = Timeout(90, TimeUnit.SECONDS)
 
+    val width = 40
+    val height = 40
+
     @Test
-    fun testEverySpotOccupiedAfterGenerationParallel() {
+    fun testEverySpotOccupiedAfterGenerationParallel() = runBlocking {
         val engine = GameGenerator()
-        val width = 8
-        val height = 8
         val simulations = 100
         val failures = AtomicInteger(0)
 
-        val threads = mutableListOf<Thread>()
+        val dispatcher = Dispatchers.Default.limitedParallelism(Runtime.getRuntime().availableProcessors())
 
-        for (sim in 1..simulations) {
-            val t = Thread {
+        (1..simulations).map { sim ->
+            async(dispatcher) {
                 val level = engine.generateSolvableLevel(width, height, 7)
                 var occupiedCount = 0
                 val grid = Array(width) { IntArray(height) { 0 } }
@@ -39,11 +41,7 @@ class GameGeneratorTest {
                     println("Simulation $sim/$simulations: FAILED - Not all spots occupied. Occupied: $occupiedCount, Total: ${width * height}")
                 }
             }
-            threads.add(t)
-        }
-
-        threads.forEach { it.start() }
-        threads.forEach { it.join() }
+        }.awaitAll()
 
         println("Completed $simulations parallel simulations. Total failures: ${failures.get()}")
         assertEquals("Some simulations failed: Not all spots occupied", 0, failures.get())
@@ -59,17 +57,15 @@ class GameGeneratorTest {
      * 4. Repeat point 1 until no snakes are on the board.
      */
     @Test
-    fun testEveryPuzzleIsSolvable() {
+    fun testEveryPuzzleIsSolvable() = runBlocking {
         val engine = GameGenerator()
-        val width = 30
-        val height = 30
         val simulations = 500
         val failures = AtomicInteger(0)
 
-        val threads = mutableListOf<Thread>()
+        val dispatcher = Dispatchers.Default.limitedParallelism(Runtime.getRuntime().availableProcessors())
 
-        for (sim in 1..simulations) {
-            val t = Thread {
+        (1..simulations).map { sim ->
+            async(dispatcher) {
                 val level = engine.generateSolvableLevel(width, height, 7)
 
                 // Create a grid to track which cells are occupied
@@ -98,12 +94,12 @@ class GameGeneratorTest {
                     }
 
                     // Find a snake that can be removed (has clear line of sight to edge)
-                    val removableSnake = findRemovableSnake(remainingSnakes, snakeMap, grid, width, height)
+                    val removableSnake = findRemovableSnake(remainingSnakes, snakeMap, grid)
 
                     if (removableSnake == null) {
                         failures.incrementAndGet()
                         println("Simulation $sim/$simulations: FAILED - No removable snake found. Remaining snakes: ${remainingSnakes.size}")
-                        printBoard(grid, width, height, snakeMap)
+                        printBoard(grid, snakeMap)
                         break
                     }
 
@@ -119,11 +115,7 @@ class GameGeneratorTest {
                     println("Simulation $sim/$simulations: SUCCESS - All snakes removed in $iterationCount steps")
                 }
             }
-            threads.add(t)
-        }
-
-        threads.forEach { it.start() }
-        threads.forEach { it.join() }
+        }.awaitAll()
 
         println("Completed $simulations parallel simulations. Total failures: ${failures.get()}")
         assertEquals("Some puzzles were not solvable", 0, failures.get())
@@ -136,9 +128,7 @@ class GameGeneratorTest {
     private fun findRemovableSnake(
         remainingSnakes: Set<Int>,
         snakeMap: Map<Int, Snake>,
-        grid: Array<IntArray>,
-        width: Int,
-        height: Int
+        grid: Array<IntArray>
     ): Int? {
         for (snakeId in remainingSnakes) {
             val snake = snakeMap[snakeId]!!
@@ -146,7 +136,7 @@ class GameGeneratorTest {
             val direction = snake.headDirection
 
             // Check if the line of sight to the edge is clear
-            if (hasCleanLineOfSight(head, direction, snake.id, grid, width, height)) {
+            if (hasCleanLineOfSight(head, direction, snake.id, grid)) {
                 return snakeId
             }
         }
@@ -161,9 +151,7 @@ class GameGeneratorTest {
         head: Point,
         direction: Direction,
         snakeId: Int,
-        grid: Array<IntArray>,
-        width: Int,
-        height: Int
+        grid: Array<IntArray>
     ): Boolean {
         var current = head + direction
 
@@ -185,7 +173,7 @@ class GameGeneratorTest {
     /**
      * Helper function to print the board state for debugging.
      */
-    private fun printBoard(grid: Array<IntArray>, width: Int, height: Int, snakeMap: Map<Int, Snake>) {
+    private fun printBoard(grid: Array<IntArray>, snakeMap: Map<Int, Snake>) {
         println("Current board state:")
         for (y in 0 until height) {
             for (x in 0 until width) {
