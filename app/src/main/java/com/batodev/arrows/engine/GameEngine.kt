@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.batodev.arrows.TAP_AREA_OFFSET_FACTOR
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -56,13 +57,18 @@ class GameEngine(
         // Convert to grid cell coordinates
         val cellWidth = boardSizePx / level.width
         val cellHeight = boardSizePx / level.height
-        val cellX = (contentX / cellWidth).toInt()
-        val cellY = (contentY / cellHeight).toInt()
+        val cellX = contentX / cellWidth
+        val cellY = contentY / cellHeight
 
-        // Check if tapped cell contains a snake head
+        // Check if tapped cell contains a snake head (with tolerance for easier tapping)
+        val tolerance = 0.6f // Allow tapping within 0.6 cells of the tap area center
         val tappedSnake = level.snakes.find { snake ->
             val head = snake.body.first()
-            head.x == cellX && head.y == cellY
+            // Account for the offset of tap area in arrow direction
+            val tapAreaCenterX = head.x + 0.5f + snake.headDirection.dx * TAP_AREA_OFFSET_FACTOR
+            val tapAreaCenterY = head.y + 0.5f + snake.headDirection.dy * TAP_AREA_OFFSET_FACTOR
+            kotlin.math.abs(tapAreaCenterX - cellX) <= tolerance &&
+            kotlin.math.abs(tapAreaCenterY - cellY) <= tolerance
         }
 
         if (tappedSnake != null) {
