@@ -489,7 +489,7 @@ class GameGenerator {
         val height = level.height
 
         // Create a grid to track which cells are occupied
-        val grid = Array(width) { IntArray(height) { 0 } }
+        val grid = Array(width) { IntArray(height) }
         val snakeMap = mutableMapOf<Int, Snake>()
 
         // Fill the grid with snake IDs

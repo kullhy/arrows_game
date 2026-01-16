@@ -63,7 +63,7 @@ fun ArrowsGameView() {
                 maxSpeed = 30f,
                 damping = 0.9f,
                 spread = 360,
-                colors = listOf(0xfce18a.toInt(), 0xff726d.toInt(), 0xf4306d.toInt(), 0xb48def.toInt()),
+                colors = listOf(0xfce18a, 0xff726d, 0xf4306d, 0xb48def),
                 position = Position.Relative(0.5, 0.3),
                 emitter = Emitter(duration = 100, TimeUnit.MILLISECONDS).max(100)
             )
