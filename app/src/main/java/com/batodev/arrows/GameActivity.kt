@@ -5,6 +5,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -190,12 +192,18 @@ fun ArrowsGameView() {
         }
 
         // Progress Bar
-        val progressValue = if (engine.totalSnakesInLevel > 0) {
+        val targetProgress = if (engine.totalSnakesInLevel > 0) {
             (engine.totalSnakesInLevel - engine.level.snakes.size).toFloat() / engine.totalSnakesInLevel
         } else 0f
 
+        val animatedProgress by animateFloatAsState(
+            targetValue = targetProgress,
+            animationSpec = tween(durationMillis = 500),
+            label = "ProgressBarAnimation"
+        )
+
         LinearProgressIndicator(
-            progress = { progressValue },
+            progress = { animatedProgress },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(6.dp),
