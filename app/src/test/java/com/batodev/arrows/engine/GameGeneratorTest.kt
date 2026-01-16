@@ -26,7 +26,7 @@ class GameGeneratorTest {
 
         (1..simulations).map { sim ->
             async(dispatcher) {
-                val level = engine.generateSolvableLevel(width, height, 7)
+                val level = engine.generateSolvableLevel(width, height, 7, true)
                 var occupiedCount = 0
                 val grid = Array(width) { IntArray(height) { 0 } }
                 for (snake in level.snakes) {

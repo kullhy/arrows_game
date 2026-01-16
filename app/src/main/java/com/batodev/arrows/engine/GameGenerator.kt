@@ -110,8 +110,8 @@ class GameGenerator {
         width: Int,
         height: Int,
         maxSnakeLength: Int,
-        onProgress: (Float) -> Unit = {},
-        fillTheBoard: Boolean = false
+        fillTheBoard: Boolean = false,
+        onProgress: (Float) -> Unit = {}
     ): GameLevel {
         require(width > 0 && height > 0) { "Board must be non-empty" }
         require(maxSnakeLength >= 1) { "maxSnakeLength must be at least 1" }
