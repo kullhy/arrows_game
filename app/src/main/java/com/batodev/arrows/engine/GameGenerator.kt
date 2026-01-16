@@ -111,6 +111,7 @@ class GameGenerator {
         height: Int,
         maxSnakeLength: Int,
         onProgress: (Float) -> Unit = {},
+        fillTheBoard: Boolean = false
     ): GameLevel {
         require(width > 0 && height > 0) { "Board must be non-empty" }
         require(maxSnakeLength >= 1) { "maxSnakeLength must be at least 1" }
@@ -142,13 +143,16 @@ class GameGenerator {
                 buildNextSnake(width, height, maxSnakeLength, snakes, occupied, frontierCandidates)
         }
 
-        var lastSnake: Snake? = buildLastSnake(width, height, maxSnakeLength, snakes, occupied)
 
-        while (lastSnake != null) {
-            snakes.add(lastSnake)
-            markOccupied(occupied, lastSnake)
+        if (fillTheBoard) {
+            var lastSnake: Snake? = buildLastSnake(width, height, maxSnakeLength, snakes, occupied)
 
-            lastSnake = buildLastSnake(width, height, maxSnakeLength, snakes, occupied)
+            while (lastSnake != null) {
+                snakes.add(lastSnake)
+                markOccupied(occupied, lastSnake)
+
+                lastSnake = buildLastSnake(width, height, maxSnakeLength, snakes, occupied)
+            }
         }
 
         return GameLevel(width, height, snakes)

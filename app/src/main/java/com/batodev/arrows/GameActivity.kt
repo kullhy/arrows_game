@@ -22,6 +22,11 @@ import androidx.compose.ui.unit.dp
 import com.batodev.arrows.engine.GameEngine
 import com.batodev.arrows.ui.theme.ArrowsTheme
 import androidx.compose.material3.LinearProgressIndicator
+import nl.dionsegijn.konfetti.compose.KonfettiView
+import nl.dionsegijn.konfetti.core.Party
+import nl.dionsegijn.konfetti.core.Position
+import nl.dionsegijn.konfetti.core.emitter.Emitter
+import java.util.concurrent.TimeUnit
 
 class GameActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +54,23 @@ class GameActivity : ComponentActivity() {
 fun ArrowsGameView() {
     val coroutineScope = rememberCoroutineScope()
     val engine = remember { GameEngine(coroutineScope) }
+    var state by remember { mutableStateOf<List<Party>>(emptyList()) }
+
+    if (engine.isGameWon && state.isEmpty()) {
+        state = listOf(
+            Party(
+                speed = 0f,
+                maxSpeed = 30f,
+                damping = 0.9f,
+                spread = 360,
+                colors = listOf(0xfce18a.toInt(), 0xff726d.toInt(), 0xf4306d.toInt(), 0xb48def.toInt()),
+                position = Position.Relative(0.5, 0.3),
+                emitter = Emitter(duration = 100, TimeUnit.MILLISECONDS).max(100)
+            )
+        )
+    } else if (!engine.isGameWon && state.isNotEmpty()) {
+        state = emptyList()
+    }
 
     val boardSize = 1000.dp
 
@@ -114,6 +136,13 @@ fun ArrowsGameView() {
                     modifier = Modifier.width(200.dp),
                 )
             }
+        }
+
+        if (state.isNotEmpty()) {
+            KonfettiView(
+                modifier = Modifier.fillMaxSize(),
+                parties = state,
+            )
         }
     }
 }

@@ -20,6 +20,9 @@ class GameEngine(
     var isLoading by mutableStateOf(true)
         private set
 
+    var isGameWon by mutableStateOf(false)
+        private set
+
     var loadingProgress by mutableFloatStateOf(0f)
         private set
 
@@ -97,6 +100,7 @@ class GameEngine(
             })
             kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
                 level = newLevel
+                isGameWon = false
                 scale = 1f
                 offsetX = 0f
                 offsetY = 0f
@@ -124,6 +128,9 @@ class GameEngine(
             removalProgress = removalProgress.toMutableMap().apply { put(snakeId, 1f) }
             level = level.copy(snakes = level.snakes.filter { it.id != snakeId })
             removalProgress = removalProgress.toMutableMap().apply { remove(snakeId) }
+            if (level.snakes.isEmpty()) {
+                isGameWon = true
+            }
         }
     }
 
