@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -21,7 +20,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -192,8 +190,12 @@ fun ArrowsGameView() {
         }
 
         // Progress Bar
+        val progressValue = if (engine.totalSnakesInLevel > 0) {
+            (engine.totalSnakesInLevel - engine.level.snakes.size).toFloat() / engine.totalSnakesInLevel
+        } else 0f
+
         LinearProgressIndicator(
-            progress = { 0.3f }, // Fixed progress for visual matching
+            progress = { progressValue },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(6.dp),

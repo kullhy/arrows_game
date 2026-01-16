@@ -20,6 +20,9 @@ class GameEngine(
     var isLoading by mutableStateOf(true)
         private set
 
+    var totalSnakesInLevel by mutableStateOf(0)
+        private set
+
     var isGameWon by mutableStateOf(false)
         private set
 
@@ -100,6 +103,7 @@ class GameEngine(
             })
             kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
                 level = newLevel
+                totalSnakesInLevel = newLevel.snakes.size
                 isGameWon = false
                 scale = 1f
                 offsetX = 0f
