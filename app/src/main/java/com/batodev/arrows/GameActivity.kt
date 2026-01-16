@@ -1,5 +1,6 @@
 package com.batodev.arrows
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -7,21 +8,55 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.VideoLabel
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.batodev.arrows.engine.GameEngine
 import com.batodev.arrows.ui.theme.ArrowsTheme
-import androidx.compose.material3.LinearProgressIndicator
+import com.batodev.arrows.ui.theme.DarkBackground
+import com.batodev.arrows.ui.theme.HeartRed
+import com.batodev.arrows.ui.theme.ProgressBarGreen
+import com.batodev.arrows.ui.theme.TopBarButtonBackground
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.core.Party
 import nl.dionsegijn.konfetti.core.Position
@@ -34,13 +69,11 @@ class GameActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ArrowsTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(modifier = Modifier.fillMaxSize(), containerColor = DarkBackground) { innerPadding ->
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding)
-                            .background(Color.White),
-                        contentAlignment = Alignment.Center
                     ) {
                         ArrowsGameView()
                     }
@@ -55,6 +88,7 @@ fun ArrowsGameView() {
     val coroutineScope = rememberCoroutineScope()
     val engine = remember { GameEngine(coroutineScope) }
     var state by remember { mutableStateOf<List<Party>>(emptyList()) }
+    val context = LocalContext.current
 
     if (engine.isGameWon && state.isEmpty()) {
         state = listOf(
@@ -74,75 +108,168 @@ fun ArrowsGameView() {
 
     val boardSize = 1000.dp
 
-    Box(
-        contentAlignment = Alignment.Center,
+    Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
+        // Top Bar
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f)
-                    .padding(16.dp)
-                    .clipToBounds()
-            ) {
-                Box(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(boardSize)
-                        .pointerInput(Unit) {
-                            detectTransformGestures { _, pan, zoom, _ ->
-                                engine.onTransform(pan, zoom)
-                            }
-                        }
-                        .pointerInput(engine.scale, engine.offsetX, engine.offsetY, engine.level) {
-                            detectTapGestures { tapOffset ->
-                                engine.onTap(tapOffset, size.width.toFloat())
-                            }
-                        }
-                        .graphicsLayer(
-                            scaleX = engine.scale,
-                            scaleY = engine.scale,
-                            translationX = engine.offsetX,
-                            translationY = engine.offsetY
-                        )
+            // Left Controls
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(
+                    onClick = { (context as? Activity)?.finish() },
+                    colors = IconButtonDefaults.iconButtonColors(containerColor = TopBarButtonBackground),
+                    modifier = Modifier.size(40.dp)
                 ) {
-                    ArrowsBoardRenderer.Board(
-                        level = engine.level,
-                        flashingSnakeId = engine.flashingSnakeId,
-                        removalProgress = engine.removalProgress,
-                        modifier = Modifier.fillMaxSize()
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.White
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                IconButton(
+                    onClick = { engine.regenerateLevel() },
+                    colors = IconButtonDefaults.iconButtonColors(containerColor = TopBarButtonBackground),
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Restart",
+                        tint = Color.White
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = { engine.regenerateLevel() },
-                enabled = !engine.isLoading
-            ) {
-                Text("Regenerate Board")
-            }
-        }
 
-        if (engine.isLoading) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Generating... ${(engine.loadingProgress * 100).toInt()}%")
-                Spacer(modifier = Modifier.height(8.dp))
-                LinearProgressIndicator(
-                    progress = { engine.loadingProgress },
-                    modifier = Modifier.width(200.dp),
+            // Hearts
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = "Life",
+                    tint = HeartRed,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = "Life",
+                    tint = HeartRed,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = "Life",
+                    tint = HeartRed,
+                    modifier = Modifier.size(24.dp)
                 )
             }
+
+            // Right Control (Loading/Hint)
+            Button(
+                onClick = { /* TODO */ },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = TopBarButtonBackground,
+                    contentColor = Color.White
+                ),
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+                modifier = Modifier.height(40.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.VideoLabel,
+                    contentDescription = "Ad",
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(text = "Loading..", fontSize = 12.sp)
+            }
         }
 
-        if (state.isNotEmpty()) {
-            KonfettiView(
-                modifier = Modifier.fillMaxSize(),
-                parties = state,
-            )
+        // Progress Bar
+        LinearProgressIndicator(
+            progress = { 0.3f }, // Fixed progress for visual matching
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(6.dp),
+            color = ProgressBarGreen,
+            trackColor = TopBarButtonBackground,
+            strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
+        )
+
+        // Game Area
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f)
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .padding(16.dp)
+                        .clipToBounds()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .size(boardSize)
+                            .pointerInput(Unit) {
+                                detectTransformGestures { _, pan, zoom, _ ->
+                                    engine.onTransform(pan, zoom)
+                                }
+                            }
+                            .pointerInput(engine.scale, engine.offsetX, engine.offsetY, engine.level) {
+                                detectTapGestures { tapOffset ->
+                                    engine.onTap(tapOffset, size.width.toFloat())
+                                }
+                            }
+                            .graphicsLayer(
+                                scaleX = engine.scale,
+                                scaleY = engine.scale,
+                                translationX = engine.offsetX,
+                                translationY = engine.offsetY
+                            )
+                    ) {
+                        ArrowsBoardRenderer.Board(
+                            level = engine.level,
+                            flashingSnakeId = engine.flashingSnakeId,
+                            removalProgress = engine.removalProgress,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                }
+            }
+
+            if (engine.isLoading) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Generating... ${(engine.loadingProgress * 100).toInt()}%", color = Color.White)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LinearProgressIndicator(
+                        progress = { engine.loadingProgress },
+                        modifier = Modifier.width(200.dp),
+                        color = ProgressBarGreen,
+                        trackColor = TopBarButtonBackground
+                    )
+                }
+            }
+
+            if (state.isNotEmpty()) {
+                KonfettiView(
+                    modifier = Modifier.fillMaxSize(),
+                    parties = state,
+                )
+            }
         }
     }
 }

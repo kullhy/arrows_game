@@ -15,3 +15,7 @@ val AccentBlue = Color(0xFF5B7BFE)
 val LightCyan = Color(0xFF4CC9F0)
 val BottomBarBackground = Color(0xFF2A2C3E)
 val InactiveIcon = Color(0xFF6C6E85)
+
+val HeartRed = Color(0xFFFF5252)
+val ProgressBarGreen = Color(0xFF00E676)
+val TopBarButtonBackground = Color(0xFF3E4155)
