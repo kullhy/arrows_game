@@ -40,6 +40,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,6 +56,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.batodev.arrows.engine.GameEngine
+import com.batodev.arrows.ui.AppViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.BottomBarBackground
 import com.batodev.arrows.ui.theme.DarkBackground
@@ -72,15 +75,21 @@ class GameActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val application = applicationContext as ArrowsApplication
         setContent {
-            ArrowsTheme {
+            val viewModel: AppViewModel = viewModel(
+                factory = AppViewModel.Factory(application.userPreferencesRepository)
+            )
+            val currentTheme by viewModel.theme.collectAsState()
+
+            ArrowsTheme(darkTheme = currentTheme == "Dark") {
                 Scaffold(modifier = Modifier.fillMaxSize(), containerColor = DarkBackground) { innerPadding ->
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding)
                     ) {
-                        ArrowsGameView()
+                        ArrowsGameView(repository = application.userPreferencesRepository)
                     }
                 }
             }
@@ -89,9 +98,9 @@ class GameActivity : ComponentActivity() {
 }
 
 @Composable
-fun ArrowsGameView() {
+fun ArrowsGameView(repository: com.batodev.arrows.data.UserPreferencesRepository) {
     val coroutineScope = rememberCoroutineScope()
-    val engine = remember { GameEngine(coroutineScope) }
+    val engine = remember { GameEngine(coroutineScope, repository) }
     var state by remember { mutableStateOf<List<Party>>(emptyList()) }
     val context = LocalContext.current
 
@@ -139,7 +148,7 @@ fun ArrowsGameView() {
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 IconButton(
-                    onClick = { engine.regenerateLevel() },
+                    onClick = { engine.restartLevel() },
                     colors = IconButtonDefaults.iconButtonColors(containerColor = TopBarButtonBackground),
                     modifier = Modifier.size(40.dp)
                 ) {
@@ -279,7 +288,7 @@ fun ArrowsGameView() {
 
             if (engine.lives <= 0) {
                 GameOverDialog(
-                    onRestart = { engine.regenerateLevel() },
+                    onRestart = { engine.restartLevel() },
                     onWatchAd = { engine.addLife() }
                 )
             }

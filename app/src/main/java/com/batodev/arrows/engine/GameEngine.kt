@@ -6,15 +6,22 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.batodev.arrows.TAP_AREA_OFFSET_FACTOR
+import com.batodev.arrows.data.UserPreferencesRepository
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class GameEngine(
     private val coroutineScope: CoroutineScope,
+    private val repository: UserPreferencesRepository,
     private val gameGenerator: GameGenerator = GameGenerator()
 ) {
+    private val gson = Gson()
+    private var initialLevel: GameLevel? = null
+
     var level by mutableStateOf(GameLevel(1, 1, emptyList()))
         private set
 
@@ -46,7 +53,50 @@ class GameEngine(
         private set
 
     init {
-        regenerateLevel()
+        loadOrRegenerateLevel()
+    }
+
+    private fun loadOrRegenerateLevel() {
+        coroutineScope.launch {
+            val savedInitial = repository.initialLevel.first()
+            val savedCurrent = repository.currentLevel.first()
+
+            if (savedInitial != null && savedCurrent != null) {
+                try {
+                    initialLevel = gson.fromJson(savedInitial, GameLevel::class.java)
+                    level = gson.fromJson(savedCurrent, GameLevel::class.java)
+                    totalSnakesInLevel = initialLevel?.snakes?.size ?: 0
+                    isGameWon = level.snakes.isEmpty()
+                    lives = maxLives
+                    isLoading = false
+                } catch (e: Exception) {
+                    regenerateLevel()
+                }
+            } else {
+                regenerateLevel()
+            }
+        }
+    }
+
+    private fun saveState() {
+        coroutineScope.launch {
+            repository.saveCurrentLevel(gson.toJson(level))
+        }
+    }
+
+    fun restartLevel() {
+        initialLevel?.let {
+            level = it
+            totalSnakesInLevel = it.snakes.size
+            isGameWon = false
+            lives = maxLives
+            scale = 1f
+            offsetX = 0f
+            offsetY = 0f
+            flashingSnakeId = null
+            removalProgress = emptyMap()
+            saveState()
+        }
     }
 
     fun onTransform(pan: androidx.compose.ui.geometry.Offset, zoom: Float) {
@@ -119,6 +169,7 @@ class GameEngine(
                 loadingProgress = progress
             })
             kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                initialLevel = newLevel
                 level = newLevel
                 totalSnakesInLevel = newLevel.snakes.size
                 isGameWon = false
@@ -129,6 +180,13 @@ class GameEngine(
                 flashingSnakeId = null
                 removalProgress = emptyMap()
                 isLoading = false
+                
+                // Save both initial and current as same for a new level
+                coroutineScope.launch {
+                    val json = gson.toJson(newLevel)
+                    repository.saveInitialLevel(json)
+                    repository.saveCurrentLevel(json)
+                }
             }
         }
     }
@@ -150,6 +208,7 @@ class GameEngine(
             removalProgress = removalProgress.toMutableMap().apply { put(snakeId, 1f) }
             level = level.copy(snakes = level.snakes.filter { it.id != snakeId })
             removalProgress = removalProgress.toMutableMap().apply { remove(snakeId) }
+            saveState()
             if (level.snakes.isEmpty()) {
                 isGameWon = true
             }
