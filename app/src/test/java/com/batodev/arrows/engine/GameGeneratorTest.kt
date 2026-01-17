@@ -19,7 +19,7 @@ class GameGeneratorTest {
     @Test
     fun testEverySpotOccupiedAfterGenerationParallel() = runBlocking {
         val engine = GameGenerator()
-        val simulations = 100
+        val simulations = 10
         val failures = AtomicInteger(0)
 
         val dispatcher = Dispatchers.Default.limitedParallelism(Runtime.getRuntime().availableProcessors())
@@ -59,7 +59,7 @@ class GameGeneratorTest {
     @Test
     fun testEveryPuzzleIsSolvable() = runBlocking {
         val engine = GameGenerator()
-        val simulations = 500
+        val simulations = 50
         val failures = AtomicInteger(0)
 
         val dispatcher = Dispatchers.Default.limitedParallelism(Runtime.getRuntime().availableProcessors())

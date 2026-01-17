@@ -39,6 +39,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.theme.AccentBlue
 import com.batodev.arrows.ui.theme.ArrowsTheme
@@ -70,6 +72,10 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     val context = LocalContext.current
+    val application = context.applicationContext as ArrowsApplication
+    val repository = application.userPreferencesRepository
+    val currentLevel by repository.currentLevel.collectAsState(initial = null)
+    
     Scaffold(
         containerColor = DarkBackground,
         bottomBar = {
@@ -175,7 +181,7 @@ fun MainScreen() {
                 shape = RoundedCornerShape(28.dp)
             ) {
                 Text(
-                    text = "Play",
+                    text = if (currentLevel != null) "Continue" else "Play",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
