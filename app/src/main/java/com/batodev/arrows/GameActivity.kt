@@ -26,8 +26,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.VideoLabel
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -36,6 +38,7 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,10 +51,12 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.batodev.arrows.engine.GameEngine
 import com.batodev.arrows.ui.theme.ArrowsTheme
+import com.batodev.arrows.ui.theme.BottomBarBackground
 import com.batodev.arrows.ui.theme.DarkBackground
 import com.batodev.arrows.ui.theme.HeartRed
 import com.batodev.arrows.ui.theme.ProgressBarGreen
@@ -148,26 +153,17 @@ fun ArrowsGameView() {
 
             // Hearts
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = "Life",
-                    tint = HeartRed,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = "Life",
-                    tint = HeartRed,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = "Life",
-                    tint = HeartRed,
-                    modifier = Modifier.size(24.dp)
-                )
+                repeat(3) { index ->
+                    Icon(
+                        imageVector = if (index < engine.lives) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = "Life",
+                        tint = HeartRed,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    if (index < 2) {
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
+                }
             }
 
             // Right Control (Loading/Hint)
@@ -280,6 +276,52 @@ fun ArrowsGameView() {
                     parties = state,
                 )
             }
+
+            if (engine.lives <= 0) {
+                GameOverDialog(
+                    onRestart = { engine.regenerateLevel() },
+                    onWatchAd = { engine.addLife() }
+                )
+            }
         }
     }
+}
+
+@Composable
+fun GameOverDialog(
+    onRestart: () -> Unit,
+    onWatchAd: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = { /* Don't dismiss by clicking outside */ },
+        containerColor = BottomBarBackground,
+        title = {
+            Text(
+                text = "Game Over",
+                color = White,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Text(
+                text = "You are out of lives! Would you like to restart the board or watch an ad to get one more life?",
+                color = White
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = onWatchAd,
+                colors = ButtonDefaults.buttonColors(containerColor = ProgressBarGreen)
+            ) {
+                Icon(Icons.Default.VideoLabel, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Watch Ad", color = White)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onRestart) {
+                Text("Restart Board", color = HeartRed)
+            }
+        }
+    )
 }

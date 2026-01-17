@@ -30,6 +30,11 @@ class GameEngine(
     var loadingProgress by mutableFloatStateOf(0f)
         private set
 
+    var lives by mutableIntStateOf(3)
+        private set
+
+    private val maxLives = 3
+
     var scale by mutableFloatStateOf(1f)
     var offsetX by mutableFloatStateOf(0f)
     var offsetY by mutableFloatStateOf(0f)
@@ -50,11 +55,17 @@ class GameEngine(
         offsetY += pan.y
     }
 
+    fun addLife() {
+        if (lives < maxLives) {
+            lives++
+        }
+    }
+
     fun onTap(
         tapOffset: androidx.compose.ui.geometry.Offset,
         boardSizePx: Float
     ) {
-        if (isLoading) return
+        if (isLoading || lives <= 0) return
 
         // Transform tap coordinates to content coordinates
         val center = boardSizePx / 2
@@ -80,6 +91,11 @@ class GameEngine(
 
         if (tappedSnake != null) {
             if (isLineOfSightObstructed(tappedSnake)) {
+                // Deduct life on obstructed move
+                if (lives > 0) {
+                    lives--
+                }
+
                 // Flash red
                 flashingSnakeId = tappedSnake.id
                 coroutineScope.launch {
@@ -106,6 +122,7 @@ class GameEngine(
                 level = newLevel
                 totalSnakesInLevel = newLevel.snakes.size
                 isGameWon = false
+                lives = maxLives
                 scale = 1f
                 offsetX = 0f
                 offsetY = 0f
