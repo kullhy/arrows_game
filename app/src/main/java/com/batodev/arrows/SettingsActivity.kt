@@ -41,11 +41,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,42 +58,66 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.theme.AccentBlue
 import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.BottomBarBackground
 import com.batodev.arrows.ui.theme.DarkBackground
 import com.batodev.arrows.ui.theme.InactiveIcon
+import com.batodev.arrows.ui.theme.NavigationIndicator
 import com.batodev.arrows.ui.theme.TopBarButtonBackground
+import com.batodev.arrows.ui.theme.White
 import com.google.android.play.core.review.ReviewManagerFactory
 
 class SettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val application = applicationContext as ArrowsApplication
         setContent {
-            ArrowsTheme {
-                SettingsScreen()
+            val viewModel: AppViewModel = viewModel(
+                factory = AppViewModel.Factory(application.userPreferencesRepository)
+            )
+            val currentTheme by viewModel.theme.collectAsState()
+
+            ArrowsTheme(darkTheme = currentTheme == "Dark") {
+                SettingsScreen(viewModel = viewModel)
             }
         }
     }
 }
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(viewModel: AppViewModel) {
     val context = LocalContext.current
+
+    var showThemeDialog by remember { mutableStateOf(false) }
+    val currentTheme by viewModel.theme.collectAsState()
+
+    if (showThemeDialog) {
+        ThemeSelectionDialog(
+            currentTheme = currentTheme,
+            onDismiss = { showThemeDialog = false },
+            onThemeSelected = {
+                viewModel.saveTheme(it)
+                showThemeDialog = false
+            }
+        )
+    }
+
     Scaffold(
         containerColor = DarkBackground,
         bottomBar = {
             NavigationBar(
                 containerColor = BottomBarBackground,
-                contentColor = Color.White
+                contentColor = White
             ) {
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Lock, contentDescription = "Levels") },
@@ -120,9 +149,9 @@ fun SettingsScreen() {
                     selected = true,
                     onClick = { },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color.White,
-                        indicatorColor = Color(0xFF3E4155),
-                        selectedTextColor = Color.White
+                        selectedIconColor = White,
+                        indicatorColor = NavigationIndicator,
+                        selectedTextColor = White
                     )
                 )
             }
@@ -153,8 +182,8 @@ fun SettingsScreen() {
                 SettingsClickableItem(
                     icon = Icons.Default.Palette,
                     title = "Theme",
-                    valueText = "Dark",
-                    onClick = { /* TODO: Theme chooser */ }
+                    valueText = currentTheme,
+                    onClick = { showThemeDialog = true }
                 )
             }
 
@@ -279,13 +308,13 @@ fun SettingsSwitchItem(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = Color.White.copy(alpha = 0.7f),
+            tint = White.copy(alpha = 0.7f),
             modifier = Modifier.size(24.dp)
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(
             text = title,
-            color = Color.White,
+            color = White,
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.weight(1f)
@@ -297,9 +326,9 @@ fun SettingsSwitchItem(
                 onCheckedChange?.invoke(it)
             },
             colors = SwitchDefaults.colors(
-                checkedThumbColor = Color.White,
+                checkedThumbColor = White,
                 checkedTrackColor = AccentBlue,
-                uncheckedThumbColor = Color.White,
+                uncheckedThumbColor = White,
                 uncheckedTrackColor = InactiveIcon
             )
         )
@@ -323,13 +352,13 @@ fun SettingsClickableItem(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = Color.White.copy(alpha = 0.7f),
+            tint = White.copy(alpha = 0.7f),
             modifier = Modifier.size(24.dp)
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(
             text = title,
-            color = Color.White,
+            color = White,
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.weight(1f)
@@ -337,7 +366,7 @@ fun SettingsClickableItem(
         if (valueText != null) {
             Text(
                 text = valueText,
-                color = Color.White.copy(alpha = 0.7f),
+                color = White.copy(alpha = 0.7f),
                 fontSize = 14.sp,
                 modifier = Modifier.padding(end = 8.dp)
             )
@@ -345,8 +374,62 @@ fun SettingsClickableItem(
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
             contentDescription = "Open",
-            tint = Color.White.copy(alpha = 0.5f),
+            tint = White.copy(alpha = 0.5f),
             modifier = Modifier.size(16.dp)
         )
     }
+}
+
+@Composable
+fun ThemeSelectionDialog(
+    currentTheme: String,
+    onDismiss: () -> Unit,
+    onThemeSelected: (String) -> Unit
+) {
+    val themes = listOf("Dark") // Ready to add more: "Light", "System", "Blue", etc.
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = BottomBarBackground,
+        title = {
+            Text(
+                text = "Choose Theme",
+                color = White,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column {
+                themes.forEach { theme ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onThemeSelected(theme) }
+                            .padding(vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = theme == currentTheme,
+                            onClick = { onThemeSelected(theme) },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = AccentBlue,
+                                unselectedColor = InactiveIcon
+                            )
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = theme,
+                            color = White,
+                            fontSize = 16.sp
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel", color = AccentBlue)
+            }
+        }
+    )
 }

@@ -21,3 +21,8 @@ val ProgressBarGreen = Color(0xFF00E676)
 val TopBarButtonBackground = Color(0xFF3E4155)
 
 val SnakeColor = Color(0xFFA9B1FF)
+
+val White = Color(0xFFFFFFFF)
+val LightGray = Color(0xFFD3D3D3)
+val FlashingRed = Color(0xFFFF0000)
+val NavigationIndicator = Color(0xFF3E4155)

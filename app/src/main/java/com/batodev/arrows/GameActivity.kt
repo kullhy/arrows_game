@@ -45,7 +45,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -57,6 +56,7 @@ import com.batodev.arrows.ui.theme.DarkBackground
 import com.batodev.arrows.ui.theme.HeartRed
 import com.batodev.arrows.ui.theme.ProgressBarGreen
 import com.batodev.arrows.ui.theme.TopBarButtonBackground
+import com.batodev.arrows.ui.theme.White
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.core.Party
 import nl.dionsegijn.konfetti.core.Position
@@ -129,7 +129,7 @@ fun ArrowsGameView() {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = Color.White
+                        tint = White
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
@@ -141,7 +141,7 @@ fun ArrowsGameView() {
                     Icon(
                         imageVector = Icons.Default.Refresh,
                         contentDescription = "Restart",
-                        tint = Color.White
+                        tint = White
                     )
                 }
             }
@@ -175,7 +175,7 @@ fun ArrowsGameView() {
                 onClick = { /* TODO */ },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = TopBarButtonBackground,
-                    contentColor = Color.White
+                    contentColor = White
                 ),
                 shape = RoundedCornerShape(12.dp),
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
@@ -263,7 +263,7 @@ fun ArrowsGameView() {
 
             if (engine.isLoading) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Generating... ${(engine.loadingProgress * 100).toInt()}%", color = Color.White)
+                    Text("Generating... ${(engine.loadingProgress * 100).toInt()}%", color = White)
                     Spacer(modifier = Modifier.height(8.dp))
                     LinearProgressIndicator(
                         progress = { engine.loadingProgress },

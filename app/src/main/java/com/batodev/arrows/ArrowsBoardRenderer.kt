@@ -12,6 +12,8 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import com.batodev.arrows.engine.Direction
 import com.batodev.arrows.engine.GameLevel
+import com.batodev.arrows.ui.theme.FlashingRed
+import com.batodev.arrows.ui.theme.LightGray
 import com.batodev.arrows.ui.theme.SnakeColor
 import kotlin.math.PI
 import kotlin.math.cos
@@ -57,7 +59,6 @@ object ArrowsBoardRenderer {
      * @param flashingSnakeId ID of a snake that should be rendered in red (e.g., when obstructed)
      * @param removalProgress Map of snake IDs to their removal animation progress (0.0 to 1.0).
      *                        0.0 = not started, 1.0 = fully removed
-     * @param showTapAreas Whether to draw tap area visualizations (typically enabled in debug builds only)
      */
     @Composable
     fun Board(
@@ -96,7 +97,7 @@ object ArrowsBoardRenderer {
 
                         // Draw semi-transparent circle showing tappable area
                         drawCircle(
-                            color = Color.LightGray.copy(alpha = 0.3f),
+                            color = LightGray.copy(alpha = 0.3f),
                             radius = tapRadius,
                             center = Offset(tapOffsetX, tapOffsetY)
                         )
@@ -111,8 +112,8 @@ object ArrowsBoardRenderer {
 
                     val path = Path()
                     val body = snake.body
-                    // Use red color if snake is flashing (obstructed), otherwise SnakeColor
-                    val baseColor = if (snake.id == flashingSnakeId) Color.Red else SnakeColor
+                    // Use FlashingRed if snake is flashing (obstructed), otherwise SnakeColor
+                    val baseColor = if (snake.id == flashingSnakeId) FlashingRed else SnakeColor
                     val snakeColor = baseColor.copy(alpha = alpha)
 
                     val head = body.first()

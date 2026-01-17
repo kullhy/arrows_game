@@ -36,19 +36,31 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.theme.AccentBlue
 import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.BottomBarBackground
 import com.batodev.arrows.ui.theme.DarkBackground
 import com.batodev.arrows.ui.theme.InactiveIcon
 import com.batodev.arrows.ui.theme.LightCyan
+import com.batodev.arrows.ui.theme.NavigationIndicator
+import com.batodev.arrows.ui.theme.White
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val application = applicationContext as ArrowsApplication
         setContent {
-            ArrowsTheme {
+            val viewModel: AppViewModel = viewModel(
+                factory = AppViewModel.Factory(application.userPreferencesRepository)
+            )
+            val currentTheme by viewModel.theme.collectAsState()
+
+            ArrowsTheme(darkTheme = currentTheme == "Dark") {
                 MainScreen()
             }
         }
@@ -63,7 +75,7 @@ fun MainScreen() {
         bottomBar = {
             NavigationBar(
                 containerColor = BottomBarBackground,
-                contentColor = Color.White
+                contentColor = White
             ) {
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Lock, contentDescription = "Levels") },
@@ -81,9 +93,9 @@ fun MainScreen() {
                     selected = true,
                     onClick = { },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color.White,
-                        indicatorColor = Color(0xFF3E4155),
-                        selectedTextColor = Color.White
+                        selectedIconColor = White,
+                        indicatorColor = NavigationIndicator,
+                        selectedTextColor = White
                     )
                 )
                 NavigationBarItem(
@@ -123,13 +135,13 @@ fun MainScreen() {
                     // Custom Triangle Icon
                     TriangleIcon(
                         modifier = Modifier.size(40.dp),
-                        color = Color.White
+                        color = White
                     )
                     Text(
                         text = "rrows",
                         fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = White
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
