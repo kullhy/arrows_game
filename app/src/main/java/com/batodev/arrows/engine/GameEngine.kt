@@ -2,6 +2,7 @@ package com.batodev.arrows.engine
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.batodev.arrows.TAP_AREA_OFFSET_FACTOR
@@ -20,7 +21,7 @@ class GameEngine(
     var isLoading by mutableStateOf(true)
         private set
 
-    var totalSnakesInLevel by mutableStateOf(0)
+    var totalSnakesInLevel by mutableIntStateOf(0)
         private set
 
     var isGameWon by mutableStateOf(false)

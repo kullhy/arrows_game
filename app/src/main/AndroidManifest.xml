@@ -23,6 +23,10 @@
             android:name=".GameActivity"
             android:exported="false"
             android:theme="@style/Theme.Arrows" />
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Arrows" />
     </application>
 
 </manifest>

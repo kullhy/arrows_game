@@ -90,7 +90,11 @@ fun MainScreen() {
                     icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
                     label = { Text("Settings") },
                     selected = false,
-                    onClick = { },
+                    onClick = {
+                        val intent = Intent(context, SettingsActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                        context.startActivity(intent)
+                    },
                     colors = NavigationBarItemDefaults.colors(
                         unselectedIconColor = InactiveIcon,
                         unselectedTextColor = InactiveIcon
