@@ -19,3 +19,5 @@ val InactiveIcon = Color(0xFF6C6E85)
 val HeartRed = Color(0xFFFF5252)
 val ProgressBarGreen = Color(0xFF00E676)
 val TopBarButtonBackground = Color(0xFF3E4155)
+
+val SnakeColor = Color(0xFFA9B1FF)
