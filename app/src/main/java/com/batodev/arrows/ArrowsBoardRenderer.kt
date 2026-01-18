@@ -81,6 +81,15 @@ fun Board(
                 // Distance to move snake head during removal animation (off-screen)
                 val moveDist = max(size.width, size.height) * 1.2f
 
+                // Draw game area border in debug builds
+                if (BuildConfig.DEBUG) {
+                    drawRect(
+                        color = Color.Gray,
+                        size = size,
+                        style = Stroke(width = 2f)
+                    )
+                }
+
                 // Draw tap areas for snake heads (debug visualization only)
                 if (BuildConfig.DEBUG) {
                     val tapTolerance = 0.6f // Tap radius in cells
