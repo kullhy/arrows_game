@@ -130,8 +130,10 @@ class GameEngine(
     ) {
         if (isLoading || lives <= 0) return
 
-        android.util.Log.v("TapDebug", "onTap: tap=$tapOffset, containerSize=$containerSizePx, boardSize=$boardSizePx")
-        android.util.Log.v("TapDebug", "graphicsLayer: scale=$scale, offsetX=$offsetX, offsetY=$offsetY")
+        if (com.batodev.arrows.BuildConfig.DRAW_DEBUG_STUFF) {
+            android.util.Log.v("TapDebug", "onTap: tap=$tapOffset, containerSize=$containerSizePx, boardSize=$boardSizePx")
+            android.util.Log.v("TapDebug", "graphicsLayer: scale=$scale, offsetX=$offsetX, offsetY=$offsetY")
+        }
 
         // The board Box is sized at boardSizePx (1000dp in pixels), but it's positioned at (0,0)
         // of the container and then scaled/translated by graphicsLayer.
@@ -146,14 +148,18 @@ class GameEngine(
         val transformedX = (tapOffset.x - offsetX - centerContainer) / scale + centerContainer
         val transformedY = (tapOffset.y - offsetY - centerContainer) / scale + centerContainer
 
-        android.util.Log.v("TapDebug", "transformed in container space: ($transformedX, $transformedY)")
+        if (com.batodev.arrows.BuildConfig.DRAW_DEBUG_STUFF) {
+            android.util.Log.v("TapDebug", "transformed in container space: ($transformedX, $transformedY)")
+        }
 
         // Step 2: Scale from container space to board space
         val boardToContainerScale = containerSizePx / boardSizePx
         val contentX = transformedX / boardToContainerScale
         val contentY = transformedY / boardToContainerScale
 
-        android.util.Log.v("TapDebug", "content coords: contentX=$contentX, contentY=$contentY")
+        if (com.batodev.arrows.BuildConfig.DRAW_DEBUG_STUFF) {
+            android.util.Log.v("TapDebug", "content coords: contentX=$contentX, contentY=$contentY")
+        }
 
         // Step 3: Convert to grid cell coordinates
         val cellWidth = boardSizePx / level.width
@@ -161,7 +167,9 @@ class GameEngine(
         val cellX = contentX / cellWidth
         val cellY = contentY / cellHeight
 
-        android.util.Log.v("TapDebug", "grid coords: cellX=$cellX, cellY=$cellY (grid size: ${level.width}x${level.height})")
+        if (com.batodev.arrows.BuildConfig.DRAW_DEBUG_STUFF) {
+            android.util.Log.v("TapDebug", "grid coords: cellX=$cellX, cellY=$cellY (grid size: ${level.width}x${level.height})")
+        }
 
         // Check if tapped cell contains a snake head (with tolerance for easier tapping)
         val tolerance = 4.0f // High tolerance - accounts for zoom/pan transform inaccuracies and screen density variations
@@ -176,7 +184,9 @@ class GameEngine(
                 val dy = tapAreaCenterY - cellY
                 val distSq = dx * dx + dy * dy
 
-                android.util.Log.v("TapDebug", "Snake ${snake.id} head at (${head.x}, ${head.y}), tap area center: ($tapAreaCenterX, $tapAreaCenterY), distSq=$distSq")
+                if (com.batodev.arrows.BuildConfig.DRAW_DEBUG_STUFF) {
+                    android.util.Log.v("TapDebug", "Snake ${snake.id} head at (${head.x}, ${head.y}), tap area center: ($tapAreaCenterX, $tapAreaCenterY), distSq=$distSq")
+                }
 
                 snake to distSq
             }
@@ -184,7 +194,9 @@ class GameEngine(
             .minByOrNull { (_, distSq) -> distSq }
             ?.first
 
-        android.util.Log.v("TapDebug", "tappedSnake: ${tappedSnake?.id}")
+        if (com.batodev.arrows.BuildConfig.DRAW_DEBUG_STUFF) {
+            android.util.Log.v("TapDebug", "tappedSnake: ${tappedSnake?.id}")
+        }
 
         if (tappedSnake != null) {
             if (isVibrationEnabled) {

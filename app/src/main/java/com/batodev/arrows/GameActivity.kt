@@ -262,7 +262,9 @@ fun ArrowsGameView(
                             engine.scale, engine.offsetX, engine.offsetY, engine.level
                         ) {
                             detectTapGestures { tapOffset ->
-                                Log.v("TapDebug", "Container tap: $tapOffset, containerSize: ${size.width}")
+                                if (BuildConfig.DRAW_DEBUG_STUFF) {
+                                    Log.v("TapDebug", "Container tap: $tapOffset, containerSize: ${size.width}")
+                                }
 
                                 // Pass raw tap offset and container size to engine
                                 // Engine will handle all coordinate transformations
@@ -295,18 +297,19 @@ fun ArrowsGameView(
                                 .padding(10.dp)
                         )
 
-                        // DEBUG: Draw marker at (0,0)
-                        Canvas(modifier = Modifier.fillMaxSize()) {
-                            drawCircle(
-                                color = Color.Red,
-                                radius = 20f,
-                                center = Offset(0f, 0f)
-                            )
+                        if (BuildConfig.DRAW_DEBUG_STUFF) {
+                            Canvas(modifier = Modifier.fillMaxSize()) {
+                                drawCircle(
+                                    color = Color.Red,
+                                    radius = 20f,
+                                    center = Offset(0f, 0f)
+                                )
+                            }
                         }
                     }
 
                     // DEBUG: Draw marker at last tapOffset in container coordinates
-                    if (tapAnimations.isNotEmpty()) {
+                    if (BuildConfig.DRAW_DEBUG_STUFF && tapAnimations.isNotEmpty()) {
                         val lastTap = tapAnimations.last().offset
                         Canvas(modifier = Modifier.fillMaxSize()) {
                             drawCircle(
