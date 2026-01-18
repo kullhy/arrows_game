@@ -43,6 +43,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -84,8 +85,7 @@ class GameActivity : ComponentActivity() {
             ArrowsTheme(themeName = currentTheme) {
                 val themeColors = com.batodev.arrows.ui.theme.LocalThemeColors.current
                 Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    containerColor = themeColors.background
+                    modifier = Modifier.fillMaxSize(), containerColor = themeColors.background
                 ) { innerPadding ->
                     Box(
                         modifier = Modifier
@@ -110,14 +110,13 @@ fun ArrowsGameView(
     val view = LocalView.current
     val engine = remember {
         GameEngine(
-            coroutineScope,
-            repository,
-            onVibrate = {
+            coroutineScope, repository, onVibrate = {
                 view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-            }
-        )
+            })
     }
     var state by remember { mutableStateOf<List<Party>>(emptyList()) }
+    val tapAnimations =
+        remember { androidx.compose.runtime.mutableStateListOf<TapAnimationState>() }
     val context = LocalContext.current
 
     val themeColors = com.batodev.arrows.ui.theme.LocalThemeColors.current
@@ -197,8 +196,7 @@ fun ArrowsGameView(
             Button(
                 onClick = { /* TODO */ },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = themeColors.topBarButton,
-                    contentColor = White
+                    containerColor = themeColors.topBarButton, contentColor = White
                 ),
                 shape = RoundedCornerShape(12.dp),
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
@@ -237,8 +235,7 @@ fun ArrowsGameView(
 
         // Game Area
         Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
+            contentAlignment = Alignment.Center, modifier = Modifier
                 .fillMaxSize()
                 .weight(1f)
         ) {
@@ -253,37 +250,47 @@ fun ArrowsGameView(
                         .padding(16.dp)
                         .clipToBounds()
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(boardSize)
-                            .pointerInput(Unit) {
-                                detectTransformGestures { _, pan, zoom, _ ->
-                                    engine.onTransform(pan, zoom)
-                                }
+                    Box(modifier = Modifier
+                        .size(boardSize)
+                        .pointerInput(Unit) {
+                            detectTransformGestures { _, pan, zoom, _ ->
+                                engine.onTransform(pan, zoom)
                             }
-                            .pointerInput(
-                                engine.scale,
-                                engine.offsetX,
-                                engine.offsetY,
-                                engine.level
-                            ) {
-                                detectTapGestures { tapOffset ->
-                                    engine.onTap(tapOffset, size.width.toFloat())
-                                }
+                        }
+                        .pointerInput(
+                            engine.scale, engine.offsetX, engine.offsetY, engine.level
+                        ) {
+                            detectTapGestures { tapOffset ->
+                                engine.onTap(tapOffset, size.width.toFloat())
+                                tapAnimations.add(
+                                    TapAnimationState(
+                                        System.nanoTime(), tapOffset
+                                    )
+                                )
                             }
-                            .graphicsLayer(
-                                scaleX = engine.scale,
-                                scaleY = engine.scale,
-                                translationX = engine.offsetX,
-                                translationY = engine.offsetY
-                            )
-                    ) {
+                        }
+                        .graphicsLayer(
+                            scaleX = engine.scale,
+                            scaleY = engine.scale,
+                            translationX = engine.offsetX,
+                            translationY = engine.offsetY
+                        )) {
                         ArrowsBoardRenderer.Board(
                             level = engine.level,
                             flashingSnakeId = engine.flashingSnakeId,
                             removalProgress = engine.removalProgress,
-                            modifier = Modifier.fillMaxSize().padding(10.dp)
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(10.dp)
                         )
+
+                        tapAnimations.forEach { anim ->
+                            key(anim.id) {
+                                TapRipple(
+                                    offset = anim.offset,
+                                    onFinished = { tapAnimations.remove(anim) })
+                            }
+                        }
                     }
                 }
             }
@@ -311,8 +318,7 @@ fun ArrowsGameView(
             if (engine.lives <= 0) {
                 GameOverDialog(
                     onRestart = { engine.restartLevel() },
-                    onWatchAd = { engine.addLife() }
-                )
+                    onWatchAd = { engine.addLife() })
             }
         }
     }
@@ -329,9 +335,7 @@ fun GameOverDialog(
         containerColor = themeColors.bottomBar,
         title = {
             Text(
-                text = "Game Over",
-                color = White,
-                fontWeight = FontWeight.Bold
+                text = "Game Over", color = White, fontWeight = FontWeight.Bold
             )
         },
         text = {
@@ -358,6 +362,5 @@ fun GameOverDialog(
             TextButton(onClick = onRestart) {
                 Text("Restart Board", color = HeartRed)
             }
-        }
-    )
+        })
 }
