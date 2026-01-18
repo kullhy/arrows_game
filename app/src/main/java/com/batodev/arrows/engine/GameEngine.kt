@@ -19,10 +19,12 @@ class GameEngine(
     private val repository: UserPreferencesRepository,
     private val gameGenerator: GameGenerator = GameGenerator(),
     autoLoad: Boolean = true,
-    private val backgroundDispatcher: kotlinx.coroutines.CoroutineDispatcher = kotlinx.coroutines.Dispatchers.Default
+    private val backgroundDispatcher: kotlinx.coroutines.CoroutineDispatcher = kotlinx.coroutines.Dispatchers.Default,
+    private val onVibrate: () -> Unit = {}
 ) {
     private val gson = Gson()
     private var initialLevel: GameLevel? = null
+    private var isVibrationEnabled = true
 
     var level by mutableStateOf(GameLevel(1, 1, emptyList()))
         private set
@@ -55,6 +57,11 @@ class GameEngine(
         private set
 
     init {
+        coroutineScope.launch {
+            repository.isVibrationEnabled.collect {
+                isVibrationEnabled = it
+            }
+        }
         if (autoLoad) {
             loadOrRegenerateLevel()
         }
@@ -145,6 +152,9 @@ class GameEngine(
         }
 
         if (tappedSnake != null) {
+            if (isVibrationEnabled) {
+                onVibrate()
+            }
             if (isLineOfSightObstructed(tappedSnake)) {
                 // Deduct life on obstructed move
                 if (lives > 0) {

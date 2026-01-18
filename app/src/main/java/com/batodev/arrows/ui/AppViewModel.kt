@@ -17,9 +17,21 @@ class AppViewModel(private val userPreferencesRepository: UserPreferencesReposit
         initialValue = "Dark"
     )
 
+    val isVibrationEnabled: StateFlow<Boolean> = userPreferencesRepository.isVibrationEnabled.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = true
+    )
+
     fun saveTheme(theme: String) {
         viewModelScope.launch {
             userPreferencesRepository.saveThemePreference(theme)
+        }
+    }
+
+    fun saveVibration(enabled: Boolean) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveVibrationPreference(enabled)
         }
     }
 

@@ -98,6 +98,7 @@ fun SettingsScreen(viewModel: AppViewModel) {
 
     var showThemeDialog by remember { mutableStateOf(false) }
     val currentTheme by viewModel.theme.collectAsState()
+    val isVibrationEnabled by viewModel.isVibrationEnabled.collectAsState()
     val themeColors = LocalThemeColors.current
 
     if (showThemeDialog) {
@@ -171,8 +172,9 @@ fun SettingsScreen(viewModel: AppViewModel) {
                 SettingsSwitchItem(
                     icon = Icons.Default.Vibration,
                     title = "Vibrations",
-                    initialValue = true,
-                    accentColor = themeColors.accent
+                    initialValue = isVibrationEnabled,
+                    accentColor = themeColors.accent,
+                    onCheckedChange = { viewModel.saveVibration(it) }
                 )
                 SettingsSwitchItem(
                     icon = Icons.AutoMirrored.Filled.VolumeUp,

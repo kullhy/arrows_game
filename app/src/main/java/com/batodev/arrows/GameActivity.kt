@@ -2,6 +2,7 @@ package com.batodev.arrows
 
 import android.app.Activity
 import android.os.Bundle
+import android.view.HapticFeedbackConstants
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -52,6 +53,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -105,7 +107,16 @@ fun ArrowsGameView(
     repository: com.batodev.arrows.data.UserPreferencesRepository,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val engine = remember { GameEngine(coroutineScope, repository) }
+    val view = LocalView.current
+    val engine = remember {
+        GameEngine(
+            coroutineScope,
+            repository,
+            onVibrate = {
+                view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+            }
+        )
+    }
     var state by remember { mutableStateOf<List<Party>>(emptyList()) }
     val context = LocalContext.current
 
