@@ -28,6 +28,8 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,17 +39,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import com.batodev.arrows.ui.AppViewModel
-import com.batodev.arrows.ui.theme.AccentBlue
 import com.batodev.arrows.ui.theme.ArrowsTheme
-import com.batodev.arrows.ui.theme.BottomBarBackground
-import com.batodev.arrows.ui.theme.DarkBackground
 import com.batodev.arrows.ui.theme.InactiveIcon
 import com.batodev.arrows.ui.theme.LightCyan
+import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.NavigationIndicator
 import com.batodev.arrows.ui.theme.White
 
@@ -62,7 +58,7 @@ class MainActivity : ComponentActivity() {
             )
             val currentTheme by viewModel.theme.collectAsState()
 
-            ArrowsTheme(darkTheme = currentTheme == "Dark") {
+            ArrowsTheme(themeName = currentTheme) {
                 MainScreen()
             }
         }
@@ -75,12 +71,14 @@ fun MainScreen() {
     val application = context.applicationContext as ArrowsApplication
     val repository = application.userPreferencesRepository
     val currentLevel by repository.currentLevel.collectAsState(initial = null)
-    
+
+    val themeColors = LocalThemeColors.current
+
     Scaffold(
-        containerColor = DarkBackground,
+        containerColor = themeColors.background,
         bottomBar = {
             NavigationBar(
-                containerColor = BottomBarBackground,
+                containerColor = themeColors.bottomBar,
                 contentColor = White
             ) {
                 NavigationBarItem(
@@ -155,7 +153,7 @@ fun MainScreen() {
                     text = "Level 16",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = AccentBlue
+                    color = themeColors.accent
                 )
                 Text(
                     text = "Hard",
@@ -176,7 +174,7 @@ fun MainScreen() {
                     .fillMaxWidth()
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = AccentBlue
+                    containerColor = themeColors.accent
                 ),
                 shape = RoundedCornerShape(28.dp)
             ) {

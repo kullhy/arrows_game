@@ -14,7 +14,6 @@ import com.batodev.arrows.engine.Direction
 import com.batodev.arrows.engine.GameLevel
 import com.batodev.arrows.ui.theme.FlashingRed
 import com.batodev.arrows.ui.theme.LightGray
-import com.batodev.arrows.ui.theme.SnakeColor
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.max
@@ -61,14 +60,15 @@ object ArrowsBoardRenderer {
      *                        0.0 = not started, 1.0 = fully removed
      */
     @Composable
-    fun Board(
-        level: GameLevel,
-        modifier: Modifier = Modifier,
-        flashingSnakeId: Int? = null,
-        removalProgress: Map<Int, Float> = emptyMap()
-    ) {
-        Canvas(modifier = modifier) {
-            val totalDrawTime = measureTimeMillis {
+fun Board(
+    level: GameLevel,
+    modifier: Modifier = Modifier,
+    flashingSnakeId: Int? = null,
+    removalProgress: Map<Int, Float> = emptyMap()
+) {
+    val themeColors = com.batodev.arrows.ui.theme.LocalThemeColors.current
+    Canvas(modifier = modifier) {
+        val totalDrawTime = measureTimeMillis {
                 // Calculate cell dimensions based on canvas size and grid dimensions
                 val cellWidth = size.width / level.width
                 val cellHeight = size.height / level.height
@@ -112,8 +112,8 @@ object ArrowsBoardRenderer {
 
                     val path = Path()
                     val body = snake.body
-                    // Use FlashingRed if snake is flashing (obstructed), otherwise SnakeColor
-                    val baseColor = if (snake.id == flashingSnakeId) FlashingRed else SnakeColor
+                    // Use FlashingRed if snake is flashing (obstructed), otherwise themeColors.snake
+                    val baseColor = if (snake.id == flashingSnakeId) FlashingRed else themeColors.snake
                     val snakeColor = baseColor.copy(alpha = alpha)
 
                     val head = body.first()

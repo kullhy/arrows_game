@@ -55,15 +55,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.batodev.arrows.engine.GameEngine
 import com.batodev.arrows.ui.AppViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.batodev.arrows.ui.theme.ArrowsTheme
-import com.batodev.arrows.ui.theme.BottomBarBackground
-import com.batodev.arrows.ui.theme.DarkBackground
 import com.batodev.arrows.ui.theme.HeartRed
 import com.batodev.arrows.ui.theme.ProgressBarGreen
-import com.batodev.arrows.ui.theme.TopBarButtonBackground
 import com.batodev.arrows.ui.theme.White
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.core.Party
@@ -82,14 +79,20 @@ class GameActivity : ComponentActivity() {
             )
             val currentTheme by viewModel.theme.collectAsState()
 
-            ArrowsTheme(darkTheme = currentTheme == "Dark") {
-                Scaffold(modifier = Modifier.fillMaxSize(), containerColor = DarkBackground) { innerPadding ->
+            ArrowsTheme(themeName = currentTheme) {
+                val themeColors = com.batodev.arrows.ui.theme.LocalThemeColors.current
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    containerColor = themeColors.background
+                ) { innerPadding ->
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding)
                     ) {
-                        ArrowsGameView(repository = application.userPreferencesRepository)
+                        ArrowsGameView(
+                            repository = application.userPreferencesRepository
+                        )
                     }
                 }
             }
@@ -98,11 +101,15 @@ class GameActivity : ComponentActivity() {
 }
 
 @Composable
-fun ArrowsGameView(repository: com.batodev.arrows.data.UserPreferencesRepository) {
+fun ArrowsGameView(
+    repository: com.batodev.arrows.data.UserPreferencesRepository,
+) {
     val coroutineScope = rememberCoroutineScope()
     val engine = remember { GameEngine(coroutineScope, repository) }
     var state by remember { mutableStateOf<List<Party>>(emptyList()) }
     val context = LocalContext.current
+
+    val themeColors = com.batodev.arrows.ui.theme.LocalThemeColors.current
 
     if (engine.isGameWon && state.isEmpty()) {
         state = listOf(
@@ -137,7 +144,7 @@ fun ArrowsGameView(repository: com.batodev.arrows.data.UserPreferencesRepository
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(
                     onClick = { (context as? Activity)?.finish() },
-                    colors = IconButtonDefaults.iconButtonColors(containerColor = TopBarButtonBackground),
+                    colors = IconButtonDefaults.iconButtonColors(containerColor = themeColors.topBarButton),
                     modifier = Modifier.size(40.dp)
                 ) {
                     Icon(
@@ -149,7 +156,7 @@ fun ArrowsGameView(repository: com.batodev.arrows.data.UserPreferencesRepository
                 Spacer(modifier = Modifier.width(8.dp))
                 IconButton(
                     onClick = { engine.restartLevel() },
-                    colors = IconButtonDefaults.iconButtonColors(containerColor = TopBarButtonBackground),
+                    colors = IconButtonDefaults.iconButtonColors(containerColor = themeColors.topBarButton),
                     modifier = Modifier.size(40.dp)
                 ) {
                     Icon(
@@ -179,7 +186,7 @@ fun ArrowsGameView(repository: com.batodev.arrows.data.UserPreferencesRepository
             Button(
                 onClick = { /* TODO */ },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = TopBarButtonBackground,
+                    containerColor = themeColors.topBarButton,
                     contentColor = White
                 ),
                 shape = RoundedCornerShape(12.dp),
@@ -213,7 +220,7 @@ fun ArrowsGameView(repository: com.batodev.arrows.data.UserPreferencesRepository
                 .fillMaxWidth()
                 .height(6.dp),
             color = ProgressBarGreen,
-            trackColor = TopBarButtonBackground,
+            trackColor = themeColors.topBarButton,
             strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
         )
 
@@ -244,7 +251,12 @@ fun ArrowsGameView(repository: com.batodev.arrows.data.UserPreferencesRepository
                                     engine.onTransform(pan, zoom)
                                 }
                             }
-                            .pointerInput(engine.scale, engine.offsetX, engine.offsetY, engine.level) {
+                            .pointerInput(
+                                engine.scale,
+                                engine.offsetX,
+                                engine.offsetY,
+                                engine.level
+                            ) {
                                 detectTapGestures { tapOffset ->
                                     engine.onTap(tapOffset, size.width.toFloat())
                                 }
@@ -274,7 +286,7 @@ fun ArrowsGameView(repository: com.batodev.arrows.data.UserPreferencesRepository
                         progress = { engine.loadingProgress },
                         modifier = Modifier.width(200.dp),
                         color = ProgressBarGreen,
-                        trackColor = TopBarButtonBackground
+                        trackColor = themeColors.topBarButton
                     )
                 }
             }
@@ -299,11 +311,12 @@ fun ArrowsGameView(repository: com.batodev.arrows.data.UserPreferencesRepository
 @Composable
 fun GameOverDialog(
     onRestart: () -> Unit,
-    onWatchAd: () -> Unit
+    onWatchAd: () -> Unit,
 ) {
+    val themeColors = com.batodev.arrows.ui.theme.LocalThemeColors.current
     AlertDialog(
         onDismissRequest = { /* Don't dismiss by clicking outside */ },
-        containerColor = BottomBarBackground,
+        containerColor = themeColors.bottomBar,
         title = {
             Text(
                 text = "Game Over",
@@ -322,7 +335,11 @@ fun GameOverDialog(
                 onClick = onWatchAd,
                 colors = ButtonDefaults.buttonColors(containerColor = ProgressBarGreen)
             ) {
-                Icon(Icons.Default.VideoLabel, contentDescription = null, modifier = Modifier.size(18.dp))
+                Icon(
+                    Icons.Default.VideoLabel,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Watch Ad", color = White)
             }

@@ -58,6 +58,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -66,13 +67,10 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.batodev.arrows.ui.AppViewModel
-import com.batodev.arrows.ui.theme.AccentBlue
 import com.batodev.arrows.ui.theme.ArrowsTheme
-import com.batodev.arrows.ui.theme.BottomBarBackground
-import com.batodev.arrows.ui.theme.DarkBackground
 import com.batodev.arrows.ui.theme.InactiveIcon
+import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.NavigationIndicator
-import com.batodev.arrows.ui.theme.TopBarButtonBackground
 import com.batodev.arrows.ui.theme.White
 import com.google.android.play.core.review.ReviewManagerFactory
 
@@ -87,7 +85,7 @@ class SettingsActivity : ComponentActivity() {
             )
             val currentTheme by viewModel.theme.collectAsState()
 
-            ArrowsTheme(darkTheme = currentTheme == "Dark") {
+            ArrowsTheme(themeName = currentTheme) {
                 SettingsScreen(viewModel = viewModel)
             }
         }
@@ -100,6 +98,7 @@ fun SettingsScreen(viewModel: AppViewModel) {
 
     var showThemeDialog by remember { mutableStateOf(false) }
     val currentTheme by viewModel.theme.collectAsState()
+    val themeColors = LocalThemeColors.current
 
     if (showThemeDialog) {
         ThemeSelectionDialog(
@@ -113,10 +112,10 @@ fun SettingsScreen(viewModel: AppViewModel) {
     }
 
     Scaffold(
-        containerColor = DarkBackground,
+        containerColor = themeColors.background,
         bottomBar = {
             NavigationBar(
-                containerColor = BottomBarBackground,
+                containerColor = themeColors.bottomBar,
                 contentColor = White
             ) {
                 NavigationBarItem(
@@ -168,16 +167,18 @@ fun SettingsScreen(viewModel: AppViewModel) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // Group 1: Preferences
-            SettingsGroup {
+            SettingsGroup(themeColors.topBarButton) {
                 SettingsSwitchItem(
                     icon = Icons.Default.Vibration,
                     title = "Vibrations",
-                    initialValue = true
+                    initialValue = true,
+                    accentColor = themeColors.accent
                 )
                 SettingsSwitchItem(
                     icon = Icons.AutoMirrored.Filled.VolumeUp,
                     title = "Sounds",
-                    initialValue = true
+                    initialValue = true,
+                    accentColor = themeColors.accent
                 )
                 SettingsClickableItem(
                     icon = Icons.Default.Palette,
@@ -188,7 +189,7 @@ fun SettingsScreen(viewModel: AppViewModel) {
             }
 
             // Group 2: Feedback
-            SettingsGroup {
+            SettingsGroup(themeColors.topBarButton) {
                 SettingsClickableItem(
                     icon = Icons.Default.Star,
                     title = "Rate us",
@@ -207,16 +208,17 @@ fun SettingsScreen(viewModel: AppViewModel) {
             }
 
             // Group 3: Purchases
-            SettingsGroup {
+            SettingsGroup(themeColors.topBarButton) {
                 SettingsSwitchItem(
                     icon = Icons.Default.Block,
                     title = "Remove Ads",
-                    initialValue = false
+                    initialValue = false,
+                    accentColor = themeColors.accent
                 )
             }
 
             // Group 4: Legal
-            SettingsGroup {
+            SettingsGroup(themeColors.topBarButton) {
                 SettingsClickableItem(
                     icon = Icons.Default.Description,
                     title = "Privacy",
@@ -265,25 +267,21 @@ fun launchReviewFlow(context: Context) {
             val reviewInfo = task.result
             val flow = manager.launchReviewFlow(context, reviewInfo)
             flow.addOnCompleteListener { _ ->
-                // The flow has finished. The API does not indicate whether the user
-                // reviewed or not, or even whether the review dialog was shown.
-                // Thus, no matter the result, we continue our app flow.
+                // The flow has finished.
             }
         } else {
-            // There was some problem, continue regardless of the result.
-            // You can log the error here.
             Toast.makeText(context, "Could not launch review flow", Toast.LENGTH_SHORT).show()
         }
     }
 }
 
 @Composable
-fun SettingsGroup(content: @Composable () -> Unit) {
+fun SettingsGroup(backgroundColor: Color, content: @Composable () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(TopBarButtonBackground)
+            .background(backgroundColor)
             .padding(vertical = 8.dp)
     ) {
         content()
@@ -295,6 +293,7 @@ fun SettingsSwitchItem(
     icon: ImageVector,
     title: String,
     initialValue: Boolean,
+    accentColor: Color,
     onCheckedChange: ((Boolean) -> Unit)? = null
 ) {
     var checked by remember { mutableStateOf(initialValue) }
@@ -327,7 +326,7 @@ fun SettingsSwitchItem(
             },
             colors = SwitchDefaults.colors(
                 checkedThumbColor = White,
-                checkedTrackColor = AccentBlue,
+                checkedTrackColor = accentColor,
                 uncheckedThumbColor = White,
                 uncheckedTrackColor = InactiveIcon
             )
@@ -386,11 +385,12 @@ fun ThemeSelectionDialog(
     onDismiss: () -> Unit,
     onThemeSelected: (String) -> Unit
 ) {
-    val themes = listOf("Dark") // Ready to add more: "Light", "System", "Blue", etc.
+    val themeColors = LocalThemeColors.current
+    val themes = listOf("Dark", "Green", "Red", "Yellow", "Orange", "Black and White")
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = BottomBarBackground,
+        containerColor = themeColors.bottomBar,
         title = {
             Text(
                 text = "Choose Theme",
@@ -412,7 +412,7 @@ fun ThemeSelectionDialog(
                             selected = theme == currentTheme,
                             onClick = { onThemeSelected(theme) },
                             colors = RadioButtonDefaults.colors(
-                                selectedColor = AccentBlue,
+                                selectedColor = themeColors.accent,
                                 unselectedColor = InactiveIcon
                             )
                         )
@@ -428,7 +428,7 @@ fun ThemeSelectionDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel", color = AccentBlue)
+                Text("Cancel", color = themeColors.accent)
             }
         }
     )
