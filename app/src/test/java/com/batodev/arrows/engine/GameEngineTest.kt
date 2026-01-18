@@ -25,6 +25,10 @@ class FakeUserPreferencesRepository : UserPreferencesRepository(mock()) {
     override suspend fun saveThemePreference(theme: String) { themeFlow.value = theme }
     override suspend fun saveInitialLevel(levelJson: String) { initialLevelFlow.value = levelJson }
     override suspend fun saveCurrentLevel(levelJson: String) { currentLevelFlow.value = levelJson }
+    override suspend fun clearSavedLevel() {
+        initialLevelFlow.value = null
+        currentLevelFlow.value = null
+    }
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -109,5 +113,31 @@ class GameEngineTest {
         
         assertEquals(1f, engine.scale)
         assertEquals(level, engine.level)
+    }
+
+    @Test
+    fun `test clearSavedLevel is called when game is won`() = runTest {
+        // Level with 1 snake
+        val level = GameLevel(5, 5, listOf(Snake(1, listOf(Point(0, 0)), Direction.RIGHT)))
+        whenever(gameGenerator.generateSolvableLevel(any(), any(), any(), any(), any())).thenReturn(level)
+
+        val engine = GameEngine(this, repository, gameGenerator, autoLoad = false, backgroundDispatcher = UnconfinedTestDispatcher(testScheduler))
+        engine.loadOrRegenerateLevel()
+        
+        // Ensure it's saved initially
+        assertNotNull(repository.initialLevelFlow.value)
+        
+        // Tap to remove the only snake
+        // Target (160, 100) for head (0,0)
+        engine.onTap(Offset(160f, 100f), 1000f)
+        
+        // Wait for animation and removal
+        // Note: animateRemoval has loops and delays. In UnconfinedTestDispatcher with runTest, 
+        // delays are handled by virtual time.
+        advanceUntilIdle()
+
+        assertTrue(engine.isGameWon)
+        assertNull(repository.initialLevelFlow.value)
+        assertNull(repository.currentLevelFlow.value)
     }
 }

@@ -213,9 +213,13 @@ class GameEngine(
             removalProgress = removalProgress.toMutableMap().apply { put(snakeId, 1f) }
             level = level.copy(snakes = level.snakes.filter { it.id != snakeId })
             removalProgress = removalProgress.toMutableMap().apply { remove(snakeId) }
-            saveState()
             if (level.snakes.isEmpty()) {
                 isGameWon = true
+                coroutineScope.launch(backgroundDispatcher) {
+                    repository.clearSavedLevel()
+                }
+            } else {
+                saveState()
             }
         }
     }

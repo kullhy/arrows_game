@@ -46,4 +46,11 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
             preferences[PreferencesKeys.CURRENT_LEVEL] = levelJson
         }
     }
+
+    open suspend fun clearSavedLevel() {
+        dataStore.edit { preferences ->
+            preferences.remove(PreferencesKeys.INITIAL_LEVEL)
+            preferences.remove(PreferencesKeys.CURRENT_LEVEL)
+        }
+    }
 }
