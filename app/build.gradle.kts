@@ -27,10 +27,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("Boolean", "DRAW_DEBUG_STUFF", "false")
         }
         debug {
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
+            buildConfigField("Boolean", "DRAW_DEBUG_STUFF", "false")
         }
     }
     compileOptions {

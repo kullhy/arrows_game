@@ -105,7 +105,7 @@ class GameEngine(
     }
 
     fun onTransform(pan: androidx.compose.ui.geometry.Offset, zoom: Float) {
-        scale = (scale * zoom).coerceIn(0.3f, 5f)
+        scale = (scale * zoom).coerceIn(0.2f, 6f)
         offsetX += pan.x
         offsetY += pan.y
     }

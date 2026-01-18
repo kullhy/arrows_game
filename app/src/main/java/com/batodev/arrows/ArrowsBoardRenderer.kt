@@ -67,7 +67,7 @@ object ArrowsBoardRenderer {
         removalProgress: Map<Int, Float> = emptyMap(),
     ) {
         val themeColors = com.batodev.arrows.ui.theme.LocalThemeColors.current
-        val debug = BuildConfig.DEBUG || false
+        val debug = BuildConfig.DRAW_DEBUG_STUFF
         Canvas(modifier = modifier) {
             val totalDrawTime = measureTimeMillis {
                 // Calculate cell dimensions based on canvas size and grid dimensions

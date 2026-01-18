@@ -244,7 +244,6 @@ fun ArrowsGameView(
                 ) {
                     Box(
                         modifier = Modifier
-                            .padding(8.dp)
                             .size(boardSize)
                             .pointerInput(Unit) {
                                 detectTransformGestures { _, pan, zoom, _ ->
@@ -272,7 +271,7 @@ fun ArrowsGameView(
                             level = engine.level,
                             flashingSnakeId = engine.flashingSnakeId,
                             removalProgress = engine.removalProgress,
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize().padding(10.dp)
                         )
                     }
                 }
