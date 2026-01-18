@@ -141,15 +141,22 @@ class GameEngine(
         val cellY = contentY / cellHeight
 
         // Check if tapped cell contains a snake head (with tolerance for easier tapping)
-        val tolerance = 0.6f // Allow tapping within 0.6 cells of the tap area center
-        val tappedSnake = level.snakes.find { snake ->
-            val head = snake.body.first()
-            // Account for the offset of tap area in arrow direction
-            val tapAreaCenterX = head.x + 0.5f + snake.headDirection.dx * TAP_AREA_OFFSET_FACTOR
-            val tapAreaCenterY = head.y + 0.5f + snake.headDirection.dy * TAP_AREA_OFFSET_FACTOR
-            kotlin.math.abs(tapAreaCenterX - cellX) <= tolerance &&
-            kotlin.math.abs(tapAreaCenterY - cellY) <= tolerance
-        }
+        val tolerance = 0.85f // High tolerance
+        val tappedSnake = level.snakes
+            .map { snake ->
+                val head = snake.body.first()
+                // Account for the offset of tap area in arrow direction
+                val tapAreaCenterX = head.x + 0.5f + snake.headDirection.dx * TAP_AREA_OFFSET_FACTOR
+                val tapAreaCenterY = head.y + 0.5f + snake.headDirection.dy * TAP_AREA_OFFSET_FACTOR
+                
+                val dx = tapAreaCenterX - cellX
+                val dy = tapAreaCenterY - cellY
+                val distSq = dx * dx + dy * dy
+                snake to distSq
+            }
+            .filter { (_, distSq) -> distSq <= tolerance * tolerance }
+            .minByOrNull { (_, distSq) -> distSq }
+            ?.first
 
         if (tappedSnake != null) {
             if (isVibrationEnabled) {
