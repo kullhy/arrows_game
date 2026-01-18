@@ -60,15 +60,16 @@ object ArrowsBoardRenderer {
      *                        0.0 = not started, 1.0 = fully removed
      */
     @Composable
-fun Board(
-    level: GameLevel,
-    modifier: Modifier = Modifier,
-    flashingSnakeId: Int? = null,
-    removalProgress: Map<Int, Float> = emptyMap()
-) {
-    val themeColors = com.batodev.arrows.ui.theme.LocalThemeColors.current
-    Canvas(modifier = modifier) {
-        val totalDrawTime = measureTimeMillis {
+    fun Board(
+        level: GameLevel,
+        modifier: Modifier = Modifier,
+        flashingSnakeId: Int? = null,
+        removalProgress: Map<Int, Float> = emptyMap(),
+    ) {
+        val themeColors = com.batodev.arrows.ui.theme.LocalThemeColors.current
+        val debug = BuildConfig.DEBUG || false
+        Canvas(modifier = modifier) {
+            val totalDrawTime = measureTimeMillis {
                 // Calculate cell dimensions based on canvas size and grid dimensions
                 val cellWidth = size.width / level.width
                 val cellHeight = size.height / level.height
@@ -82,7 +83,7 @@ fun Board(
                 val moveDist = max(size.width, size.height) * 1.2f
 
                 // Draw game area border in debug builds
-                if (BuildConfig.DEBUG) {
+                if (debug) {
                     drawRect(
                         color = Color.Gray,
                         size = size,
@@ -91,7 +92,7 @@ fun Board(
                 }
 
                 // Draw tap areas for snake heads (debug visualization only)
-                if (BuildConfig.DEBUG) {
+                if (debug) {
                     val tapTolerance = 0.6f // Tap radius in cells
                     level.snakes.forEach { snake ->
                         val head = snake.body.first()
@@ -101,8 +102,10 @@ fun Board(
                         val tapRadius = tapTolerance * cellWidth
 
                         // Shift tap area in arrow direction for easier tapping
-                        val tapOffsetX = headCx + snake.headDirection.dx * cellWidth * TAP_AREA_OFFSET_FACTOR
-                        val tapOffsetY = headCy + snake.headDirection.dy * cellHeight * TAP_AREA_OFFSET_FACTOR
+                        val tapOffsetX =
+                            headCx + snake.headDirection.dx * cellWidth * TAP_AREA_OFFSET_FACTOR
+                        val tapOffsetY =
+                            headCy + snake.headDirection.dy * cellHeight * TAP_AREA_OFFSET_FACTOR
 
                         // Draw semi-transparent circle showing tappable area
                         drawCircle(
@@ -122,7 +125,8 @@ fun Board(
                     val path = Path()
                     val body = snake.body
                     // Use FlashingRed if snake is flashing (obstructed), otherwise themeColors.snake
-                    val baseColor = if (snake.id == flashingSnakeId) FlashingRed else themeColors.snake
+                    val baseColor =
+                        if (snake.id == flashingSnakeId) FlashingRed else themeColors.snake
                     val snakeColor = baseColor.copy(alpha = alpha)
 
                     val head = body.first()
