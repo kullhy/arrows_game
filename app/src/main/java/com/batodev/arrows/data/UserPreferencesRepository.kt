@@ -11,38 +11,38 @@ import kotlinx.coroutines.flow.map
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
-class UserPreferencesRepository(private val context: Context) {
+open class UserPreferencesRepository(private val dataStore: DataStore<Preferences>) {
     private object PreferencesKeys {
         val THEME = stringPreferencesKey("theme")
         val INITIAL_LEVEL = stringPreferencesKey("initial_level")
         val CURRENT_LEVEL = stringPreferencesKey("current_level")
     }
 
-    val theme: Flow<String> = context.dataStore.data
+    open val theme: Flow<String> = dataStore.data
         .map { preferences ->
             preferences[PreferencesKeys.THEME] ?: "Dark"
         }
 
-    val initialLevel: Flow<String?> = context.dataStore.data
+    open val initialLevel: Flow<String?> = dataStore.data
         .map { preferences -> preferences[PreferencesKeys.INITIAL_LEVEL] }
 
-    val currentLevel: Flow<String?> = context.dataStore.data
+    open val currentLevel: Flow<String?> = dataStore.data
         .map { preferences -> preferences[PreferencesKeys.CURRENT_LEVEL] }
 
-    suspend fun saveThemePreference(theme: String) {
-        context.dataStore.edit { preferences ->
+    open suspend fun saveThemePreference(theme: String) {
+        dataStore.edit { preferences ->
             preferences[PreferencesKeys.THEME] = theme
         }
     }
 
-    suspend fun saveInitialLevel(levelJson: String) {
-        context.dataStore.edit { preferences ->
+    open suspend fun saveInitialLevel(levelJson: String) {
+        dataStore.edit { preferences ->
             preferences[PreferencesKeys.INITIAL_LEVEL] = levelJson
         }
     }
 
-    suspend fun saveCurrentLevel(levelJson: String) {
-        context.dataStore.edit { preferences ->
+    open suspend fun saveCurrentLevel(levelJson: String) {
+        dataStore.edit { preferences ->
             preferences[PreferencesKeys.CURRENT_LEVEL] = levelJson
         }
     }

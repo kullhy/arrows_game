@@ -10,14 +10,16 @@ import com.batodev.arrows.data.UserPreferencesRepository
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class GameEngine(
     private val coroutineScope: CoroutineScope,
     private val repository: UserPreferencesRepository,
-    private val gameGenerator: GameGenerator = GameGenerator()
+    private val gameGenerator: GameGenerator = GameGenerator(),
+    autoLoad: Boolean = true,
+    private val backgroundDispatcher: kotlinx.coroutines.CoroutineDispatcher = kotlinx.coroutines.Dispatchers.Default
 ) {
     private val gson = Gson()
     private var initialLevel: GameLevel? = null
@@ -53,13 +55,15 @@ class GameEngine(
         private set
 
     init {
-        loadOrRegenerateLevel()
+        if (autoLoad) {
+            loadOrRegenerateLevel()
+        }
     }
 
-    private fun loadOrRegenerateLevel() {
-        coroutineScope.launch {
-            val savedInitial = repository.initialLevel.first()
-            val savedCurrent = repository.currentLevel.first()
+    fun loadOrRegenerateLevel() {
+        coroutineScope.launch(backgroundDispatcher) {
+            val savedInitial = repository.initialLevel.firstOrNull()
+            val savedCurrent = repository.currentLevel.firstOrNull()
 
             if (savedInitial != null && savedCurrent != null) {
                 try {
@@ -69,17 +73,18 @@ class GameEngine(
                     isGameWon = level.snakes.isEmpty()
                     lives = maxLives
                     isLoading = false
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     regenerateLevel()
                 }
             } else {
                 regenerateLevel()
+                isLoading = false
             }
         }
     }
 
     private fun saveState() {
-        coroutineScope.launch {
+        coroutineScope.launch(backgroundDispatcher) {
             repository.saveCurrentLevel(gson.toJson(level))
         }
     }
@@ -164,7 +169,7 @@ class GameEngine(
     fun regenerateLevel() {
         isLoading = true
         loadingProgress = 0f
-        coroutineScope.launch(kotlinx.coroutines.Dispatchers.Default) {
+        coroutineScope.launch(backgroundDispatcher) {
             val newLevel = gameGenerator.generateSolvableLevel(15, 15, 30, onProgress = { progress ->
                 loadingProgress = progress
             })
@@ -180,9 +185,9 @@ class GameEngine(
                 flashingSnakeId = null
                 removalProgress = emptyMap()
                 isLoading = false
-                
+
                 // Save both initial and current as same for a new level
-                coroutineScope.launch {
+                coroutineScope.launch(backgroundDispatcher) {
                     val json = gson.toJson(newLevel)
                     repository.saveInitialLevel(json)
                     repository.saveCurrentLevel(json)
