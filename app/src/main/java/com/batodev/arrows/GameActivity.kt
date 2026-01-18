@@ -2,6 +2,7 @@ package com.batodev.arrows
 
 import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.view.HapticFeedbackConstants
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -252,9 +253,6 @@ fun ArrowsGameView(
                         .aspectRatio(1f)
                         .padding(16.dp)
                         .clipToBounds()
-                ) {
-                    Box(modifier = Modifier
-                        .size(boardSize)
                         .pointerInput(Unit) {
                             detectTransformGestures { _, pan, zoom, _ ->
                                 engine.onTransform(pan, zoom)
@@ -264,8 +262,14 @@ fun ArrowsGameView(
                             engine.scale, engine.offsetX, engine.offsetY, engine.level
                         ) {
                             detectTapGestures { tapOffset ->
-                                android.util.Log.d("TapDebug", "tapOffset: $tapOffset, scale: ${engine.scale}, offsetX: ${engine.offsetX}, offsetY: ${engine.offsetY}")
-                                engine.onTap(tapOffset, size.width.toFloat())
+                                Log.v("TapDebug", "Container tap: $tapOffset, containerSize: ${size.width}")
+
+                                // Pass raw tap offset and container size to engine
+                                // Engine will handle all coordinate transformations
+                                engine.onTap(tapOffset, size.width.toFloat(), 1000.dp.toPx())
+
+
+                                // Store tap position in container coordinates for animation
                                 tapAnimations.add(
                                     TapAnimationState(
                                         System.nanoTime(), tapOffset
@@ -273,6 +277,9 @@ fun ArrowsGameView(
                                 )
                             }
                         }
+                ) {
+                    Box(modifier = Modifier
+                        .size(boardSize)
                         .graphicsLayer(
                             scaleX = engine.scale,
                             scaleY = engine.scale,
@@ -296,23 +303,26 @@ fun ArrowsGameView(
                                 center = Offset(0f, 0f)
                             )
                         }
-                        // DEBUG: Draw marker at last tapOffset
-                        if (tapAnimations.isNotEmpty()) {
-                            val lastTap = tapAnimations.last().offset
-                            Canvas(modifier = Modifier.fillMaxSize()) {
-                                drawCircle(
-                                    color = Color.Green,
-                                    radius = 20f,
-                                    center = lastTap
-                                )
-                            }
+                    }
+
+                    // DEBUG: Draw marker at last tapOffset in container coordinates
+                    if (tapAnimations.isNotEmpty()) {
+                        val lastTap = tapAnimations.last().offset
+                        Canvas(modifier = Modifier.fillMaxSize()) {
+                            drawCircle(
+                                color = Color.Green,
+                                radius = 20f,
+                                center = lastTap
+                            )
                         }
-                        tapAnimations.forEach { anim ->
-                            key(anim.id) {
-                                TapRipple(
-                                    offset = anim.offset,
-                                    onFinished = { tapAnimations.remove(anim) })
-                            }
+                    }
+
+                    // Tap animations rendered in container coordinate space
+                    tapAnimations.forEach { anim ->
+                        key(anim.id) {
+                            TapRipple(
+                                offset = anim.offset,
+                                onFinished = { tapAnimations.remove(anim) })
                         }
                     }
                 }

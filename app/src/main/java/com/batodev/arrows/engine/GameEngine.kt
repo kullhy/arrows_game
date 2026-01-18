@@ -125,38 +125,66 @@ class GameEngine(
 
     fun onTap(
         tapOffset: androidx.compose.ui.geometry.Offset,
+        containerSizePx: Float,
         boardSizePx: Float
     ) {
         if (isLoading || lives <= 0) return
 
-        // Transform tap coordinates to content coordinates
-        val center = boardSizePx / 2
-        val contentX = (tapOffset.x - offsetX - center) / scale + center
-        val contentY = (tapOffset.y - offsetY - center) / scale + center
+        android.util.Log.v("TapDebug", "onTap: tap=$tapOffset, containerSize=$containerSizePx, boardSize=$boardSizePx")
+        android.util.Log.v("TapDebug", "graphicsLayer: scale=$scale, offsetX=$offsetX, offsetY=$offsetY")
 
-        // Convert to grid cell coordinates
+        // The board Box is sized at boardSizePx (1000dp in pixels), but it's positioned at (0,0)
+        // of the container and then scaled/translated by graphicsLayer.
+        // The container clips to containerSizePx x containerSizePx.
+        // Tap offset is in container coordinates.
+
+        // Key insight: offsetX and offsetY are in CONTAINER pixel space (applied by graphicsLayer),
+        // but we need to work in BOARD pixel space for the transformation.
+
+        // Step 1: Apply inverse graphicsLayer transformation (scale and translation) in container space
+        val centerContainer = containerSizePx / 2
+        val transformedX = (tapOffset.x - offsetX - centerContainer) / scale + centerContainer
+        val transformedY = (tapOffset.y - offsetY - centerContainer) / scale + centerContainer
+
+        android.util.Log.v("TapDebug", "transformed in container space: ($transformedX, $transformedY)")
+
+        // Step 2: Scale from container space to board space
+        val boardToContainerScale = containerSizePx / boardSizePx
+        val contentX = transformedX / boardToContainerScale
+        val contentY = transformedY / boardToContainerScale
+
+        android.util.Log.v("TapDebug", "content coords: contentX=$contentX, contentY=$contentY")
+
+        // Step 3: Convert to grid cell coordinates
         val cellWidth = boardSizePx / level.width
         val cellHeight = boardSizePx / level.height
         val cellX = contentX / cellWidth
         val cellY = contentY / cellHeight
 
+        android.util.Log.v("TapDebug", "grid coords: cellX=$cellX, cellY=$cellY (grid size: ${level.width}x${level.height})")
+
         // Check if tapped cell contains a snake head (with tolerance for easier tapping)
-        val tolerance = 0.85f // High tolerance
+        val tolerance = 4.0f // High tolerance - accounts for zoom/pan transform inaccuracies and screen density variations
         val tappedSnake = level.snakes
             .map { snake ->
                 val head = snake.body.first()
                 // Account for the offset of tap area in arrow direction
                 val tapAreaCenterX = head.x + 0.5f + snake.headDirection.dx * TAP_AREA_OFFSET_FACTOR
                 val tapAreaCenterY = head.y + 0.5f + snake.headDirection.dy * TAP_AREA_OFFSET_FACTOR
-                
+
                 val dx = tapAreaCenterX - cellX
                 val dy = tapAreaCenterY - cellY
                 val distSq = dx * dx + dy * dy
+
+                android.util.Log.v("TapDebug", "Snake ${snake.id} head at (${head.x}, ${head.y}), tap area center: ($tapAreaCenterX, $tapAreaCenterY), distSq=$distSq")
+
                 snake to distSq
             }
             .filter { (_, distSq) -> distSq <= tolerance * tolerance }
             .minByOrNull { (_, distSq) -> distSq }
             ?.first
+
+        android.util.Log.v("TapDebug", "tappedSnake: ${tappedSnake?.id}")
 
         if (tappedSnake != null) {
             if (isVibrationEnabled) {
