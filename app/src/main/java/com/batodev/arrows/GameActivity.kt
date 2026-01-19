@@ -43,6 +43,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -69,6 +70,7 @@ import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.HeartRed
 import com.batodev.arrows.ui.theme.ProgressBarGreen
 import com.batodev.arrows.ui.theme.White
+import kotlinx.coroutines.delay
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.core.Party
 import nl.dionsegijn.konfetti.core.Position
@@ -124,6 +126,13 @@ fun ArrowsGameView(
     val context = LocalContext.current
 
     val themeColors = com.batodev.arrows.ui.theme.LocalThemeColors.current
+
+    LaunchedEffect(engine.isGameWon) {
+        if (engine.isGameWon) {
+            delay(3000) // Wait for confetti
+            (context as? Activity)?.finish()
+        }
+    }
 
     if (engine.isGameWon && state.isEmpty()) {
         state = listOf(
