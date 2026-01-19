@@ -114,16 +114,17 @@ fun ArrowsGameView(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val view = LocalView.current
+    val context = LocalContext.current
+    val soundManager = remember { SoundManager(context) }
     val engine = remember {
         GameEngine(
             coroutineScope, repository, onVibrate = {
                 view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-            })
+            }, soundManager = soundManager)
     }
     var state by remember { mutableStateOf<List<Party>>(emptyList()) }
     val tapAnimations =
         remember { androidx.compose.runtime.mutableStateListOf<TapAnimationState>() }
-    val context = LocalContext.current
 
     val themeColors = com.batodev.arrows.ui.theme.LocalThemeColors.current
 

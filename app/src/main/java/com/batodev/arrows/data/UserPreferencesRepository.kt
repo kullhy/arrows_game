@@ -18,6 +18,7 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
         val CURRENT_LEVEL = stringPreferencesKey("current_level")
         val VIBRATION_ENABLED = androidx.datastore.preferences.core.booleanPreferencesKey("vibration_enabled")
         val ANIMATION_SPEED = stringPreferencesKey("animation_speed")
+        val SOUNDS_ENABLED = androidx.datastore.preferences.core.booleanPreferencesKey("sounds_enabled")
     }
 
     open val theme: Flow<String> = dataStore.data
@@ -33,6 +34,11 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
     open val isVibrationEnabled: Flow<Boolean> = dataStore.data
         .map { preferences ->
             preferences[PreferencesKeys.VIBRATION_ENABLED] ?: true
+        }
+
+    open val isSoundsEnabled: Flow<Boolean> = dataStore.data
+        .map { preferences ->
+            preferences[PreferencesKeys.SOUNDS_ENABLED] ?: true
         }
 
     open val initialLevel: Flow<String?> = dataStore.data
@@ -56,6 +62,12 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
     open suspend fun saveVibrationPreference(enabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.VIBRATION_ENABLED] = enabled
+        }
+    }
+
+    open suspend fun saveSoundsPreference(enabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.SOUNDS_ENABLED] = enabled
         }
     }
 

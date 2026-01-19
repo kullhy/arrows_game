@@ -31,6 +31,8 @@ class GameEngineTapTest {
             on { initialLevel } doReturn MutableStateFlow(levelJson)
             on { currentLevel } doReturn MutableStateFlow(levelJson)
             on { isVibrationEnabled } doReturn MutableStateFlow(false)
+            on { isSoundsEnabled } doReturn MutableStateFlow(true)
+            on { animationSpeed } doReturn MutableStateFlow("Medium")
         }
 
         val testDispatcher = UnconfinedTestDispatcher()
@@ -72,7 +74,7 @@ class GameEngineTapTest {
         // So S2 is also obstructed.
         
         val tapOffset = Offset(2.4f * cellWidth, 1.5f * cellWidth)
-        engine.onTap(tapOffset, boardSize)
+        engine.onTap(tapOffset, boardSize, boardSize)
         
         // Check if S1 flashed (id 1)
         assertEquals(1, engine.flashingSnakeId)
@@ -88,7 +90,7 @@ class GameEngineTapTest {
         // Should pick S2.
         
         val tapOffset2 = Offset(2.6f * cellWidth, 1.5f * cellWidth)
-        engine.onTap(tapOffset2, boardSize)
+        engine.onTap(tapOffset2, boardSize, boardSize)
         
         // S2 should flash (id 2)
         assertEquals(2, engine.flashingSnakeId)

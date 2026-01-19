@@ -102,6 +102,7 @@ fun SettingsScreen(viewModel: AppViewModel) {
     val currentTheme by viewModel.theme.collectAsState()
     val currentAnimationSpeed by viewModel.animationSpeed.collectAsState()
     val isVibrationEnabled by viewModel.isVibrationEnabled.collectAsState()
+    val isSoundsEnabled by viewModel.isSoundsEnabled.collectAsState()
     val themeColors = LocalThemeColors.current
 
     if (showThemeDialog) {
@@ -193,8 +194,9 @@ fun SettingsScreen(viewModel: AppViewModel) {
                 SettingsSwitchItem(
                     icon = Icons.AutoMirrored.Filled.VolumeUp,
                     title = "Sounds",
-                    initialValue = true,
-                    accentColor = themeColors.accent
+                    initialValue = isSoundsEnabled,
+                    accentColor = themeColors.accent,
+                    onCheckedChange = { viewModel.saveSounds(it) }
                 )
                 SettingsClickableItem(
                     icon = Icons.Default.Palette,

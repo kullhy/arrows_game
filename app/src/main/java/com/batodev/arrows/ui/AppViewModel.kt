@@ -29,21 +29,33 @@ class AppViewModel(private val userPreferencesRepository: UserPreferencesReposit
         initialValue = true
     )
 
+    val isSoundsEnabled: StateFlow<Boolean> = userPreferencesRepository.isSoundsEnabled.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = true
+    )
+
     fun saveTheme(theme: String) {
         viewModelScope.launch {
             userPreferencesRepository.saveThemePreference(theme)
         }
     }
 
-    fun saveAnimationSpeed(speed: String) {
-        viewModelScope.launch {
-            userPreferencesRepository.saveAnimationSpeed(speed)
-        }
-    }
-
     fun saveVibration(enabled: Boolean) {
         viewModelScope.launch {
             userPreferencesRepository.saveVibrationPreference(enabled)
+        }
+    }
+
+    fun saveSounds(enabled: Boolean) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveSoundsPreference(enabled)
+        }
+    }
+
+    fun saveAnimationSpeed(speed: String) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveAnimationSpeed(speed)
         }
     }
 

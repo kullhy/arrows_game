@@ -22,11 +22,13 @@ class GameEngine(
     private val gameGenerator: GameGenerator = GameGenerator(),
     autoLoad: Boolean = true,
     private val backgroundDispatcher: kotlinx.coroutines.CoroutineDispatcher = kotlinx.coroutines.Dispatchers.Default,
-    private val onVibrate: () -> Unit = {}
+    private val onVibrate: () -> Unit = {},
+    private val soundManager: com.batodev.arrows.SoundManager? = null
 ) {
     private val gson = Gson()
     private var initialLevel: GameLevel? = null
     private var isVibrationEnabled = true
+    private var isSoundsEnabled = true
     private var animationSpeed = "Medium"
 
     var level by mutableStateOf(GameLevel(1, 1, emptyList()))
@@ -63,6 +65,12 @@ class GameEngine(
         coroutineScope.launch {
             repository.isVibrationEnabled.collect {
                 isVibrationEnabled = it
+            }
+        }
+        coroutineScope.launch {
+            repository.isSoundsEnabled.collect {
+                isSoundsEnabled = it
+                soundManager?.setSoundsEnabled(it)
             }
         }
         coroutineScope.launch {
@@ -217,6 +225,11 @@ class GameEngine(
                 // Deduct life on obstructed move
                 if (lives > 0) {
                     lives--
+                    if (lives > 0) {
+                        soundManager?.playLiveLost()
+                    } else {
+                        soundManager?.playGameLost()
+                    }
                 }
 
                 // Flash red
@@ -226,6 +239,8 @@ class GameEngine(
                     flashingSnakeId = null
                 }
             } else {
+                // Play random switch sound on successful tap
+                soundManager?.playRandomSwitch()
                 // Animate out, then remove
                 if (!removalProgress.containsKey(tappedSnake.id)) {
                     animateRemoval(tappedSnake.id)
@@ -285,12 +300,15 @@ class GameEngine(
             removalProgress = removalProgress.toMutableMap().apply { put(snakeId, 1f) }
             level = level.copy(snakes = level.snakes.filter { it.id != snakeId })
             removalProgress = removalProgress.toMutableMap().apply { remove(snakeId) }
+            
             if (level.snakes.isEmpty()) {
                 isGameWon = true
+                soundManager?.playGameWon()
                 coroutineScope.launch(backgroundDispatcher) {
                     repository.clearSavedLevel()
                 }
             } else {
+                soundManager?.playSnakeRemoved()
                 saveState()
             }
         }
