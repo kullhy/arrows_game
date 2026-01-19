@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material3.Icon
@@ -97,7 +98,9 @@ fun SettingsScreen(viewModel: AppViewModel) {
     val context = LocalContext.current
 
     var showThemeDialog by remember { mutableStateOf(false) }
+    var showAnimationSpeedDialog by remember { mutableStateOf(false) }
     val currentTheme by viewModel.theme.collectAsState()
+    val currentAnimationSpeed by viewModel.animationSpeed.collectAsState()
     val isVibrationEnabled by viewModel.isVibrationEnabled.collectAsState()
     val themeColors = LocalThemeColors.current
 
@@ -108,6 +111,17 @@ fun SettingsScreen(viewModel: AppViewModel) {
             onThemeSelected = {
                 viewModel.saveTheme(it)
                 showThemeDialog = false
+            }
+        )
+    }
+
+    if (showAnimationSpeedDialog) {
+        AnimationSpeedSelectionDialog(
+            currentSpeed = currentAnimationSpeed,
+            onDismiss = { showAnimationSpeedDialog = false },
+            onSpeedSelected = {
+                viewModel.saveAnimationSpeed(it)
+                showAnimationSpeedDialog = false
             }
         )
     }
@@ -187,6 +201,12 @@ fun SettingsScreen(viewModel: AppViewModel) {
                     title = "Theme",
                     valueText = currentTheme,
                     onClick = { showThemeDialog = true }
+                )
+                SettingsClickableItem(
+                    icon = Icons.Default.Speed,
+                    title = "Animation Speed",
+                    valueText = currentAnimationSpeed,
+                    onClick = { showAnimationSpeedDialog = true }
                 )
             }
 
@@ -421,6 +441,61 @@ fun ThemeSelectionDialog(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = theme,
+                            color = White,
+                            fontSize = 16.sp
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel", color = themeColors.accent)
+            }
+        }
+    )
+}
+
+@Composable
+fun AnimationSpeedSelectionDialog(
+    currentSpeed: String,
+    onDismiss: () -> Unit,
+    onSpeedSelected: (String) -> Unit
+) {
+    val themeColors = LocalThemeColors.current
+    val speeds = listOf("High", "Medium", "Low")
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = themeColors.bottomBar,
+        title = {
+            Text(
+                text = "Animation Speed",
+                color = White,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column {
+                speeds.forEach { speed ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onSpeedSelected(speed) }
+                            .padding(vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = speed == currentSpeed,
+                            onClick = { onSpeedSelected(speed) },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = themeColors.accent,
+                                unselectedColor = InactiveIcon
+                            )
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = speed,
                             color = White,
                             fontSize = 16.sp
                         )

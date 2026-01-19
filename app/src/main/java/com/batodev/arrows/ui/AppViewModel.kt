@@ -17,6 +17,12 @@ class AppViewModel(private val userPreferencesRepository: UserPreferencesReposit
         initialValue = "Dark"
     )
 
+    val animationSpeed: StateFlow<String> = userPreferencesRepository.animationSpeed.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = "Medium"
+    )
+
     val isVibrationEnabled: StateFlow<Boolean> = userPreferencesRepository.isVibrationEnabled.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -26,6 +32,12 @@ class AppViewModel(private val userPreferencesRepository: UserPreferencesReposit
     fun saveTheme(theme: String) {
         viewModelScope.launch {
             userPreferencesRepository.saveThemePreference(theme)
+        }
+    }
+
+    fun saveAnimationSpeed(speed: String) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveAnimationSpeed(speed)
         }
     }
 

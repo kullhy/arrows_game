@@ -25,6 +25,7 @@ class GameEngine(
     private val gson = Gson()
     private var initialLevel: GameLevel? = null
     private var isVibrationEnabled = true
+    private var animationSpeed = "Medium"
 
     var level by mutableStateOf(GameLevel(1, 1, emptyList()))
         private set
@@ -60,6 +61,11 @@ class GameEngine(
         coroutineScope.launch {
             repository.isVibrationEnabled.collect {
                 isVibrationEnabled = it
+            }
+        }
+        coroutineScope.launch {
+            repository.animationSpeed.collect {
+                animationSpeed = it
             }
         }
         if (autoLoad) {
@@ -254,7 +260,11 @@ class GameEngine(
     }
 
     private fun animateRemoval(snakeId: Int) {
-        val durationMs = 600L
+        val durationMs = when (animationSpeed) {
+            "High" -> 300L
+            "Low" -> 900L
+            else -> 600L
+        }
         val frameDelayMs = 16L
         coroutineScope.launch {
             removalProgress = removalProgress.toMutableMap().apply { put(snakeId, 0f) }
