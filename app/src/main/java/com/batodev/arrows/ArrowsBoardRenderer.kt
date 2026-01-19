@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import com.batodev.arrows.engine.Direction
 import com.batodev.arrows.engine.GameLevel
+import com.batodev.arrows.engine.tolerance
 import com.batodev.arrows.ui.theme.FlashingRed
 import com.batodev.arrows.ui.theme.LightGray
 import kotlin.math.PI
@@ -67,7 +68,6 @@ object ArrowsBoardRenderer {
         removalProgress: Map<Int, Float> = emptyMap(),
     ) {
         val themeColors = com.batodev.arrows.ui.theme.LocalThemeColors.current
-        val debug = BuildConfig.DRAW_DEBUG_STUFF
         Canvas(modifier = modifier) {
             val totalDrawTime = measureTimeMillis {
                 // Calculate cell dimensions based on canvas size and grid dimensions
@@ -83,7 +83,7 @@ object ArrowsBoardRenderer {
                 val moveDist = max(size.width, size.height) * 1.2f
 
                 // Draw game area border in debug builds
-                if (debug) {
+                if (BuildConfig.DRAW_DEBUG_STUFF) {
                     drawRect(
                         color = Color.Gray,
                         size = size,
@@ -92,14 +92,13 @@ object ArrowsBoardRenderer {
                 }
 
                 // Draw tap areas for snake heads (debug visualization only)
-                if (debug) {
-                    val tapTolerance = 0.6f // Tap radius in cells
+                if (BuildConfig.DRAW_DEBUG_STUFF) {
                     level.snakes.forEach { snake ->
                         val head = snake.body.first()
                         // Calculate center of head cell
                         val headCx = head.x * cellWidth + cellWidth / 2
                         val headCy = head.y * cellHeight + cellHeight / 2
-                        val tapRadius = tapTolerance * cellWidth
+                        val tapRadius = tolerance * cellWidth
 
                         // Shift tap area in arrow direction for easier tapping
                         val tapOffsetX =

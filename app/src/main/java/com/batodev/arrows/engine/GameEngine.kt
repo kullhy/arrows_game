@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
+const val tolerance = 1.3f // Enlarged tolerance for easier tapping
+
 class GameEngine(
     private val coroutineScope: CoroutineScope,
     private val repository: UserPreferencesRepository,
@@ -178,7 +180,6 @@ class GameEngine(
         }
 
         // Check if tapped cell contains a snake head (with tolerance for easier tapping)
-        val tolerance = 4.0f // High tolerance - accounts for zoom/pan transform inaccuracies and screen density variations
         val tappedSnake = level.snakes
             .map { snake ->
                 val head = snake.body.first()
@@ -194,10 +195,14 @@ class GameEngine(
                     android.util.Log.v("TapDebug", "Snake ${snake.id} head at (${head.x}, ${head.y}), tap area center: ($tapAreaCenterX, $tapAreaCenterY), distSq=$distSq")
                 }
 
-                snake to distSq
+                // We store the snake, its distance squared, and whether it's obstructed
+                Triple(snake, distSq, isLineOfSightObstructed(snake))
             }
-            .filter { (_, distSq) -> distSq <= tolerance * tolerance }
-            .minByOrNull { (_, distSq) -> distSq }
+            .filter { it.second <= tolerance * tolerance }
+            // Sort by:
+            // 1. Obstructed (false < true, so non-obstructed come first)
+            // 2. Distance squared (closest first)
+            .minWithOrNull(compareBy({ it.third }, { it.second }))
             ?.first
 
         if (com.batodev.arrows.BuildConfig.DRAW_DEBUG_STUFF) {
