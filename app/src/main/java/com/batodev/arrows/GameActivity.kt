@@ -285,7 +285,7 @@ fun ArrowsGameView(
 
                                 // Pass raw tap offset and container size to engine
                                 // Engine will handle all coordinate transformations
-                                engine.onTap(tapOffset, size.width.toFloat(), 1000.dp.toPx())
+                                engine.onTap(tapOffset, size.width.toFloat(), boardSize.toPx())
 
 
                                 // Store tap position in container coordinates for animation
