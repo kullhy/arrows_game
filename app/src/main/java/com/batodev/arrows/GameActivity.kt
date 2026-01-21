@@ -125,6 +125,11 @@ fun ArrowsGameView(
     }
     var state by remember { mutableStateOf<List<Party>>(emptyList()) }
     var showGuidanceLines by remember { mutableStateOf(false) }
+    val guidanceAlpha by animateFloatAsState(
+        targetValue = if (showGuidanceLines) 1f else 0f,
+        animationSpec = tween(durationMillis = 500),
+        label = "GuidanceAlphaAnimation"
+    )
     val tapAnimations =
         remember { androidx.compose.runtime.mutableStateListOf<TapAnimationState>() }
 
@@ -304,7 +309,7 @@ fun ArrowsGameView(
                             level = engine.level,
                             flashingSnakeId = engine.flashingSnakeId,
                             removalProgress = engine.removalProgress,
-                            showGuidanceLines = showGuidanceLines,
+                            guidanceAlpha = guidanceAlpha,
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(10.dp)

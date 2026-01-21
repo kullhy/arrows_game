@@ -67,7 +67,7 @@ object ArrowsBoardRenderer {
         modifier: Modifier = Modifier,
         flashingSnakeId: Int? = null,
         removalProgress: Map<Int, Float> = emptyMap(),
-        showGuidanceLines: Boolean = false,
+        guidanceAlpha: Float = 0f,
     ) {
         val themeColors = com.batodev.arrows.ui.theme.LocalThemeColors.current
         Canvas(modifier = modifier) {
@@ -93,7 +93,7 @@ object ArrowsBoardRenderer {
                     )
                 }
 
-                if (showGuidanceLines) {
+                if (guidanceAlpha > 0f) {
                     level.snakes.forEach { snake ->
                         if (removalProgress.containsKey(snake.id)) return@forEach
 
@@ -101,15 +101,20 @@ object ArrowsBoardRenderer {
                         val headCx = head.x * cellWidth + cellWidth / 2
                         val headCy = head.y * cellHeight + cellHeight / 2
 
-                        val endPoint = when (snake.headDirection) {
+                        val fullEndPoint = when (snake.headDirection) {
                             Direction.UP -> Offset(headCx, 0f)
                             Direction.DOWN -> Offset(headCx, size.height)
                             Direction.LEFT -> Offset(0f, headCy)
                             Direction.RIGHT -> Offset(size.width, headCy)
                         }
 
+                        val endPoint = Offset(
+                            x = headCx + (fullEndPoint.x - headCx) * guidanceAlpha,
+                            y = headCy + (fullEndPoint.y - headCy) * guidanceAlpha
+                        )
+
                         drawLine(
-                            color = themeColors.accent.copy(alpha = 0.4f),
+                            color = themeColors.accent.copy(alpha = 0.4f * guidanceAlpha),
                             start = Offset(headCx, headCy),
                             end = endPoint,
                             strokeWidth = 2.dp.toPx(),
