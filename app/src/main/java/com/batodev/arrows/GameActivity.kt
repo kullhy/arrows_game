@@ -158,8 +158,6 @@ fun ArrowsGameView(
         state = emptyList()
     }
 
-    val boardSize = 1000.dp
-
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -256,120 +254,121 @@ fun ArrowsGameView(
 
         // Game Area
         Box(
-            contentAlignment = Alignment.Center, modifier = Modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .weight(1f)
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f)
-                        .padding(16.dp)
-                        .clipToBounds()
-                        .pointerInput(Unit) {
-                            detectTransformGestures { _, pan, zoom, _ ->
-                                engine.onTransform(pan, zoom)
-                            }
-                        }
-                        .pointerInput(
-                            engine.scale, engine.offsetX, engine.offsetY, engine.level
-                        ) {
-                            detectTapGestures { tapOffset ->
-                                if (BuildConfig.DRAW_DEBUG_STUFF) {
-                                    Log.v("TapDebug", "Container tap: $tapOffset, containerSize: ${size.width}")
-                                }
-
-                                // Pass raw tap offset and container size to engine
-                                // Engine will handle all coordinate transformations
-                                engine.onTap(tapOffset, size.width.toFloat(), boardSize.toPx())
-
-
-                                // Store tap position in container coordinates for animation
-                                tapAnimations.add(
-                                    TapAnimationState(
-                                        System.nanoTime(), tapOffset
-                                    )
-                                )
-                            }
-                        }
+                .padding(16.dp)
+                .clipToBounds()
+                .pointerInput(Unit) {
+                    detectTransformGestures { _, pan, zoom, _ ->
+                        engine.onTransform(pan, zoom)
+                    }
+                }
+                .pointerInput(
+                    engine.scale, engine.offsetX, engine.offsetY, engine.level
                 ) {
-                    Box(modifier = Modifier
-                        .size(boardSize)
-                        .graphicsLayer(
-                            scaleX = engine.scale,
-                            scaleY = engine.scale,
-                            translationX = engine.offsetX,
-                            translationY = engine.offsetY
-                        )) {
-                        ArrowsBoardRenderer.Board(
-                            level = engine.level,
-                            flashingSnakeId = engine.flashingSnakeId,
-                            removalProgress = engine.removalProgress,
-                            guidanceAlpha = guidanceAlpha,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(10.dp)
-                        )
-
+                    detectTapGestures { tapOffset ->
                         if (BuildConfig.DRAW_DEBUG_STUFF) {
-                            Canvas(modifier = Modifier.fillMaxSize()) {
-                                drawCircle(
-                                    color = Color.Red,
-                                    radius = 20f,
-                                    center = Offset(0f, 0f)
-                                )
-                            }
-                        }
-                    }
-
-                    // Guidance Lines Toggle Button
-                    IconButton(
-                        onClick = { showGuidanceLines = !showGuidanceLines },
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(8.dp)
-                            .size(48.dp),
-                        colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = if (showGuidanceLines) themeColors.accent else themeColors.topBarButton,
-                            contentColor = White
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Grid4x4,
-                            contentDescription = "Guidance Lines",
-                            tint = White
-                        )
-                    }
-
-                    // DEBUG: Draw marker at last tapOffset in container coordinates
-                    if (BuildConfig.DRAW_DEBUG_STUFF && tapAnimations.isNotEmpty()) {
-                        val lastTap = tapAnimations.last().offset
-                        Canvas(modifier = Modifier.fillMaxSize()) {
-                            drawCircle(
-                                color = Color.Green,
-                                radius = 20f,
-                                center = lastTap
+                            Log.v(
+                                "TapDebug",
+                                "Container tap: $tapOffset, containerSize: ${size.width}x${size.height}"
                             )
                         }
-                    }
 
-                    // Tap animations rendered in container coordinate space
-                    tapAnimations.forEach { anim ->
-                        key(anim.id) {
-                            TapRipple(
-                                offset = anim.offset,
-                                onFinished = { tapAnimations.remove(anim) })
-                        }
+                        // Pass raw tap offset and container size to engine
+                        // Engine will handle all coordinate transformations
+                        engine.onTap(
+                            tapOffset,
+                            size.width.toFloat(),
+                            size.height.toFloat(),
+                            size.width.toFloat(),
+                            size.height.toFloat()
+                        )
+
+
+                        // Store tap position in container coordinates for animation
+                        tapAnimations.add(
+                            TapAnimationState(
+                                System.nanoTime(), tapOffset
+                            )
+                        )
+                    }
+                }
+        ) {
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer(
+                    scaleX = engine.scale,
+                    scaleY = engine.scale,
+                    translationX = engine.offsetX,
+                    translationY = engine.offsetY
+                )) {
+                ArrowsBoardRenderer.Board(
+                    level = engine.level,
+                    flashingSnakeId = engine.flashingSnakeId,
+                    removalProgress = engine.removalProgress,
+                    guidanceAlpha = guidanceAlpha,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(10.dp)
+                )
+
+                if (BuildConfig.DRAW_DEBUG_STUFF) {
+                    Canvas(modifier = Modifier.fillMaxSize()) {
+                        drawCircle(
+                            color = Color.Red,
+                            radius = 20f,
+                            center = Offset(0f, 0f)
+                        )
                     }
                 }
             }
 
+            // Guidance Lines Toggle Button
+            IconButton(
+                onClick = { showGuidanceLines = !showGuidanceLines },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(8.dp)
+                    .size(48.dp),
+                colors = IconButtonDefaults.iconButtonColors(
+                    containerColor = if (showGuidanceLines) themeColors.accent else themeColors.topBarButton,
+                    contentColor = White
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Grid4x4,
+                    contentDescription = "Guidance Lines",
+                    tint = White
+                )
+            }
+
+            // DEBUG: Draw marker at last tapOffset in container coordinates
+            if (BuildConfig.DRAW_DEBUG_STUFF && tapAnimations.isNotEmpty()) {
+                val lastTap = tapAnimations.last().offset
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    drawCircle(
+                        color = Color.Green,
+                        radius = 20f,
+                        center = lastTap
+                    )
+                }
+            }
+
+            // Tap animations rendered in container coordinate space
+            tapAnimations.forEach { anim ->
+                key(anim.id) {
+                    TapRipple(
+                        offset = anim.offset,
+                        onFinished = { tapAnimations.remove(anim) })
+                }
+            }
+
             if (engine.isLoading) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text("Generating... ${(engine.loadingProgress * 100).toInt()}%", color = White)
                     Spacer(modifier = Modifier.height(8.dp))
                     LinearProgressIndicator(

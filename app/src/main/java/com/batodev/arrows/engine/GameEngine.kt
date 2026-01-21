@@ -141,47 +141,42 @@ class GameEngine(
 
     fun onTap(
         tapOffset: androidx.compose.ui.geometry.Offset,
-        containerSizePx: Float,
-        boardSizePx: Float
+        containerWidthPx: Float,
+        containerHeightPx: Float,
+        boardWidthPx: Float,
+        boardHeightPx: Float
     ) {
         if (isLoading || lives <= 0) return
 
         if (com.batodev.arrows.BuildConfig.DRAW_DEBUG_STUFF) {
-            android.util.Log.v("TapDebug", "onTap: tap=$tapOffset, containerSize=$containerSizePx, boardSize=$boardSizePx")
+            android.util.Log.v("TapDebug", "onTap: tap=$tapOffset, containerSize=${containerWidthPx}x${containerHeightPx}, boardSize=${boardWidthPx}x${boardHeightPx}")
             android.util.Log.v("TapDebug", "graphicsLayer: scale=$scale, offsetX=$offsetX, offsetY=$offsetY")
         }
 
-        // The board Box is sized at boardSizePx (1000dp in pixels), but it's positioned at (0,0)
-        // of the container and then scaled/translated by graphicsLayer.
-        // The container clips to containerSizePx x containerSizePx.
-        // Tap offset is in container coordinates.
+        // Step 1: Apply inverse graphicsLayer transformation in container space
+        val centerX = containerWidthPx / 2
+        val centerY = containerHeightPx / 2
+        val transformedX = (tapOffset.x - offsetX - centerX) / scale + centerX
+        val transformedY = (tapOffset.y - offsetY - centerY) / scale + centerY
 
-        // Key insight: offsetX and offsetY are in CONTAINER pixel space (applied by graphicsLayer),
-        // but we need to work in BOARD pixel space for the transformation.
+        // Step 2: Calculate centered board bounds within the transformed container space
+        val cellSize = kotlin.math.min(containerWidthPx / level.width, containerHeightPx / level.height)
+        val boardWidth = cellSize * level.width
+        val boardHeight = cellSize * level.height
+        val leftOffset = (containerWidthPx - boardWidth) / 2
+        val topOffset = (containerHeightPx - boardHeight) / 2
 
-        // Step 1: Apply inverse graphicsLayer transformation (scale and translation) in container space
-        val centerContainer = containerSizePx / 2
-        val transformedX = (tapOffset.x - offsetX - centerContainer) / scale + centerContainer
-        val transformedY = (tapOffset.y - offsetY - centerContainer) / scale + centerContainer
-
-        if (com.batodev.arrows.BuildConfig.DRAW_DEBUG_STUFF) {
-            android.util.Log.v("TapDebug", "transformed in container space: ($transformedX, $transformedY)")
-        }
-
-        // Step 2: Scale from container space to board space
-        val boardToContainerScale = containerSizePx / boardSizePx
-        val contentX = transformedX / boardToContainerScale
-        val contentY = transformedY / boardToContainerScale
+        // Step 3: Convert to board-relative coordinates
+        val contentX = transformedX - leftOffset
+        val contentY = transformedY - topOffset
 
         if (com.batodev.arrows.BuildConfig.DRAW_DEBUG_STUFF) {
             android.util.Log.v("TapDebug", "content coords: contentX=$contentX, contentY=$contentY")
         }
 
-        // Step 3: Convert to grid cell coordinates
-        val cellWidth = boardSizePx / level.width
-        val cellHeight = boardSizePx / level.height
-        val cellX = contentX / cellWidth
-        val cellY = contentY / cellHeight
+        // Step 4: Convert to grid cell coordinates
+        val cellX = contentX / cellSize
+        val cellY = contentY / cellSize
 
         if (com.batodev.arrows.BuildConfig.DRAW_DEBUG_STUFF) {
             android.util.Log.v("TapDebug", "grid coords: cellX=$cellX, cellY=$cellY (grid size: ${level.width}x${level.height})")

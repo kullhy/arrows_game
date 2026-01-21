@@ -72,9 +72,17 @@ object ArrowsBoardRenderer {
         val themeColors = com.batodev.arrows.ui.theme.LocalThemeColors.current
         Canvas(modifier = modifier) {
             val totalDrawTime = measureTimeMillis {
-                // Calculate cell dimensions based on canvas size and grid dimensions
-                val cellWidth = size.width / level.width
-                val cellHeight = size.height / level.height
+                // Calculate uniform cell size to maintain aspect ratio
+                val cellSize = kotlin.math.min(size.width / level.width, size.height / level.height)
+                val boardWidth = cellSize * level.width
+                val boardHeight = cellSize * level.height
+                
+                // Centering offsets
+                val leftOffset = (size.width - boardWidth) / 2
+                val topOffset = (size.height - boardHeight) / 2
+
+                val cellWidth = cellSize
+                val cellHeight = cellSize
 
                 // Visual styling parameters
                 val strokeWidth = cellWidth * 0.15f // Snake body thickness
@@ -88,10 +96,14 @@ object ArrowsBoardRenderer {
                 if (BuildConfig.DRAW_DEBUG_STUFF) {
                     drawRect(
                         color = Color.Gray,
-                        size = size,
+                        topLeft = Offset(leftOffset, topOffset),
+                        size = androidx.compose.ui.geometry.Size(boardWidth, boardHeight),
                         style = Stroke(width = 2f)
                     )
                 }
+
+                drawContext.canvas.save()
+                drawContext.canvas.translate(leftOffset, topOffset)
 
                 if (guidanceAlpha > 0f) {
                     level.snakes.forEach { snake ->
@@ -102,10 +114,10 @@ object ArrowsBoardRenderer {
                         val headCy = head.y * cellHeight + cellHeight / 2
 
                         val fullEndPoint = when (snake.headDirection) {
-                            Direction.UP -> Offset(headCx, 0f)
-                            Direction.DOWN -> Offset(headCx, size.height)
-                            Direction.LEFT -> Offset(0f, headCy)
-                            Direction.RIGHT -> Offset(size.width, headCy)
+                            Direction.UP -> Offset(headCx, -topOffset)
+                            Direction.DOWN -> Offset(headCx, boardHeight + (size.height - boardHeight - topOffset))
+                            Direction.LEFT -> Offset(-leftOffset, headCy)
+                            Direction.RIGHT -> Offset(boardWidth + (size.width - boardWidth - leftOffset), headCy)
                         }
 
                         val endPoint = Offset(
@@ -276,6 +288,7 @@ object ArrowsBoardRenderer {
                         color = snakeColor
                     )
                 }
+                drawContext.canvas.restore()
             }
             // Log the total time taken to draw the board for performance monitoring
             Log.v(
