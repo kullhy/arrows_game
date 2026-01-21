@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.unit.dp
 import com.batodev.arrows.engine.Direction
 import com.batodev.arrows.engine.GameLevel
 import com.batodev.arrows.engine.tolerance
@@ -66,6 +67,7 @@ object ArrowsBoardRenderer {
         modifier: Modifier = Modifier,
         flashingSnakeId: Int? = null,
         removalProgress: Map<Int, Float> = emptyMap(),
+        showGuidanceLines: Boolean = false,
     ) {
         val themeColors = com.batodev.arrows.ui.theme.LocalThemeColors.current
         Canvas(modifier = modifier) {
@@ -89,6 +91,34 @@ object ArrowsBoardRenderer {
                         size = size,
                         style = Stroke(width = 2f)
                     )
+                }
+
+                if (showGuidanceLines) {
+                    level.snakes.forEach { snake ->
+                        if (removalProgress.containsKey(snake.id)) return@forEach
+
+                        val head = snake.body.first()
+                        val headCx = head.x * cellWidth + cellWidth / 2
+                        val headCy = head.y * cellHeight + cellHeight / 2
+
+                        val endPoint = when (snake.headDirection) {
+                            Direction.UP -> Offset(headCx, 0f)
+                            Direction.DOWN -> Offset(headCx, size.height)
+                            Direction.LEFT -> Offset(0f, headCy)
+                            Direction.RIGHT -> Offset(size.width, headCy)
+                        }
+
+                        drawLine(
+                            color = themeColors.accent.copy(alpha = 0.4f),
+                            start = Offset(headCx, headCy),
+                            end = endPoint,
+                            strokeWidth = 2.dp.toPx(),
+                            cap = StrokeCap.Round,
+                            pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(
+                                floatArrayOf(10f, 10f), 0f
+                            )
+                        )
+                    }
                 }
 
                 // Draw tap areas for snake heads (debug visualization only)

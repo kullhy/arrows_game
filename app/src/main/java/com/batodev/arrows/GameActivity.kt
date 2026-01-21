@@ -30,6 +30,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Grid4x4
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.VideoLabel
 import androidx.compose.material3.AlertDialog
@@ -123,6 +124,7 @@ fun ArrowsGameView(
             }, soundManager = soundManager)
     }
     var state by remember { mutableStateOf<List<Party>>(emptyList()) }
+    var showGuidanceLines by remember { mutableStateOf(false) }
     val tapAnimations =
         remember { androidx.compose.runtime.mutableStateListOf<TapAnimationState>() }
 
@@ -302,6 +304,7 @@ fun ArrowsGameView(
                             level = engine.level,
                             flashingSnakeId = engine.flashingSnakeId,
                             removalProgress = engine.removalProgress,
+                            showGuidanceLines = showGuidanceLines,
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(10.dp)
@@ -316,6 +319,25 @@ fun ArrowsGameView(
                                 )
                             }
                         }
+                    }
+
+                    // Guidance Lines Toggle Button
+                    IconButton(
+                        onClick = { showGuidanceLines = !showGuidanceLines },
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(8.dp)
+                            .size(48.dp),
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = if (showGuidanceLines) themeColors.accent else themeColors.topBarButton,
+                            contentColor = White
+                        )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Grid4x4,
+                            contentDescription = "Guidance Lines",
+                            tint = White
+                        )
                     }
 
                     // DEBUG: Draw marker at last tapOffset in container coordinates
