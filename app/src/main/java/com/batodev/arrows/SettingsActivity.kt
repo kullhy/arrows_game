@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Grid4x4
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Palette
@@ -103,6 +104,7 @@ fun SettingsScreen(viewModel: AppViewModel) {
     val currentAnimationSpeed by viewModel.animationSpeed.collectAsState()
     val isVibrationEnabled by viewModel.isVibrationEnabled.collectAsState()
     val isSoundsEnabled by viewModel.isSoundsEnabled.collectAsState()
+    val isFillBoardEnabled by viewModel.isFillBoardEnabled.collectAsState()
     val themeColors = LocalThemeColors.current
 
     if (showThemeDialog) {
@@ -197,6 +199,13 @@ fun SettingsScreen(viewModel: AppViewModel) {
                     initialValue = isSoundsEnabled,
                     accentColor = themeColors.accent,
                     onCheckedChange = { viewModel.saveSounds(it) }
+                )
+                SettingsSwitchItem(
+                    icon = Icons.Default.Grid4x4,
+                    title = "Fill board (slower)",
+                    initialValue = isFillBoardEnabled,
+                    accentColor = themeColors.accent,
+                    onCheckedChange = { viewModel.saveFillBoard(it) }
                 )
                 SettingsClickableItem(
                     icon = Icons.Default.Palette,
@@ -321,6 +330,10 @@ fun SettingsSwitchItem(
     onCheckedChange: ((Boolean) -> Unit)? = null
 ) {
     var checked by remember { mutableStateOf(initialValue) }
+    
+    androidx.compose.runtime.LaunchedEffect(initialValue) {
+        checked = initialValue
+    }
 
     Row(
         modifier = Modifier

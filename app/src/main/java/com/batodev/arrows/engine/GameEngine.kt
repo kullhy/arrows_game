@@ -29,6 +29,7 @@ class GameEngine(
     private var initialLevel: GameLevel? = null
     private var isVibrationEnabled = true
     private var isSoundsEnabled = true
+    private var isFillBoardEnabled by mutableStateOf(false)
     private var animationSpeed = "Medium"
 
     var level by mutableStateOf(GameLevel(1, 1, emptyList()))
@@ -71,6 +72,11 @@ class GameEngine(
             repository.isSoundsEnabled.collect {
                 isSoundsEnabled = it
                 soundManager?.setSoundsEnabled(it)
+            }
+        }
+        coroutineScope.launch {
+            repository.isFillBoardEnabled.collect {
+                isFillBoardEnabled = it
             }
         }
         coroutineScope.launch {
@@ -247,9 +253,10 @@ class GameEngine(
         isLoading = true
         loadingProgress = 0f
         coroutineScope.launch(backgroundDispatcher) {
-            val newLevel = gameGenerator.generateSolvableLevel(25, 25, 30, onProgress = { progress ->
+            val fillBoard = repository.isFillBoardEnabled.firstOrNull() ?: false
+            val newLevel = gameGenerator.generateSolvableLevel(15, 15, 30, onProgress = { progress ->
                 loadingProgress = progress
-            }, fillTheBoard = true)
+            }, fillTheBoard = fillBoard)
             kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
                 initialLevel = newLevel
                 level = newLevel
@@ -294,7 +301,7 @@ class GameEngine(
             removalProgress = removalProgress.toMutableMap().apply { put(snakeId, 1f) }
             level = level.copy(snakes = level.snakes.filter { it.id != snakeId })
             removalProgress = removalProgress.toMutableMap().apply { remove(snakeId) }
-            
+
             if (level.snakes.isEmpty()) {
                 isGameWon = true
                 soundManager?.playGameWon()

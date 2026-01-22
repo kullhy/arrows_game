@@ -35,6 +35,12 @@ class AppViewModel(private val userPreferencesRepository: UserPreferencesReposit
         initialValue = true
     )
 
+    val isFillBoardEnabled: StateFlow<Boolean> = userPreferencesRepository.isFillBoardEnabled.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = false
+    )
+
     fun saveTheme(theme: String) {
         viewModelScope.launch {
             userPreferencesRepository.saveThemePreference(theme)
@@ -50,6 +56,12 @@ class AppViewModel(private val userPreferencesRepository: UserPreferencesReposit
     fun saveSounds(enabled: Boolean) {
         viewModelScope.launch {
             userPreferencesRepository.saveSoundsPreference(enabled)
+        }
+    }
+
+    fun saveFillBoard(enabled: Boolean) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveFillBoardPreference(enabled)
         }
     }
 
