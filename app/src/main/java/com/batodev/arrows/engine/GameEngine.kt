@@ -101,7 +101,6 @@ class GameEngine(
                 }
             } else {
                 regenerateLevel()
-                isLoading = false
             }
         }
     }
