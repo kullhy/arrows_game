@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Grid4x4
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lock
@@ -330,7 +331,7 @@ fun SettingsSwitchItem(
     onCheckedChange: ((Boolean) -> Unit)? = null
 ) {
     var checked by remember { mutableStateOf(initialValue) }
-    
+
     androidx.compose.runtime.LaunchedEffect(initialValue) {
         checked = initialValue
     }

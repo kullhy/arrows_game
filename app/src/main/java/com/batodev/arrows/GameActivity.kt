@@ -198,14 +198,14 @@ fun ArrowsGameView(
 
             // Hearts
             Row(verticalAlignment = Alignment.CenterVertically) {
-                repeat(3) { index ->
+                repeat(engine.maxLives) { index ->
                     Icon(
                         imageVector = if (index < engine.lives) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                         contentDescription = "Life",
                         tint = HeartRed,
                         modifier = Modifier.size(24.dp)
                     )
-                    if (index < 2) {
+                    if (index < engine.maxLives - 1) {
                         Spacer(modifier = Modifier.width(4.dp))
                     }
                 }

@@ -5,6 +5,7 @@ import com.batodev.arrows.data.UserPreferencesRepository
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Assert.assertEquals
@@ -13,6 +14,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class GameEngineTapTest {
 
     @Test
@@ -32,6 +34,7 @@ class GameEngineTapTest {
             on { currentLevel } doReturn MutableStateFlow(levelJson)
             on { isVibrationEnabled } doReturn MutableStateFlow(false)
             on { isSoundsEnabled } doReturn MutableStateFlow(true)
+            on { isFillBoardEnabled } doReturn MutableStateFlow(false)
             on { animationSpeed } doReturn MutableStateFlow("Medium")
         }
 
@@ -61,27 +64,17 @@ class GameEngineTapTest {
         // Tap at x = 2.4. 
         // Dist to S1 (1.8): 0.6.
         // Dist to S2 (3.2): 0.8.
-        // Both are within tolerance 0.85.
+        // Both are within tolerance 1.3.
         // Should pick S1.
-        
-        // But S1 is obstructed by S2?
-        // S1 (1,1) RIGHT -> path (2,1), (3,1), (4,1).
-        // (3,1) is occupied by S2.
-        // So S1 is obstructed. It should flash.
-        
-        // S2 (3,1) LEFT -> path (2,1), (1,1), (0,1).
-        // (1,1) is occupied by S1.
-        // So S2 is also obstructed.
         
         val tapOffset = Offset(2.4f * cellWidth, 1.5f * cellWidth)
         engine.onTap(tapOffset, boardSize, boardSize, boardSize, boardSize)
         
         // Check if S1 flashed (id 1)
-        assertEquals(1, engine.flashingSnakeId)
+        assertEquals("Should have picked snake 1", 1, engine.flashingSnakeId)
         
-        // Reset flashing (hacky but needed since we can't wait for delay easily in this setup without advanceTimeBy)
-        // We can just create a new engine or reset state via restart if mocked correctly.
-        // Or just test the other case.
+        // Reset flashing
+        engine.restartLevel()
         
         // Tap closer to Snake 2
         // Tap at x = 2.6.
@@ -93,6 +86,6 @@ class GameEngineTapTest {
         engine.onTap(tapOffset2, boardSize, boardSize, boardSize, boardSize)
         
         // S2 should flash (id 2)
-        assertEquals(2, engine.flashingSnakeId)
+        assertEquals("Should have picked snake 2", 2, engine.flashingSnakeId)
     }
 }

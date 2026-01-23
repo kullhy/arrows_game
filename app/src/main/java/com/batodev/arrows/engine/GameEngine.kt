@@ -15,6 +15,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 const val tolerance = 1.3f // Enlarged tolerance for easier tapping
+const val INITIAL_LIVES = 5
 
 class GameEngine(
     private val coroutineScope: CoroutineScope,
@@ -47,10 +48,10 @@ class GameEngine(
     var loadingProgress by mutableFloatStateOf(0f)
         private set
 
-    var lives by mutableIntStateOf(3)
+    var lives by mutableIntStateOf(INITIAL_LIVES)
         private set
 
-    private val maxLives = 3
+    var val maxLives by mutableIntStateOf(INITIAL_LIVES)
 
     var scale by mutableFloatStateOf(1f)
     var offsetX by mutableFloatStateOf(0f)
@@ -69,14 +70,14 @@ class GameEngine(
             }
         }
         coroutineScope.launch {
-            repository.isSoundsEnabled.collect {
-                isSoundsEnabled = it
-                soundManager?.setSoundsEnabled(it)
+            repository.isFillBoardEnabled.collect {
+                isFillBoardEnabled = it
             }
         }
         coroutineScope.launch {
-            repository.isFillBoardEnabled.collect {
-                isFillBoardEnabled = it
+            repository.isSoundsEnabled.collect {
+                isSoundsEnabled = it
+                soundManager?.setSoundsEnabled(it)
             }
         }
         coroutineScope.launch {
