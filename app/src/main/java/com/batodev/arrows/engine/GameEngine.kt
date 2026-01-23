@@ -33,6 +33,9 @@ class GameEngine(
     private var isFillBoardEnabled by mutableStateOf(false)
     private var animationSpeed = "Medium"
 
+    var levelNumber by mutableIntStateOf(1)
+        private set
+
     var level by mutableStateOf(GameLevel(1, 1, emptyList()))
         private set
 
@@ -51,7 +54,8 @@ class GameEngine(
     var lives by mutableIntStateOf(INITIAL_LIVES)
         private set
 
-    var val maxLives by mutableIntStateOf(INITIAL_LIVES)
+    var maxLives by mutableIntStateOf(INITIAL_LIVES)
+        private set
 
     var scale by mutableFloatStateOf(1f)
     var offsetX by mutableFloatStateOf(0f)
@@ -72,6 +76,11 @@ class GameEngine(
         coroutineScope.launch {
             repository.isFillBoardEnabled.collect {
                 isFillBoardEnabled = it
+            }
+        }
+        coroutineScope.launch {
+            repository.levelNumber.collect {
+                levelNumber = it
             }
         }
         coroutineScope.launch {
@@ -255,7 +264,15 @@ class GameEngine(
         loadingProgress = 0f
         coroutineScope.launch(backgroundDispatcher) {
             val fillBoard = repository.isFillBoardEnabled.firstOrNull() ?: false
-            val newLevel = gameGenerator.generateSolvableLevel(15, 15, 30, onProgress = { progress ->
+            val currentLevelNum = repository.levelNumber.firstOrNull() ?: 1
+
+            // Calculate dimensions based on level number
+            // L1: 5x5, L2: 5x6, L3: 6x6, L4: 6x7, L5: 7x7...
+            val h = 5 + (currentLevelNum - 1) / 2
+            val w = 5 + currentLevelNum / 2
+            val maxSnakeLength = (3 + currentLevelNum / 2).coerceIn(4, 30)
+
+            val newLevel = gameGenerator.generateSolvableLevel(w, h, maxSnakeLength, onProgress = { progress ->
                 loadingProgress = progress
             }, fillTheBoard = fillBoard)
             kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
@@ -307,6 +324,8 @@ class GameEngine(
                 isGameWon = true
                 soundManager?.playGameWon()
                 coroutineScope.launch(backgroundDispatcher) {
+                    val nextLevel = levelNumber + 1
+                    repository.saveLevelNumber(nextLevel)
                     repository.clearSavedLevel()
                 }
             } else {

@@ -20,6 +20,7 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
         val ANIMATION_SPEED = stringPreferencesKey("animation_speed")
         val SOUNDS_ENABLED = androidx.datastore.preferences.core.booleanPreferencesKey("sounds_enabled")
         val FILL_BOARD_ENABLED = androidx.datastore.preferences.core.booleanPreferencesKey("fill_board_enabled")
+        val LEVEL_NUMBER = androidx.datastore.preferences.core.intPreferencesKey("level_number")
     }
 
     open val theme: Flow<String> = dataStore.data
@@ -45,6 +46,11 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
     open val isFillBoardEnabled: Flow<Boolean> = dataStore.data
         .map { preferences ->
             preferences[PreferencesKeys.FILL_BOARD_ENABLED] ?: false
+        }
+
+    open val levelNumber: Flow<Int> = dataStore.data
+        .map { preferences ->
+            preferences[PreferencesKeys.LEVEL_NUMBER] ?: 1
         }
 
     open val initialLevel: Flow<String?> = dataStore.data
@@ -80,6 +86,12 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
     open suspend fun saveFillBoardPreference(enabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.FILL_BOARD_ENABLED] = enabled
+        }
+    }
+
+    open suspend fun saveLevelNumber(level: Int) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.LEVEL_NUMBER] = level
         }
     }
 

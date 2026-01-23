@@ -42,7 +42,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.InactiveIcon
-import com.batodev.arrows.ui.theme.LightCyan
 import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.NavigationIndicator
 import com.batodev.arrows.ui.theme.White
@@ -71,6 +70,7 @@ fun MainScreen() {
     val application = context.applicationContext as ArrowsApplication
     val repository = application.userPreferencesRepository
     val currentLevel by repository.currentLevel.collectAsState(initial = null)
+    val levelNumber by repository.levelNumber.collectAsState(initial = 1)
 
     val themeColors = LocalThemeColors.current
 
@@ -83,7 +83,7 @@ fun MainScreen() {
             ) {
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Lock, contentDescription = "Levels") },
-                    label = { Text("Level 20") },
+                    label = { Text("Level $levelNumber") },
                     selected = false,
                     onClick = { },
                     colors = NavigationBarItemDefaults.colors(
@@ -150,16 +150,10 @@ fun MainScreen() {
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Level 16",
+                    text = "Level $levelNumber",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = themeColors.accent
-                )
-                Text(
-                    text = "Hard",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = LightCyan
                 )
             }
 
