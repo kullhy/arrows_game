@@ -280,8 +280,6 @@ fun ArrowsGameView(
                         engine.onTap(
                             tapOffset,
                             size.width.toFloat(),
-                            size.height.toFloat(),
-                            size.width.toFloat(),
                             size.height.toFloat()
                         )
 

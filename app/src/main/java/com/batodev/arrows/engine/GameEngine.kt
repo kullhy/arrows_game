@@ -18,7 +18,6 @@ const val DEFAULT_TOLERANCE = 1.3f
 const val INITIAL_LIVES = 5
 private const val FLASH_DURATION_MS = 500L
 private const val REMOVAL_FRAME_DELAY_MS = 16L
-private const val VIEWMODEL_SUBSCRIPTION_TIMEOUT_MS = 5000L
 
 class GameEngine(
     private val coroutineScope: CoroutineScope,
@@ -159,9 +158,7 @@ class GameEngine(
     fun onTap(
         tapOffset: androidx.compose.ui.geometry.Offset,
         containerWidthPx: Float,
-        containerHeightPx: Float,
-        boardWidthPx: Float,
-        boardHeightPx: Float
+        containerHeightPx: Float
     ) {
         if (isLoading || lives <= 0) return
 
@@ -194,7 +191,7 @@ class GameEngine(
         // Grid coordinates
         val cellX = (transformedX - leftOffset) / cellSize
         val cellY = (transformedY - topOffset) / cellSize
-        
+
         return androidx.compose.ui.geometry.Offset(cellX, cellY)
     }
 
@@ -260,36 +257,49 @@ class GameEngine(
             val fillBoard = repository.isFillBoardEnabled.firstOrNull() ?: false
             val currentLevelNum = repository.levelNumber.firstOrNull() ?: 1
 
-            // Calculate dimensions based on level number
-            // L1: 5x5, L2: 5x6, L3: 6x6, L4: 6x7, L5: 7x7...
-            val h = 5 + (currentLevelNum - 1) / 2
-            val w = 5 + currentLevelNum / 2
-            val maxSnakeLength = (3 + currentLevelNum / 2).coerceIn(4, 30)
+            val config = calculateLevelConfiguration(currentLevelNum)
 
-            val newLevel = gameGenerator.generateSolvableLevel(w, h, maxSnakeLength, onProgress = { progress ->
-                loadingProgress = progress
-            }, fillTheBoard = fillBoard)
+            val newLevel = gameGenerator.generateSolvableLevel(
+                config.width, config.height, config.maxSnakeLength,
+                onProgress = { progress -> loadingProgress = progress },
+                fillTheBoard = fillBoard
+            )
+
             kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                initialLevel = newLevel
-                level = newLevel
-                totalSnakesInLevel = newLevel.snakes.size
-                isGameWon = false
-                lives = INITIAL_LIVES
-                scale = 1f
-                offsetX = 0f
-                offsetY = 0f
-                flashingSnakeId = null
-                removalProgress = emptyMap()
-                isLoading = false
-
-                // Save both initial and current as same for a new level
-                coroutineScope.launch(backgroundDispatcher) {
-                    val json = gson.toJson(newLevel)
-                    repository.saveInitialLevel(json)
-                    repository.saveCurrentLevel(json)
-                    repository.saveCurrentLives(lives)
-                }
+                applyNewLevel(newLevel)
             }
+        }
+    }
+
+    private fun calculateLevelConfiguration(levelNum: Int): LevelConfiguration {
+        // Calculate dimensions based on level number
+        // L1: 5x5, L2: 5x6, L3: 6x6, L4: 6x7, L5: 7x7...
+        val h = 5 + (levelNum - 1) / 2
+        val w = 5 + levelNum / 2
+        val maxSnakeLength = (3 + levelNum / 2).coerceIn(4, 30)
+        return LevelConfiguration(w, h, maxSnakeLength)
+    }
+
+    private data class LevelConfiguration(val width: Int, val height: Int, val maxSnakeLength: Int)
+
+    private fun applyNewLevel(newLevel: GameLevel) {
+        initialLevel = newLevel
+        level = newLevel
+        totalSnakesInLevel = newLevel.snakes.size
+        isGameWon = false
+        lives = INITIAL_LIVES
+        scale = 1f
+        offsetX = 0f
+        offsetY = 0f
+        flashingSnakeId = null
+        removalProgress = emptyMap()
+        isLoading = false
+
+        coroutineScope.launch(backgroundDispatcher) {
+            val json = gson.toJson(newLevel)
+            repository.saveInitialLevel(json)
+            repository.saveCurrentLevel(json)
+            repository.saveCurrentLives(lives)
         }
     }
 
@@ -299,7 +309,6 @@ class GameEngine(
             "Low" -> 900L
             else -> 600L
         }
-        val frameDelayMs = 16L
         coroutineScope.launch {
             removalProgress = removalProgress.toMutableMap().apply { put(snakeId, 0f) }
             var elapsed = 0L
@@ -316,17 +325,21 @@ class GameEngine(
             removalProgress = removalProgress.toMutableMap().apply { remove(snakeId) }
 
             if (level.snakes.isEmpty()) {
-                isGameWon = true
-                soundManager?.playGameWon()
-                coroutineScope.launch(backgroundDispatcher) {
-                    val nextLevel = levelNumber + 1
-                    repository.saveLevelNumber(nextLevel)
-                    repository.clearSavedLevel()
-                }
+                handleGameWon()
             } else {
                 soundManager?.playSnakeRemoved()
                 saveState()
             }
+        }
+    }
+
+    private fun handleGameWon() {
+        isGameWon = true
+        soundManager?.playGameWon()
+        coroutineScope.launch(backgroundDispatcher) {
+            val nextLevel = levelNumber + 1
+            repository.saveLevelNumber(nextLevel)
+            repository.clearSavedLevel()
         }
     }
 

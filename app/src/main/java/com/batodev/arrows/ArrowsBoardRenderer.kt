@@ -81,213 +81,36 @@ object ArrowsBoardRenderer {
                 val leftOffset = (size.width - boardWidth) / 2
                 val topOffset = (size.height - boardHeight) / 2
 
-                val cellWidth = cellSize
-                val cellHeight = cellSize
-
-                // Visual styling parameters
-                val strokeWidth = cellWidth * 0.15f // Snake body thickness
-                val cornerRadius = cellWidth * 0.3f // Radius for rounded corners at turns
-                val arrowHeadSize = cellWidth * ARROW_HEAD_SIZE_FACTOR
-
-                // Distance to move snake head during removal animation (off-screen)
-                val moveDist = max(size.width, size.height) * 1.2f
+                val metrics = BoardMetrics(
+                    cellWidth = cellSize,
+                    cellHeight = cellSize,
+                    strokeWidth = cellSize * 0.15f,
+                    cornerRadius = cellSize * 0.3f,
+                    arrowHeadSize = cellSize * ARROW_HEAD_SIZE_FACTOR,
+                    moveDist = max(size.width, size.height) * 1.2f,
+                    boardWidth = boardWidth,
+                    boardHeight = boardHeight
+                )
 
                 // Draw game area border in debug builds
                 if (BuildConfig.DRAW_DEBUG_STUFF) {
-                    drawRect(
-                        color = Color.Gray,
-                        topLeft = Offset(leftOffset, topOffset),
-                        size = androidx.compose.ui.geometry.Size(boardWidth, boardHeight),
-                        style = Stroke(width = 2f)
-                    )
+                    drawDebugBorder(leftOffset, topOffset, metrics)
                 }
 
                 drawContext.canvas.save()
                 drawContext.canvas.translate(leftOffset, topOffset)
 
                 if (guidanceAlpha > 0f) {
-                    level.snakes.forEach { snake ->
-                        if (removalProgress.containsKey(snake.id)) return@forEach
-
-                        val head = snake.body.first()
-                        val headCx = head.x * cellWidth + cellWidth / 2
-                        val headCy = head.y * cellHeight + cellHeight / 2
-
-                        val fullEndPoint = when (snake.headDirection) {
-                            Direction.UP -> Offset(headCx, -topOffset)
-                            Direction.DOWN -> Offset(headCx, boardHeight + (size.height - boardHeight - topOffset))
-                            Direction.LEFT -> Offset(-leftOffset, headCy)
-                            Direction.RIGHT -> Offset(boardWidth + (size.width - boardWidth - leftOffset), headCy)
-                        }
-
-                        val endPoint = Offset(
-                            x = headCx + (fullEndPoint.x - headCx) * guidanceAlpha,
-                            y = headCy + (fullEndPoint.y - headCy) * guidanceAlpha
-                        )
-
-                        drawLine(
-                            color = themeColors.accent.copy(alpha = 0.4f * guidanceAlpha),
-                            start = Offset(headCx, headCy),
-                            end = endPoint,
-                            strokeWidth = 2.dp.toPx(),
-                            cap = StrokeCap.Round,
-                            pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(
-                                floatArrayOf(10f, 10f), 0f
-                            )
-                        )
-                    }
+                    drawGuidanceLines(level, metrics, removalProgress, guidanceAlpha, themeColors.accent, size.width, size.height, leftOffset, topOffset)
                 }
 
                 // Draw tap areas for snake heads (debug visualization only)
                 if (BuildConfig.DRAW_DEBUG_STUFF) {
-                    level.snakes.forEach { snake ->
-                        val head = snake.body.first()
-                        // Calculate center of head cell
-                        val headCx = head.x * cellWidth + cellWidth / 2
-                        val headCy = head.y * cellHeight + cellHeight / 2
-                        val tapRadius = DEFAULT_TOLERANCE * cellWidth
-
-                        // Shift tap area in arrow direction for easier tapping
-                        val tapOffsetX =
-                            headCx + snake.headDirection.dx * cellWidth * TAP_AREA_OFFSET_FACTOR
-                        val tapOffsetY =
-                            headCy + snake.headDirection.dy * cellHeight * TAP_AREA_OFFSET_FACTOR
-
-                        // Draw semi-transparent circle showing tappable area
-                        drawCircle(
-                            color = LightGray.copy(alpha = 0.3f),
-                            radius = tapRadius,
-                            center = Offset(tapOffsetX, tapOffsetY)
-                        )
-                    }
+                    drawDebugTapAreas(level, metrics)
                 }
 
-                level.snakes.forEach { snake ->
-                    // Get removal animation progress (0.0 = not started, 1.0 = fully removed)
-                    val p = (removalProgress[snake.id] ?: 0f).coerceIn(0f, 1f)
-                    val shift = moveDist * p // How far the head has moved
-                    val alpha = 1f - p // Fade out as removal progresses
+                drawSnakes(level, metrics, removalProgress, flashingSnakeId, themeColors)
 
-                    val path = Path()
-                    val body = snake.body
-                    // Use FlashingRed if snake is flashing (obstructed), otherwise themeColors.snake
-                    val baseColor =
-                        if (snake.id == flashingSnakeId) FlashingRed else themeColors.snake
-                    val snakeColor = baseColor.copy(alpha = alpha)
-
-                    val head = body.first()
-                    // Original head position (center of cell)
-                    val headCx0 = head.x * cellWidth + cellWidth / 2
-                    val headCy0 = head.y * cellHeight + cellHeight / 2
-
-                    // Head moves forward during removal animation
-                    val headCx = headCx0 + snake.headDirection.dx * shift
-                    val headCy = headCy0 + snake.headDirection.dy * shift
-
-                    // Arrow base (also moves with head during animation)
-                    val lineEndX = headCx + snake.headDirection.dx * cornerRadius
-                    val lineEndY = headCy + snake.headDirection.dy * cornerRadius
-
-                    // Original (non-animated) arrow base position
-                    // We draw the normal curved approach into this, then extend with
-                    // a straight segment to the moved arrow base
-                    val baseLineEndX0 = headCx0 + snake.headDirection.dx * cornerRadius
-                    val baseLineEndY0 = headCy0 + snake.headDirection.dy * cornerRadius
-
-                    if (body.size > 1) {
-                        // Calculate how many body segments to draw (shrink tail during removal)
-                        // When p=0: draw all segments (lastSegmentIndex = body.size - 1)
-                        // When p=1: draw minimum segments (lastSegmentIndex = 1)
-                        val segmentsToDraw = ((body.size - 1) * (1f - p)).toInt().coerceAtLeast(0)
-                        val lastSegmentIndex = (1 + segmentsToDraw).coerceAtMost(body.size - 1)
-
-                        // Start path from the tail (last segment to be drawn)
-                        val last = body[lastSegmentIndex]
-                        path.moveTo(
-                            last.x * cellWidth + cellWidth / 2,
-                            last.y * cellHeight + cellHeight / 2
-                        )
-
-                        // Draw each segment from tail towards head
-                        for (i in lastSegmentIndex - 1 downTo 1) {
-                            val prev = body[i + 1] // Previous segment in path (closer to tail)
-                            val current = body[i]  // Current segment
-                            val next = body[i - 1] // Next segment in path (closer to head)
-
-                            // Calculate center of current cell
-                            val currX = current.x * cellWidth + cellWidth / 2
-                            val currY = current.y * cellHeight + cellHeight / 2
-
-                            // Entry point: where line enters the current cell from previous segment
-                            val entryX = currX + (prev.x - current.x).coerceIn(-1, 1) * cornerRadius
-                            val entryY = currY + (prev.y - current.y).coerceIn(-1, 1) * cornerRadius
-
-                            // Exit point: where line exits the current cell towards next segment
-                            val exitX = currX + (next.x - current.x).coerceIn(-1, 1) * cornerRadius
-                            val exitY = currY + (next.y - current.y).coerceIn(-1, 1) * cornerRadius
-
-                            // Draw straight line to entry, then curved corner through the cell center
-                            path.lineTo(entryX, entryY)
-                            path.quadraticTo(currX, currY, exitX, exitY)
-                        }
-
-                        // Connect last body segment to the head with a curved corner
-                        val prev = body[1]
-                        val headEntryX = headCx0 + (prev.x - head.x).coerceIn(-1, 1) * cornerRadius
-                        val headEntryY = headCy0 + (prev.y - head.y).coerceIn(-1, 1) * cornerRadius
-
-                        path.lineTo(headEntryX, headEntryY)
-
-                        // Draw curved approach into the head cell/arrow base (non-animated position)
-                        path.quadraticTo(headCx0, headCy0, baseLineEndX0, baseLineEndY0)
-
-                        // During removal animation, extend with a straight "link" line to the animated arrow base
-                        if (p > 0f) {
-                            path.lineTo(lineEndX, lineEndY)
-                        }
-
-                        // Draw the complete snake body path
-                        drawPath(
-                            path = path,
-                            color = snakeColor,
-                            style = Stroke(
-                                width = strokeWidth,
-                                cap = StrokeCap.Round,
-                                join = StrokeJoin.Round
-                            )
-                        )
-                    }
-
-                    // For single-cell snakes, draw a simple tail line
-                    if (body.size == 1) {
-                        val tailLength = cellWidth * singleBlockTailFactor
-                        val tailStartX =
-                            lineEndX - snake.headDirection.dx * (tailLength + cornerRadius)
-                        val tailStartY =
-                            lineEndY - snake.headDirection.dy * (tailLength + cornerRadius)
-
-                        drawLine(
-                            color = snakeColor,
-                            start = Offset(tailStartX, tailStartY),
-                            end = Offset(lineEndX, lineEndY),
-                            strokeWidth = strokeWidth,
-                            cap = StrokeCap.Round
-                        )
-                    }
-
-                    // Draw arrow head at the front of the snake
-                    // Position it slightly ahead of the arrow base for proper appearance
-                    val triangleCenterX = lineEndX + snake.headDirection.dx * (arrowHeadSize * 0.5f)
-                    val triangleCenterY = lineEndY + snake.headDirection.dy * (arrowHeadSize * 0.5f)
-
-                    drawArrowHead(
-                        centerX = triangleCenterX,
-                        centerY = triangleCenterY,
-                        direction = snake.headDirection,
-                        arrowHeadSize = arrowHeadSize,
-                        color = snakeColor
-                    )
-                }
                 drawContext.canvas.restore()
             }
             // Log the total time taken to draw the board for performance monitoring
@@ -297,6 +120,228 @@ object ArrowsBoardRenderer {
             )
         }
     }
+
+    private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawDebugBorder(
+        leftOffset: Float,
+        topOffset: Float,
+        metrics: BoardMetrics
+    ) {
+        drawRect(
+            color = Color.Gray,
+            topLeft = Offset(leftOffset, topOffset),
+            size = androidx.compose.ui.geometry.Size(metrics.boardWidth, metrics.boardHeight),
+            style = Stroke(width = 2f)
+        )
+    }
+
+    private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawGuidanceLines(
+        level: GameLevel,
+        metrics: BoardMetrics,
+        removalProgress: Map<Int, Float>,
+        guidanceAlpha: Float,
+        accentColor: Color,
+        totalWidth: Float,
+        totalHeight: Float,
+        leftOffset: Float,
+        topOffset: Float
+    ) {
+        level.snakes.forEach { snake ->
+            if (removalProgress.containsKey(snake.id)) return@forEach
+
+            val head = snake.body.first()
+            val headCx = head.x * metrics.cellWidth + metrics.cellWidth / 2
+            val headCy = head.y * metrics.cellHeight + metrics.cellHeight / 2
+
+            val fullEndPoint = when (snake.headDirection) {
+                Direction.UP -> Offset(headCx, -topOffset)
+                Direction.DOWN -> Offset(headCx, metrics.boardHeight + (totalHeight - metrics.boardHeight - topOffset))
+                Direction.LEFT -> Offset(-leftOffset, headCy)
+                Direction.RIGHT -> Offset(metrics.boardWidth + (totalWidth - metrics.boardWidth - leftOffset), headCy)
+            }
+
+            val endPoint = Offset(
+                x = headCx + (fullEndPoint.x - headCx) * guidanceAlpha,
+                y = headCy + (fullEndPoint.y - headCy) * guidanceAlpha
+            )
+
+            drawLine(
+                color = accentColor.copy(alpha = 0.4f * guidanceAlpha),
+                start = Offset(headCx, headCy),
+                end = endPoint,
+                strokeWidth = 2.dp.toPx(),
+                cap = StrokeCap.Round,
+                pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(
+                    floatArrayOf(10f, 10f), 0f
+                )
+            )
+        }
+    }
+
+    private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawDebugTapAreas(
+        level: GameLevel,
+        metrics: BoardMetrics
+    ) {
+        level.snakes.forEach { snake ->
+            val head = snake.body.first()
+            val headCx = head.x * metrics.cellWidth + metrics.cellWidth / 2
+            val headCy = head.y * metrics.cellHeight + metrics.cellHeight / 2
+            val tapRadius = DEFAULT_TOLERANCE * metrics.cellWidth
+
+            val tapOffsetX = headCx + snake.headDirection.dx * metrics.cellWidth * TAP_AREA_OFFSET_FACTOR
+            val tapOffsetY = headCy + snake.headDirection.dy * metrics.cellHeight * TAP_AREA_OFFSET_FACTOR
+
+            drawCircle(
+                color = LightGray.copy(alpha = 0.3f),
+                radius = tapRadius,
+                center = Offset(tapOffsetX, tapOffsetY)
+            )
+        }
+    }
+
+    private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawSnakes(
+        level: GameLevel,
+        metrics: BoardMetrics,
+        removalProgress: Map<Int, Float>,
+        flashingSnakeId: Int?,
+        themeColors: com.batodev.arrows.ui.theme.ThemeColors
+    ) {
+        level.snakes.forEach { snake ->
+            val p = (removalProgress[snake.id] ?: 0f).coerceIn(0f, 1f)
+            val shift = metrics.moveDist * p
+            val alpha = 1f - p
+
+            val baseColor = if (snake.id == flashingSnakeId) FlashingRed else themeColors.snake
+            val snakeColor = baseColor.copy(alpha = alpha)
+
+            val head = snake.body.first()
+            val headCx0 = head.x * metrics.cellWidth + metrics.cellWidth / 2
+            val headCy0 = head.y * metrics.cellHeight + metrics.cellHeight / 2
+
+            val headCx = headCx0 + snake.headDirection.dx * shift
+            val headCy = headCy0 + snake.headDirection.dy * shift
+
+            val lineEndX = headCx + snake.headDirection.dx * metrics.cornerRadius
+            val lineEndY = headCy + snake.headDirection.dy * metrics.cornerRadius
+
+            val baseLineEndX0 = headCx0 + snake.headDirection.dx * metrics.cornerRadius
+            val baseLineEndY0 = headCy0 + snake.headDirection.dy * metrics.cornerRadius
+
+            if (snake.body.size > 1) {
+                drawSnakeBody(snake, p, metrics, headCx0, headCy0, baseLineEndX0, baseLineEndY0, lineEndX, lineEndY, snakeColor)
+            }
+
+            if (snake.body.size == 1) {
+                drawSingleBlockSnakeTail(snake, metrics, lineEndX, lineEndY, snakeColor)
+            }
+
+            // Draw arrow head
+            val triangleCenterX = lineEndX + snake.headDirection.dx * (metrics.arrowHeadSize * 0.5f)
+            val triangleCenterY = lineEndY + snake.headDirection.dy * (metrics.arrowHeadSize * 0.5f)
+
+            drawArrowHead(
+                centerX = triangleCenterX,
+                centerY = triangleCenterY,
+                direction = snake.headDirection,
+                arrowHeadSize = metrics.arrowHeadSize,
+                color = snakeColor
+            )
+        }
+    }
+
+    private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawSnakeBody(
+        snake: com.batodev.arrows.engine.Snake,
+        p: Float,
+        metrics: BoardMetrics,
+        headCx0: Float,
+        headCy0: Float,
+        baseLineEndX0: Float,
+        baseLineEndY0: Float,
+        lineEndX: Float,
+        lineEndY: Float,
+        snakeColor: Color
+    ) {
+        val path = Path()
+        val body = snake.body
+        val segmentsToDraw = ((body.size - 1) * (1f - p)).toInt().coerceAtLeast(0)
+        val lastSegmentIndex = (1 + segmentsToDraw).coerceAtMost(body.size - 1)
+
+        val last = body[lastSegmentIndex]
+        path.moveTo(
+            last.x * metrics.cellWidth + metrics.cellWidth / 2,
+            last.y * metrics.cellHeight + metrics.cellHeight / 2
+        )
+
+        for (i in lastSegmentIndex - 1 downTo 1) {
+            val prev = body[i + 1]
+            val current = body[i]
+            val next = body[i - 1]
+
+            val currX = current.x * metrics.cellWidth + metrics.cellWidth / 2
+            val currY = current.y * metrics.cellHeight + metrics.cellHeight / 2
+
+            val entryX = currX + (prev.x - current.x).coerceIn(-1, 1) * metrics.cornerRadius
+            val entryY = currY + (prev.y - current.y).coerceIn(-1, 1) * metrics.cornerRadius
+
+            val exitX = currX + (next.x - current.x).coerceIn(-1, 1) * metrics.cornerRadius
+            val exitY = currY + (next.y - current.y).coerceIn(-1, 1) * metrics.cornerRadius
+
+            path.lineTo(entryX, entryY)
+            path.quadraticTo(currX, currY, exitX, exitY)
+        }
+
+        val head = body[0]
+        val prev = body[1]
+        val headEntryX = headCx0 + (prev.x - head.x).coerceIn(-1, 1) * metrics.cornerRadius
+        val headEntryY = headCy0 + (prev.y - head.y).coerceIn(-1, 1) * metrics.cornerRadius
+
+        path.lineTo(headEntryX, headEntryY)
+        path.quadraticTo(headCx0, headCy0, baseLineEndX0, baseLineEndY0)
+
+        if (p > 0f) {
+            path.lineTo(lineEndX, lineEndY)
+        }
+
+        drawPath(
+            path = path,
+            color = snakeColor,
+            style = Stroke(
+                width = metrics.strokeWidth,
+                cap = StrokeCap.Round,
+                join = StrokeJoin.Round
+            )
+        )
+    }
+
+    private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawSingleBlockSnakeTail(
+        snake: com.batodev.arrows.engine.Snake,
+        metrics: BoardMetrics,
+        lineEndX: Float,
+        lineEndY: Float,
+        snakeColor: Color
+    ) {
+        val tailLength = metrics.cellWidth * singleBlockTailFactor
+        val tailStartX = lineEndX - snake.headDirection.dx * (tailLength + metrics.cornerRadius)
+        val tailStartY = lineEndY - snake.headDirection.dy * (tailLength + metrics.cornerRadius)
+
+        drawLine(
+            color = snakeColor,
+            start = Offset(tailStartX, tailStartY),
+            end = Offset(lineEndX, lineEndY),
+            strokeWidth = metrics.strokeWidth,
+            cap = StrokeCap.Round
+        )
+    }
+
+    private data class BoardMetrics(
+        val cellWidth: Float,
+        val cellHeight: Float,
+        val strokeWidth: Float,
+        val cornerRadius: Float,
+        val arrowHeadSize: Float,
+        val moveDist: Float,
+        val boardWidth: Float,
+        val boardHeight: Float
+    )
 
     /**
      * Draws an equilateral triangle arrow head pointing in the specified direction.
