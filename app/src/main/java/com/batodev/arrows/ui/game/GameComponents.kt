@@ -1,6 +1,5 @@
 package com.batodev.arrows.ui.game
 
-import android.app.Activity
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
@@ -30,7 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.batodev.arrows.ui.theme.HeartRed
@@ -45,7 +43,7 @@ fun GameTopBar(
     onBack: () -> Unit
 ) {
     val themeColors = com.batodev.arrows.ui.theme.LocalThemeColors.current
-    
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -122,7 +120,7 @@ fun GameProgressBar(
     currentSnakes: Int
 ) {
     val themeColors = com.batodev.arrows.ui.theme.LocalThemeColors.current
-    
+
     val targetProgress = if (totalSnakes > 0) {
         (totalSnakes - currentSnakes).toFloat() / totalSnakes
     } else 0f
