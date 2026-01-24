@@ -34,6 +34,7 @@ class GameEngineTapTest {
             on { isSoundsEnabled } doReturn MutableStateFlow(true)
             on { isFillBoardEnabled } doReturn MutableStateFlow(false)
             on { levelNumber } doReturn MutableStateFlow(1)
+            on { currentLives } doReturn MutableStateFlow(5)
             on { animationSpeed } doReturn MutableStateFlow("Medium")
         }
 

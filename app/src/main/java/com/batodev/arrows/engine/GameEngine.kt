@@ -103,6 +103,7 @@ class GameEngine(
         coroutineScope.launch(backgroundDispatcher) {
             val savedInitial = repository.initialLevel.firstOrNull()
             val savedCurrent = repository.currentLevel.firstOrNull()
+            val savedLives = repository.currentLives.firstOrNull()
 
             if (savedInitial != null && savedCurrent != null) {
                 try {
@@ -110,7 +111,7 @@ class GameEngine(
                     level = gson.fromJson(savedCurrent, GameLevel::class.java)
                     totalSnakesInLevel = initialLevel?.snakes?.size ?: 0
                     isGameWon = level.snakes.isEmpty()
-                    lives = maxLives
+                    lives = savedLives ?: INITIAL_LIVES
                     isLoading = false
                 } catch (_: Exception) {
                     regenerateLevel()
@@ -124,6 +125,7 @@ class GameEngine(
     private fun saveState() {
         coroutineScope.launch(backgroundDispatcher) {
             repository.saveCurrentLevel(gson.toJson(level))
+            repository.saveCurrentLives(lives)
         }
     }
 
@@ -151,6 +153,7 @@ class GameEngine(
     fun addLife() {
         if (lives < maxLives) {
             lives++
+            saveState()
         }
     }
 
@@ -235,6 +238,7 @@ class GameEngine(
                 // Deduct life on obstructed move
                 if (lives > 0) {
                     lives--
+                    saveState()
                     if (lives > 0) {
                         soundManager?.playLiveLost()
                     } else {
@@ -280,7 +284,7 @@ class GameEngine(
                 level = newLevel
                 totalSnakesInLevel = newLevel.snakes.size
                 isGameWon = false
-                lives = maxLives
+                lives = INITIAL_LIVES
                 scale = 1f
                 offsetX = 0f
                 offsetY = 0f
@@ -293,6 +297,7 @@ class GameEngine(
                     val json = gson.toJson(newLevel)
                     repository.saveInitialLevel(json)
                     repository.saveCurrentLevel(json)
+                    repository.saveCurrentLives(lives)
                 }
             }
         }
