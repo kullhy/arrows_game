@@ -14,8 +14,11 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-const val tolerance = 1.3f // Enlarged tolerance for easier tapping
+const val DEFAULT_TOLERANCE = 1.3f
 const val INITIAL_LIVES = 5
+private const val FLASH_DURATION_MS = 500L
+private const val REMOVAL_FRAME_DELAY_MS = 16L
+private const val VIEWMODEL_SUBSCRIPTION_TIMEOUT_MS = 5000L
 
 class GameEngine(
     private val coroutineScope: CoroutineScope,
@@ -68,20 +71,21 @@ class GameEngine(
         private set
 
     init {
+        observePreferences()
+        if (autoLoad) {
+            loadOrRegenerateLevel()
+        }
+    }
+
+    private fun observePreferences() {
         coroutineScope.launch {
-            repository.isVibrationEnabled.collect {
-                isVibrationEnabled = it
-            }
+            repository.isVibrationEnabled.collect { isVibrationEnabled = it }
         }
         coroutineScope.launch {
-            repository.isFillBoardEnabled.collect {
-                isFillBoardEnabled = it
-            }
+            repository.isFillBoardEnabled.collect { isFillBoardEnabled = it }
         }
         coroutineScope.launch {
-            repository.levelNumber.collect {
-                levelNumber = it
-            }
+            repository.levelNumber.collect { levelNumber = it }
         }
         coroutineScope.launch {
             repository.isSoundsEnabled.collect {
@@ -90,12 +94,7 @@ class GameEngine(
             }
         }
         coroutineScope.launch {
-            repository.animationSpeed.collect {
-                animationSpeed = it
-            }
-        }
-        if (autoLoad) {
-            loadOrRegenerateLevel()
+            repository.animationSpeed.collect { animationSpeed = it }
         }
     }
 
@@ -166,45 +165,43 @@ class GameEngine(
     ) {
         if (isLoading || lives <= 0) return
 
-        if (com.batodev.arrows.BuildConfig.DRAW_DEBUG_STUFF) {
-            android.util.Log.v("TapDebug", "onTap: tap=$tapOffset, containerSize=${containerWidthPx}x${containerHeightPx}, boardSize=${boardWidthPx}x${boardHeightPx}")
-            android.util.Log.v("TapDebug", "graphicsLayer: scale=$scale, offsetX=$offsetX, offsetY=$offsetY")
-        }
+        val gridCoords = transformTapToGrid(tapOffset, containerWidthPx, containerHeightPx)
+        val tappedSnake = findTappedSnake(gridCoords.x, gridCoords.y)
 
-        // Step 1: Apply inverse graphicsLayer transformation in container space
-        val centerX = containerWidthPx / 2
-        val centerY = containerHeightPx / 2
+        if (tappedSnake != null) {
+            handleSnakeTap(tappedSnake)
+        }
+    }
+
+    private fun transformTapToGrid(
+        tapOffset: androidx.compose.ui.geometry.Offset,
+        containerWidth: Float,
+        containerHeight: Float
+    ): androidx.compose.ui.geometry.Offset {
+        // Inverse graphicsLayer transformation
+        val centerX = containerWidth / 2
+        val centerY = containerHeight / 2
         val transformedX = (tapOffset.x - offsetX - centerX) / scale + centerX
         val transformedY = (tapOffset.y - offsetY - centerY) / scale + centerY
 
-        // Step 2: Calculate centered board bounds within the transformed container space
-        val cellSize = kotlin.math.min(containerWidthPx / level.width, containerHeightPx / level.height)
+        // Centered board bounds
+        val cellSize = kotlin.math.min(containerWidth / level.width, containerHeight / level.height)
         val boardWidth = cellSize * level.width
         val boardHeight = cellSize * level.height
-        val leftOffset = (containerWidthPx - boardWidth) / 2
-        val topOffset = (containerHeightPx - boardHeight) / 2
+        val leftOffset = (containerWidth - boardWidth) / 2
+        val topOffset = (containerHeight - boardHeight) / 2
 
-        // Step 3: Convert to board-relative coordinates
-        val contentX = transformedX - leftOffset
-        val contentY = transformedY - topOffset
+        // Grid coordinates
+        val cellX = (transformedX - leftOffset) / cellSize
+        val cellY = (transformedY - topOffset) / cellSize
+        
+        return androidx.compose.ui.geometry.Offset(cellX, cellY)
+    }
 
-        if (com.batodev.arrows.BuildConfig.DRAW_DEBUG_STUFF) {
-            android.util.Log.v("TapDebug", "content coords: contentX=$contentX, contentY=$contentY")
-        }
-
-        // Step 4: Convert to grid cell coordinates
-        val cellX = contentX / cellSize
-        val cellY = contentY / cellSize
-
-        if (com.batodev.arrows.BuildConfig.DRAW_DEBUG_STUFF) {
-            android.util.Log.v("TapDebug", "grid coords: cellX=$cellX, cellY=$cellY (grid size: ${level.width}x${level.height})")
-        }
-
-        // Check if tapped cell contains a snake head (with tolerance for easier tapping)
-        val tappedSnake = level.snakes
+    private fun findTappedSnake(cellX: Float, cellY: Float): Snake? {
+        return level.snakes
             .map { snake ->
                 val head = snake.body.first()
-                // Account for the offset of tap area in arrow direction
                 val tapAreaCenterX = head.x + 0.5f + snake.headDirection.dx * TAP_AREA_OFFSET_FACTOR
                 val tapAreaCenterY = head.y + 0.5f + snake.headDirection.dy * TAP_AREA_OFFSET_FACTOR
 
@@ -212,54 +209,47 @@ class GameEngine(
                 val dy = tapAreaCenterY - cellY
                 val distSq = dx * dx + dy * dy
 
-                if (com.batodev.arrows.BuildConfig.DRAW_DEBUG_STUFF) {
-                    android.util.Log.v("TapDebug", "Snake ${snake.id} head at (${head.x}, ${head.y}), tap area center: ($tapAreaCenterX, $tapAreaCenterY), distSq=$distSq")
-                }
-
-                // We store the snake, its distance squared, and whether it's obstructed
                 Triple(snake, distSq, isLineOfSightObstructed(snake))
             }
-            .filter { it.second <= tolerance * tolerance }
-            // Sort by:
-            // 1. Obstructed (false < true, so non-obstructed come first)
-            // 2. Distance squared (closest first)
+            .filter { it.second <= DEFAULT_TOLERANCE * DEFAULT_TOLERANCE }
             .minWithOrNull(compareBy({ it.third }, { it.second }))
             ?.first
+    }
 
-        if (com.batodev.arrows.BuildConfig.DRAW_DEBUG_STUFF) {
-            android.util.Log.v("TapDebug", "tappedSnake: ${tappedSnake?.id}")
+    private fun handleSnakeTap(snake: Snake) {
+        if (isVibrationEnabled) {
+            onVibrate()
         }
 
-        if (tappedSnake != null) {
-            if (isVibrationEnabled) {
-                onVibrate()
-            }
-            if (isLineOfSightObstructed(tappedSnake)) {
-                // Deduct life on obstructed move
-                if (lives > 0) {
-                    lives--
-                    saveState()
-                    if (lives > 0) {
-                        soundManager?.playLiveLost()
-                    } else {
-                        soundManager?.playGameLost()
-                    }
-                }
+        if (isLineOfSightObstructed(snake)) {
+            handleObstructedTap(snake)
+        } else {
+            handleSuccessfulTap(snake)
+        }
+    }
 
-                // Flash red
-                flashingSnakeId = tappedSnake.id
-                coroutineScope.launch {
-                    delay(500) // Flash duration
-                    flashingSnakeId = null
-                }
+    private fun handleObstructedTap(snake: Snake) {
+        if (lives > 0) {
+            lives--
+            saveState()
+            if (lives > 0) {
+                soundManager?.playLiveLost()
             } else {
-                // Play random switch sound on successful tap
-                soundManager?.playRandomSwitch()
-                // Animate out, then remove
-                if (!removalProgress.containsKey(tappedSnake.id)) {
-                    animateRemoval(tappedSnake.id)
-                }
+                soundManager?.playGameLost()
             }
+        }
+
+        flashingSnakeId = snake.id
+        coroutineScope.launch {
+            delay(FLASH_DURATION_MS)
+            flashingSnakeId = null
+        }
+    }
+
+    private fun handleSuccessfulTap(snake: Snake) {
+        soundManager?.playRandomSwitch()
+        if (!removalProgress.containsKey(snake.id)) {
+            animateRemoval(snake.id)
         }
     }
 
@@ -314,8 +304,8 @@ class GameEngine(
             removalProgress = removalProgress.toMutableMap().apply { put(snakeId, 0f) }
             var elapsed = 0L
             while (elapsed < durationMs && isActive) {
-                delay(frameDelayMs)
-                elapsed += frameDelayMs
+                delay(REMOVAL_FRAME_DELAY_MS)
+                elapsed += REMOVAL_FRAME_DELAY_MS
                 val linearP = (elapsed.toFloat() / durationMs).coerceIn(0f, 1f)
                 // Apply ease-in-cubic for acceleration (more progress per frame as time goes on)
                 val p = linearP * linearP * linearP

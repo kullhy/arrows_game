@@ -11,9 +11,9 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
+import com.batodev.arrows.engine.DEFAULT_TOLERANCE
 import com.batodev.arrows.engine.Direction
 import com.batodev.arrows.engine.GameLevel
-import com.batodev.arrows.engine.tolerance
 import com.batodev.arrows.ui.theme.FlashingRed
 import com.batodev.arrows.ui.theme.LightGray
 import kotlin.math.PI
@@ -145,7 +145,7 @@ object ArrowsBoardRenderer {
                         // Calculate center of head cell
                         val headCx = head.x * cellWidth + cellWidth / 2
                         val headCy = head.y * cellHeight + cellHeight / 2
-                        val tapRadius = tolerance * cellWidth
+                        val tapRadius = DEFAULT_TOLERANCE * cellWidth
 
                         // Shift tap area in arrow direction for easier tapping
                         val tapOffsetX =
