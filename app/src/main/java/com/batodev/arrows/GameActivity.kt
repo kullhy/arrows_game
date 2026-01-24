@@ -67,6 +67,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.batodev.arrows.engine.GameEngine
 import com.batodev.arrows.ui.AppViewModel
+import com.batodev.arrows.ui.game.GameProgressBar
+import com.batodev.arrows.ui.game.GameTopBar
 import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.HeartRed
 import com.batodev.arrows.ui.theme.ProgressBarGreen
@@ -162,94 +164,17 @@ fun ArrowsGameView(
         modifier = Modifier.fillMaxSize()
     ) {
         // Top Bar
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Left Controls
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(
-                    onClick = { (context as? Activity)?.finish() },
-                    colors = IconButtonDefaults.iconButtonColors(containerColor = themeColors.topBarButton),
-                    modifier = Modifier.size(40.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = White
-                    )
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                IconButton(
-                    onClick = { engine.restartLevel() },
-                    colors = IconButtonDefaults.iconButtonColors(containerColor = themeColors.topBarButton),
-                    modifier = Modifier.size(40.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = "Restart",
-                        tint = White
-                    )
-                }
-            }
-
-            // Hearts
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                repeat(engine.maxLives) { index ->
-                    Icon(
-                        imageVector = if (index < engine.lives) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                        contentDescription = "Life",
-                        tint = HeartRed,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    if (index < engine.maxLives - 1) {
-                        Spacer(modifier = Modifier.width(4.dp))
-                    }
-                }
-            }
-
-            // Right Control (Loading/Hint)
-            Button(
-                onClick = { /* TODO */ },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = themeColors.topBarButton, contentColor = White
-                ),
-                shape = RoundedCornerShape(12.dp),
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
-                modifier = Modifier.height(40.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.VideoLabel,
-                    contentDescription = "Ad",
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(text = "Loading..", fontSize = 12.sp)
-            }
-        }
-
-        // Progress Bar
-        val targetProgress = if (engine.totalSnakesInLevel > 0) {
-            (engine.totalSnakesInLevel - engine.level.snakes.size).toFloat() / engine.totalSnakesInLevel
-        } else 0f
-
-        val animatedProgress by animateFloatAsState(
-            targetValue = targetProgress,
-            animationSpec = tween(durationMillis = 500),
-            label = "ProgressBarAnimation"
+        GameTopBar(
+            lives = engine.lives,
+            maxLives = engine.maxLives,
+            onRestart = { engine.restartLevel() },
+            onBack = { (context as? Activity)?.finish() }
         )
 
-        LinearProgressIndicator(
-            progress = { animatedProgress },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(6.dp),
-            color = ProgressBarGreen,
-            trackColor = themeColors.topBarButton,
-            strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
+        // Progress Bar
+        GameProgressBar(
+            totalSnakes = engine.totalSnakesInLevel,
+            currentSnakes = engine.level.snakes.size
         )
 
         // Game Area
