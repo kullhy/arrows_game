@@ -54,6 +54,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.batodev.arrows.data.AndroidResourceBoardShapeProvider
 import com.batodev.arrows.engine.GameEngine
 import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.game.GameProgressBar
@@ -110,9 +111,12 @@ fun ArrowsGameView(
     val soundManager = remember { SoundManager(context) }
     val engine = remember {
         GameEngine(
-            coroutineScope, repository, onVibrate = {
-                view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-            }, soundManager = soundManager)
+            coroutineScope,
+            repository,
+            onVibrate = { view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK) },
+            soundManager = soundManager,
+            shapeProvider = AndroidResourceBoardShapeProvider(context)
+        )
     }
     var state by remember { mutableStateOf<List<Party>>(emptyList()) }
     var showGuidanceLines by remember { mutableStateOf(false) }

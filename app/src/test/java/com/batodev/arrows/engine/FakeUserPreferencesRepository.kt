@@ -17,28 +17,68 @@ class FakeUserPreferencesRepository : UserPreferencesRepository(
     val themeFlow = MutableStateFlow("Dark")
     override val theme: Flow<String> = themeFlow
 
-    override val isVibrationEnabled: Flow<Boolean> = MutableStateFlow(true)
-    override val initialLevel: Flow<String?> = MutableStateFlow(null)
-    override val currentLevel: Flow<String?> = MutableStateFlow(null)
+    val vibrationFlow = MutableStateFlow(true)
+    override val isVibrationEnabled: Flow<Boolean> = vibrationFlow
+
+    val soundsFlow = MutableStateFlow(true)
+    override val isSoundsEnabled: Flow<Boolean> = soundsFlow
+
+    val fillBoardFlow = MutableStateFlow(false)
+    override val isFillBoardEnabled: Flow<Boolean> = fillBoardFlow
+
+    val animationSpeedFlow = MutableStateFlow("Medium")
+    override val animationSpeed: Flow<String> = animationSpeedFlow
+
+    val levelNumberFlow = MutableStateFlow(1)
+    override val levelNumber: Flow<Int> = levelNumberFlow
+
+    val currentLivesFlow = MutableStateFlow(5)
+    override val currentLives: Flow<Int> = currentLivesFlow
+
+    val initialLevelFlow = MutableStateFlow<String?>(null)
+    override val initialLevel: Flow<String?> = initialLevelFlow
+
+    val currentLevelFlow = MutableStateFlow<String?>(null)
+    override val currentLevel: Flow<String?> = currentLevelFlow
 
     override suspend fun saveThemePreference(theme: String) {
         themeFlow.value = theme
     }
 
     override suspend fun saveVibrationPreference(enabled: Boolean) {
-        // No-op for now or update flow
+        vibrationFlow.value = enabled
+    }
+
+    override suspend fun saveSoundsPreference(enabled: Boolean) {
+        soundsFlow.value = enabled
+    }
+
+    override suspend fun saveFillBoardPreference(enabled: Boolean) {
+        fillBoardFlow.value = enabled
+    }
+
+    override suspend fun saveAnimationSpeed(speed: String) {
+        animationSpeedFlow.value = speed
+    }
+
+    override suspend fun saveLevelNumber(level: Int) {
+        levelNumberFlow.value = level
+    }
+
+    override suspend fun saveCurrentLives(lives: Int) {
+        currentLivesFlow.value = lives
     }
 
     override suspend fun saveInitialLevel(levelJson: String) {
-        (initialLevel as MutableStateFlow).value = levelJson
+        initialLevelFlow.value = levelJson
     }
 
     override suspend fun saveCurrentLevel(levelJson: String) {
-        (currentLevel as MutableStateFlow).value = levelJson
+        currentLevelFlow.value = levelJson
     }
 
     override suspend fun clearSavedLevel() {
-        (initialLevel as MutableStateFlow).value = null
-        (currentLevel as MutableStateFlow).value = null
+        initialLevelFlow.value = null
+        currentLevelFlow.value = null
     }
 }

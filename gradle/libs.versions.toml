@@ -16,7 +16,7 @@ gson = "2.13.2"
 jacocoVersion = "0.8.12"
 coroutinesTest = "1.10.2"
 mockito = "5.21.0"
-mockitoKotlin = "6.2.1"
+mockitoKotlin = "6.2.2"
 robolectric = "4.16.1"
 kotlinReflect = "2.3.0"
 

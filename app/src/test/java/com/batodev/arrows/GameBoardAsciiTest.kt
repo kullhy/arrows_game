@@ -6,11 +6,16 @@ import com.batodev.arrows.engine.Point
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.Timeout
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import java.util.concurrent.TimeUnit
 
 /**
  * Unit test to generate and print game board as ASCII art
  */
+@RunWith(RobolectricTestRunner::class)
+
 class GameBoardAsciiTest {
 
     @get:Rule

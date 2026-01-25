@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.testing.Test
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -46,16 +48,10 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
-    sourceSets {
-        getByName("main") {
-            res.directories.add("src/main/res-boards")
-        }
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
+}
+
+tasks.withType<Test> {
+    jvmArgs("-XX:+EnableDynamicAgentLoading")
 }
 
 jacoco {

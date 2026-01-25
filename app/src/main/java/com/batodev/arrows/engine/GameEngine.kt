@@ -24,6 +24,9 @@ private const val SIZE_REDUCTION_PER_STEP = 3
 private const val LIVES_REDUCTION_PER_STEP = 1
 private const val LEVELS_PER_PROGRESSION_STEP = 10
 
+private const val MIN_BOARD_SIZE_FOR_SHAPES = 20
+private const val SHAPE_APPLICATION_PROBABILITY = 0.6f
+
 class GameEngine(
     private val coroutineScope: CoroutineScope,
     private val repository: UserPreferencesRepository,
@@ -31,7 +34,9 @@ class GameEngine(
     autoLoad: Boolean = true,
     private val backgroundDispatcher: kotlinx.coroutines.CoroutineDispatcher = kotlinx.coroutines.Dispatchers.Default,
     private val onVibrate: () -> Unit = {},
-    private val soundManager: com.batodev.arrows.SoundManager? = null
+    private val soundManager: com.batodev.arrows.SoundManager? = null,
+    private val shapeProvider: BoardShapeProvider? = null,
+    private val random: kotlin.random.Random = kotlin.random.Random.Default
 ) {
     private val gson = Gson()
     private var initialLevel: GameLevel? = null
@@ -268,10 +273,19 @@ class GameEngine(
 
             val config = calculateLevelConfiguration(currentLevelNum)
 
+            val shape = if ((config.width >= MIN_BOARD_SIZE_FOR_SHAPES || config.height >= MIN_BOARD_SIZE_FOR_SHAPES) &&
+                random.nextFloat() < SHAPE_APPLICATION_PROBABILITY
+            ) {
+                shapeProvider?.getRandomShape()
+            } else {
+                null
+            }
+
             val newLevel = gameGenerator.generateSolvableLevel(
                 config.width, config.height, config.maxSnakeLength,
                 onProgress = { progress -> loadingProgress = progress },
-                fillTheBoard = fillBoard
+                fillTheBoard = fillBoard,
+                shapeBitmap = shape
             )
 
             kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {

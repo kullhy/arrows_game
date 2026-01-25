@@ -6,18 +6,23 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import kotlin.reflect.full.declaredMemberFunctions
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(RobolectricTestRunner::class)
+
 class LevelProgressionTest {
 
     @Test
     fun testLevelProgressionRules() {
         val testDispatcher = UnconfinedTestDispatcher()
-        val repo = mock<UserPreferencesRepository>()
+        val repo = FakeUserPreferencesRepository()
         val engine = GameEngine(
             coroutineScope = CoroutineScope(testDispatcher),
             repository = repo,
