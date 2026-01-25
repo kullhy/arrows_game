@@ -19,6 +19,11 @@ const val INITIAL_LIVES = 5
 private const val FLASH_DURATION_MS = 500L
 private const val REMOVAL_FRAME_DELAY_MS = 16L
 
+private const val BASE_BOARD_SIZE = 5
+private const val SIZE_REDUCTION_PER_STEP = 3
+private const val LIVES_REDUCTION_PER_STEP = 1
+private const val LEVELS_PER_PROGRESSION_STEP = 10
+
 class GameEngine(
     private val coroutineScope: CoroutineScope,
     private val repository: UserPreferencesRepository,
@@ -105,11 +110,15 @@ class GameEngine(
 
             if (savedInitial != null && savedCurrent != null) {
                 try {
+                    val currentLevelNum = repository.levelNumber.firstOrNull() ?: 1
+                    val config = calculateLevelConfiguration(currentLevelNum)
+                    
                     initialLevel = gson.fromJson(savedInitial, GameLevel::class.java)
                     level = gson.fromJson(savedCurrent, GameLevel::class.java)
                     totalSnakesInLevel = initialLevel?.snakes?.size ?: 0
                     isGameWon = level.snakes.isEmpty()
-                    lives = savedLives ?: INITIAL_LIVES
+                    maxLives = config.maxLives
+                    lives = savedLives ?: config.maxLives
                     isLoading = false
                 } catch (_: Exception) {
                     regenerateLevel()
@@ -266,28 +275,39 @@ class GameEngine(
             )
 
             kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                applyNewLevel(newLevel)
+                applyNewLevel(newLevel, config)
             }
         }
     }
 
     private fun calculateLevelConfiguration(levelNum: Int): LevelConfiguration {
-        // Calculate dimensions based on level number
+        val progressionStep = levelNum / LEVELS_PER_PROGRESSION_STEP
+        val sizeReduction = progressionStep * SIZE_REDUCTION_PER_STEP
+        val livesReduction = progressionStep * LIVES_REDUCTION_PER_STEP
+
+        // Base progression (growing) minus penalty reduction
         // L1: 5x5, L2: 5x6, L3: 6x6, L4: 6x7, L5: 7x7...
-        val h = 5 + (levelNum - 1) / 2
-        val w = 5 + levelNum / 2
+        val baseH = BASE_BOARD_SIZE + (levelNum - 1) / 2
+        val baseW = BASE_BOARD_SIZE + levelNum / 2
+        
+        val h = (baseH - sizeReduction).coerceAtLeast(1)
+        val w = (baseW - sizeReduction).coerceAtLeast(1)
+        
+        val maxLives = (INITIAL_LIVES - livesReduction).coerceAtLeast(1)
         val maxSnakeLength = (3 + levelNum / 2).coerceIn(4, 30)
-        return LevelConfiguration(w, h, maxSnakeLength)
+        
+        return LevelConfiguration(w, h, maxSnakeLength, maxLives)
     }
 
-    private data class LevelConfiguration(val width: Int, val height: Int, val maxSnakeLength: Int)
+    private data class LevelConfiguration(val width: Int, val height: Int, val maxSnakeLength: Int, val maxLives: Int)
 
-    private fun applyNewLevel(newLevel: GameLevel) {
+    private fun applyNewLevel(newLevel: GameLevel, config: LevelConfiguration) {
         initialLevel = newLevel
         level = newLevel
         totalSnakesInLevel = newLevel.snakes.size
         isGameWon = false
-        lives = INITIAL_LIVES
+        maxLives = config.maxLives
+        lives = config.maxLives
         scale = 1f
         offsetX = 0f
         offsetY = 0f
