@@ -1,6 +1,10 @@
 package com.batodev.arrows.engine
 
 import java.util.concurrent.atomic.AtomicInteger
+import android.graphics.Bitmap
+import android.graphics.Color
+import androidx.core.graphics.get
+import androidx.core.graphics.scale
 
 // --- Data Models ---
 
@@ -111,13 +115,20 @@ class GameGenerator {
         height: Int,
         maxSnakeLength: Int,
         fillTheBoard: Boolean = false,
-        onProgress: (Float) -> Unit = {}
+        shapeBitmap: Bitmap? = null,
+        onProgress: (Float) -> Unit = {},
     ): GameLevel {
         require(width > 0 && height > 0) { "Board must be non-empty" }
         require(maxSnakeLength >= 1) { "maxSnakeLength must be at least 1" }
 
-        val config = GameGeneratorConfig(width, height, maxSnakeLength, fillTheBoard)
-        val totalCells = width * height
+        val walls = if (shapeBitmap != null) {
+            createWallsFromImage(shapeBitmap, width, height)
+        } else {
+            Array(width) { BooleanArray(height) } // All false (no walls)
+        }
+
+        val config = GameGeneratorConfig(width, height, maxSnakeLength, fillTheBoard, walls)
+        val totalCells = countValidCells(width, height, walls)
         val snakes = ArrayList<Snake>(totalCells)
         val occupied = Array(width) { BooleanArray(height) }
         val frontierCandidates = mutableSetOf<Pair<Point, Direction>>()
@@ -150,17 +161,101 @@ class GameGenerator {
         return GameLevel(width, height, snakes)
     }
 
+    private fun countValidCells(width: Int, height: Int, walls: Array<BooleanArray>): Int {
+        var count = 0
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                if (!walls[x][y]) count++
+            }
+        }
+        return count
+    }
+
+    private fun createWallsFromImage(original: Bitmap, targetWidth: Int, targetHeight: Int): Array<BooleanArray> {
+        val clipped = clipToBlackContent(original)
+        val scaled = clipped.scale(targetWidth, targetHeight, false)
+        val walls = Array(targetWidth) { BooleanArray(targetHeight) }
+
+        for (x in 0 until targetWidth) {
+            for (y in 0 until targetHeight) {
+                val pixel = scaled[x, y]
+                val isBlack = Color.alpha(pixel) > 128 &&
+                        Color.red(pixel) < 128 &&
+                        Color.green(pixel) < 128 &&
+                        Color.blue(pixel) < 128
+                walls[x][y] = !isBlack
+            }
+        }
+        return walls
+    }
+
+    private fun clipToBlackContent(bitmap: Bitmap): Bitmap {
+        var minX = bitmap.width
+        var minY = bitmap.height
+        var maxX = 0
+        var maxY = 0
+        var found = false
+
+        for (x in 0 until bitmap.width) {
+            for (y in 0 until bitmap.height) {
+                val pixel = bitmap[x, y]
+                if (Color.alpha(pixel) > 128 &&
+                    Color.red(pixel) < 128 &&
+                    Color.green(pixel) < 128 &&
+                    Color.blue(pixel) < 128
+                ) {
+                    if (x < minX) minX = x
+                    if (x > maxX) maxX = x
+                    if (y < minY) minY = y
+                    if (y > maxY) maxY = y
+                    found = true
+                }
+            }
+        }
+
+        if (!found) return bitmap
+
+        val width = maxX - minX + 1
+        val height = maxY - minY + 1
+        return Bitmap.createBitmap(bitmap, minX, minY, width, height)
+    }
+
     private data class GameGeneratorConfig(
         val width: Int,
         val height: Int,
         val maxSnakeLength: Int,
-        val fillTheBoard: Boolean
-    )
+        val fillTheBoard: Boolean,
+        val walls: Array<BooleanArray>,
+    ) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as GameGeneratorConfig
+
+            if (width != other.width) return false
+            if (height != other.height) return false
+            if (maxSnakeLength != other.maxSnakeLength) return false
+            if (fillTheBoard != other.fillTheBoard) return false
+            if (!walls.contentDeepEquals(other.walls)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = width
+            result = 31 * result + height
+            result = 31 * result + maxSnakeLength
+            result = 31 * result + fillTheBoard.hashCode()
+            result = 31 * result + walls.contentDeepHashCode()
+            return result
+        }
+    }
 
     private fun fillRemainingBoard(
         config: GameGeneratorConfig,
         snakes: ArrayList<Snake>,
-        occupied: Array<BooleanArray>
+        occupied: Array<BooleanArray>,
     ) {
         var lastSnake: Snake? = buildLastSnake(config, snakes, occupied)
 
@@ -199,6 +294,7 @@ class GameGenerator {
         for ((head, direction) in candidates) {
             // Lazy check: Is the candidate still valid?
             if (occupied[head.x][head.y]) continue
+            if (config.walls[head.x][head.y]) continue
 
             val forbiddenPoints = forbiddenPoints(head, direction, config.width, config.height)
             val body = buildSnakeRecursive(
@@ -208,6 +304,7 @@ class GameGenerator {
                 forbiddenPoints,
                 config.width,
                 config.height,
+                config.walls,
                 NextToExistingSnakeCriterion(),
                 previousMoveDir = null,
                 occupied = occupied
@@ -250,7 +347,7 @@ class GameGenerator {
                         neighbor,
                         config.width,
                         config.height
-                    ) && !occupied[neighbor.x][neighbor.y]
+                    ) && !occupied[neighbor.x][neighbor.y] && !config.walls[neighbor.x][neighbor.y]
                 ) {
                     // Check all possible head directions for this neighbor
                     Direction.entries.forEach { headDir ->
@@ -259,7 +356,8 @@ class GameGenerator {
                                 headDir,
                                 occupied,
                                 config.width,
-                                config.height
+                                config.height,
+                                config.walls
                             )
                         ) {
                             frontier.add(Pair(neighbor, headDir))
@@ -295,12 +393,14 @@ class GameGenerator {
         for ((head, direction) in candidates) {
             // Lazy check: Is the candidate still valid?
             if (occupied[head.x][head.y]) continue
+            if (config.walls[head.x][head.y]) continue
             if (!hasClearLineOfSightToEdgeOfBoard(
                     head,
                     direction,
                     occupied,
                     config.width,
-                    config.height
+                    config.height,
+                    config.walls
                 )
             ) continue
 
@@ -312,6 +412,7 @@ class GameGenerator {
                 forbiddenPoints,
                 config.width,
                 config.height,
+                config.walls,
                 NextToExistingSnakeCriterion(),
                 previousMoveDir = null,
                 occupied = occupied
@@ -337,12 +438,17 @@ class GameGenerator {
         occupied: Array<BooleanArray>,
         width: Int,
         height: Int,
+        walls: Array<BooleanArray>,
     ): Boolean {
         var current = possibleHead
         while (true) {
             current = current.copy(x = current.x + direction.dx, y = current.y + direction.dy)
             if (current.x !in 0..<width || current.y !in 0..<height) {
                 break
+            }
+            // If we hit a wall, it counts as reaching the edge (escaping the play area)
+            if (walls[current.x][current.y]) {
+                return true
             }
             if (occupied[current.x][current.y]) {
                 return false
@@ -355,8 +461,13 @@ class GameGenerator {
         config: GameGeneratorConfig,
         occupied: Array<BooleanArray>,
     ): Snake {
-        val headX = rnd.nextInt(config.width)
-        val headY = rnd.nextInt(config.height)
+        var headX: Int
+        var headY: Int
+        do {
+            headX = rnd.nextInt(config.width)
+            headY = rnd.nextInt(config.height)
+        } while (config.walls[headX][headY])
+
         val head = Point(headX, headY)
         val direction = Direction.entries.toTypedArray().random()
         val forbiddenPoints = forbiddenPoints(head, direction, config.width, config.height)
@@ -367,6 +478,7 @@ class GameGenerator {
             forbiddenPoints,
             config.width,
             config.height,
+            config.walls, // Pass walls
             previousMoveDir = null,
             occupied = occupied
         )
@@ -380,6 +492,7 @@ class GameGenerator {
         forbiddenPoints: Set<Point>,
         width: Int,
         height: Int,
+        walls: Array<BooleanArray>,
         criterion: Criterion = AlwaysTrueCriterion(),
         previousMoveDir: Direction?,
         occupied: Array<BooleanArray>,
@@ -397,6 +510,7 @@ class GameGenerator {
             if (next !in forbiddenPoints &&
                 next !in body &&
                 isNotOutOfBounds(next, width, height) &&
+                !walls[next.x][next.y] && // Check wall
                 !occupied[next.x][next.y] &&
                 criterion.isSatisfied(body, next, snakes, width, height, forbiddenPoints, occupied)
             ) {
@@ -421,6 +535,7 @@ class GameGenerator {
                 forbiddenPoints = forbiddenPoints,
                 width = width,
                 height = height,
+                walls = walls,
                 criterion = criterion,
                 previousMoveDir = direction,
                 occupied = occupied
@@ -546,7 +661,7 @@ class GameGenerator {
         snakeMap: Map<Int, Snake>,
         grid: Array<IntArray>,
         width: Int,
-        height: Int
+        height: Int,
     ): Int? {
         for (snakeId in remainingSnakes) {
             val snake = snakeMap[snakeId]!!
@@ -579,7 +694,7 @@ class GameGenerator {
         snakeId: Int,
         grid: Array<IntArray>,
         width: Int,
-        height: Int
+        height: Int,
     ): Boolean {
         var current = head + direction
 
