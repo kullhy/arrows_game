@@ -383,8 +383,9 @@ class GameEngine(
         var current = Point(head.x + direction.dx, head.y + direction.dy)
 
         while (current.x in 0 until level.width && current.y in 0 until level.height) {
-            // Check if any snake occupies this position
+            // Check if any snake occupies this position, ignoring those being removed
             val occupied = level.snakes.any { otherSnake ->
+                !removalProgress.containsKey(otherSnake.id) && 
                 otherSnake.body.any { segment -> segment == current }
             }
             if (occupied) {

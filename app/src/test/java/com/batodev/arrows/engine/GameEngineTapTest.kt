@@ -7,6 +7,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -93,4 +95,67 @@ class GameEngineTapTest {
                 // S2 should flash (id 2)
                 assertEquals("Should have picked snake 2", 2, engine.flashingSnakeId)
             }
+
+    @Test
+    fun `test animating snake does not obstruct others`() = runTest {
+        val gson = Gson()
+        // S1 is at (1,1) moving RIGHT.
+        // S2 is at (3,1) moving RIGHT.
+        // S1 is obstructed by S2.
+        val s1 = Snake(1, listOf(Point(1, 1)), Direction.RIGHT)
+        val s2 = Snake(2, listOf(Point(3, 1)), Direction.RIGHT)
+        val level = GameLevel(5, 5, listOf(s1, s2))
+        val levelJson = gson.toJson(level)
+
+        val repo = mock<UserPreferencesRepository> {
+            on { initialLevel } doReturn MutableStateFlow(levelJson)
+            on { currentLevel } doReturn MutableStateFlow(levelJson)
+            on { isVibrationEnabled } doReturn MutableStateFlow(false)
+            on { isSoundsEnabled } doReturn MutableStateFlow(false)
+            on { isFillBoardEnabled } doReturn MutableStateFlow(false)
+            on { levelNumber } doReturn MutableStateFlow(1)
+            on { currentLives } doReturn MutableStateFlow(5)
+            on { animationSpeed } doReturn MutableStateFlow("Medium")
         }
+
+        val testDispatcher = UnconfinedTestDispatcher(testScheduler)
+        val engine = GameEngine(
+            coroutineScope = CoroutineScope(testDispatcher),
+            repository = repo,
+            autoLoad = false,
+            backgroundDispatcher = testDispatcher
+        )
+
+        engine.loadOrRegenerateLevel()
+        runCurrent()
+
+        assertEquals("Engine should not be loading", false, engine.isLoading)
+        assertEquals("Level should have 2 snakes", 2, engine.level.snakes.size)
+
+        // Board setup
+        val boardSize = 500f
+        val cellWidth = boardSize / 5f // 100f
+
+        // Tap S1 (obstructed by S2)
+        val tapS1 = Offset(1.8f * cellWidth, 1.5f * cellWidth)
+        engine.onTap(tapS1, boardSize, boardSize)
+        
+        assertEquals("S1 should flash when obstructed", 1, engine.flashingSnakeId)
+        engine.restartLevel()
+        runCurrent()
+
+        // Tap S2 (not obstructed)
+        val tapS2 = Offset(3.8f * cellWidth, 1.5f * cellWidth)
+        engine.onTap(tapS2, boardSize, boardSize)
+
+        // S2 should be in removal progress
+        assert(engine.removalProgress.containsKey(2))
+
+        // Now tap S1 again while S2 is animating
+        engine.onTap(tapS1, boardSize, boardSize)
+
+        // S1 should NOT flash, and it should now be in removal progress because S2 is ignored
+        assertEquals("S1 should not flash", null, engine.flashingSnakeId)
+        assert(engine.removalProgress.containsKey(1))
+    }
+}
