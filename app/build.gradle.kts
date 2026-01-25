@@ -54,7 +54,7 @@ android {
 }
 
 jacoco {
-    toolVersion = libs.versions.jacoco.get()
+    toolVersion = libs.versions.jacocoVersion.get()
 }
 
 tasks.register<JacocoReport>("testDebugUnitTestCoverage") {
