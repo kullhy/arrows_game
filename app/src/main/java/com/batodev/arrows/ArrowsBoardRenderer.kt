@@ -76,7 +76,7 @@ object ArrowsBoardRenderer {
                 val cellSize = kotlin.math.min(size.width / level.width, size.height / level.height)
                 val boardWidth = cellSize * level.width
                 val boardHeight = cellSize * level.height
-                
+
                 // Centering offsets
                 val leftOffset = (size.width - boardWidth) / 2
                 val topOffset = (size.height - boardHeight) / 2
@@ -101,7 +101,15 @@ object ArrowsBoardRenderer {
                 drawContext.canvas.translate(leftOffset, topOffset)
 
                 if (guidanceAlpha > 0f) {
-                    drawGuidanceLines(level, metrics, removalProgress, guidanceAlpha, themeColors.accent, size.width, size.height, leftOffset, topOffset)
+                    val guidanceConfig = GuidanceLineConfig(
+                        guidanceAlpha = guidanceAlpha,
+                        accentColor = themeColors.accent,
+                        totalWidth = size.width,
+                        totalHeight = size.height,
+                        leftOffset = leftOffset,
+                        topOffset = topOffset
+                    )
+                    drawGuidanceLines(level, metrics, removalProgress, guidanceConfig)
                 }
 
                 // Draw tap areas for snake heads (debug visualization only)
@@ -138,12 +146,7 @@ object ArrowsBoardRenderer {
         level: GameLevel,
         metrics: BoardMetrics,
         removalProgress: Map<Int, Float>,
-        guidanceAlpha: Float,
-        accentColor: Color,
-        totalWidth: Float,
-        totalHeight: Float,
-        leftOffset: Float,
-        topOffset: Float
+        config: GuidanceLineConfig
     ) {
         level.snakes.forEach { snake ->
             if (removalProgress.containsKey(snake.id)) return@forEach
@@ -153,19 +156,19 @@ object ArrowsBoardRenderer {
             val headCy = head.y * metrics.cellHeight + metrics.cellHeight / 2
 
             val fullEndPoint = when (snake.headDirection) {
-                Direction.UP -> Offset(headCx, -topOffset)
-                Direction.DOWN -> Offset(headCx, metrics.boardHeight + (totalHeight - metrics.boardHeight - topOffset))
-                Direction.LEFT -> Offset(-leftOffset, headCy)
-                Direction.RIGHT -> Offset(metrics.boardWidth + (totalWidth - metrics.boardWidth - leftOffset), headCy)
+                Direction.UP -> Offset(headCx, -config.topOffset)
+                Direction.DOWN -> Offset(headCx, metrics.boardHeight + (config.totalHeight - metrics.boardHeight - config.topOffset))
+                Direction.LEFT -> Offset(-config.leftOffset, headCy)
+                Direction.RIGHT -> Offset(metrics.boardWidth + (config.totalWidth - metrics.boardWidth - config.leftOffset), headCy)
             }
 
             val endPoint = Offset(
-                x = headCx + (fullEndPoint.x - headCx) * guidanceAlpha,
-                y = headCy + (fullEndPoint.y - headCy) * guidanceAlpha
+                x = headCx + (fullEndPoint.x - headCx) * config.guidanceAlpha,
+                y = headCy + (fullEndPoint.y - headCy) * config.guidanceAlpha
             )
 
             drawLine(
-                color = accentColor.copy(alpha = 0.4f * guidanceAlpha),
+                color = config.accentColor.copy(alpha = 0.4f * config.guidanceAlpha),
                 start = Offset(headCx, headCy),
                 end = endPoint,
                 strokeWidth = 2.dp.toPx(),
@@ -227,7 +230,15 @@ object ArrowsBoardRenderer {
             val baseLineEndY0 = headCy0 + snake.headDirection.dy * metrics.cornerRadius
 
             if (snake.body.size > 1) {
-                drawSnakeBody(snake, p, metrics, headCx0, headCy0, baseLineEndX0, baseLineEndY0, lineEndX, lineEndY, snakeColor)
+                val headCoords = SnakeHeadCoordinates(
+                    headCx0 = headCx0,
+                    headCy0 = headCy0,
+                    baseLineEndX0 = baseLineEndX0,
+                    baseLineEndY0 = baseLineEndY0,
+                    lineEndX = lineEndX,
+                    lineEndY = lineEndY
+                )
+                drawSnakeBody(snake, p, metrics, headCoords, snakeColor)
             }
 
             if (snake.body.size == 1) {
@@ -252,12 +263,7 @@ object ArrowsBoardRenderer {
         snake: com.batodev.arrows.engine.Snake,
         p: Float,
         metrics: BoardMetrics,
-        headCx0: Float,
-        headCy0: Float,
-        baseLineEndX0: Float,
-        baseLineEndY0: Float,
-        lineEndX: Float,
-        lineEndY: Float,
+        headCoords: SnakeHeadCoordinates,
         snakeColor: Color
     ) {
         val path = Path()
@@ -291,14 +297,14 @@ object ArrowsBoardRenderer {
 
         val head = body[0]
         val prev = body[1]
-        val headEntryX = headCx0 + (prev.x - head.x).coerceIn(-1, 1) * metrics.cornerRadius
-        val headEntryY = headCy0 + (prev.y - head.y).coerceIn(-1, 1) * metrics.cornerRadius
+        val headEntryX = headCoords.headCx0 + (prev.x - head.x).coerceIn(-1, 1) * metrics.cornerRadius
+        val headEntryY = headCoords.headCy0 + (prev.y - head.y).coerceIn(-1, 1) * metrics.cornerRadius
 
         path.lineTo(headEntryX, headEntryY)
-        path.quadraticTo(headCx0, headCy0, baseLineEndX0, baseLineEndY0)
+        path.quadraticTo(headCoords.headCx0, headCoords.headCy0, headCoords.baseLineEndX0, headCoords.baseLineEndY0)
 
         if (p > 0f) {
-            path.lineTo(lineEndX, lineEndY)
+            path.lineTo(headCoords.lineEndX, headCoords.lineEndY)
         }
 
         drawPath(
@@ -341,6 +347,24 @@ object ArrowsBoardRenderer {
         val moveDist: Float,
         val boardWidth: Float,
         val boardHeight: Float
+    )
+
+    private data class GuidanceLineConfig(
+        val guidanceAlpha: Float,
+        val accentColor: Color,
+        val totalWidth: Float,
+        val totalHeight: Float,
+        val leftOffset: Float,
+        val topOffset: Float
+    )
+
+    private data class SnakeHeadCoordinates(
+        val headCx0: Float,
+        val headCy0: Float,
+        val baseLineEndX0: Float,
+        val baseLineEndY0: Float,
+        val lineEndX: Float,
+        val lineEndY: Float
     )
 
     /**
