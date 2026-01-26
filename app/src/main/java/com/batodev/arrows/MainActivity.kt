@@ -44,6 +44,7 @@ import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.InactiveIcon
 import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.NavigationIndicator
+import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
 
 class MainActivity : ComponentActivity() {
@@ -71,52 +72,12 @@ fun MainScreen() {
     val repository = application.userPreferencesRepository
     val currentLevel by repository.currentLevel.collectAsState(initial = null)
     val levelNumber by repository.levelNumber.collectAsState(initial = 1)
-
     val themeColors = LocalThemeColors.current
 
     Scaffold(
         containerColor = themeColors.background,
         bottomBar = {
-            NavigationBar(
-                containerColor = themeColors.bottomBar,
-                contentColor = White
-            ) {
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Lock, contentDescription = "Levels") },
-                    label = { Text("Level $levelNumber") },
-                    selected = false,
-                    onClick = { },
-                    colors = NavigationBarItemDefaults.colors(
-                        unselectedIconColor = InactiveIcon,
-                        unselectedTextColor = InactiveIcon
-                    )
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-                    label = { Text("Home") },
-                    selected = true,
-                    onClick = { },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = White,
-                        indicatorColor = NavigationIndicator,
-                        selectedTextColor = White
-                    )
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
-                    label = { Text("Settings") },
-                    selected = false,
-                    onClick = {
-                        val intent = Intent(context, SettingsActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                        context.startActivity(intent)
-                    },
-                    colors = NavigationBarItemDefaults.colors(
-                        unselectedIconColor = InactiveIcon,
-                        unselectedTextColor = InactiveIcon
-                    )
-                )
-            }
+            MainBottomBar(levelNumber, themeColors)
         }
     ) { innerPadding ->
         Column(
@@ -128,59 +89,86 @@ fun MainScreen() {
             verticalArrangement = Arrangement.Center
         ) {
             Spacer(modifier = Modifier.weight(1f))
-
-            // Logo Section
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Custom Triangle Icon
-                    TriangleIcon(
-                        modifier = Modifier.size(40.dp),
-                        color = White
-                    )
-                    Text(
-                        text = "rrows",
-                        fontSize = 40.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = White
-                    )
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Level $levelNumber",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = themeColors.accent
-                )
-            }
-
+            LogoSection(levelNumber, themeColors)
             Spacer(modifier = Modifier.weight(1f))
-
-            Button(
-                onClick = {
-                    val intent = Intent(context, GameActivity::class.java)
-                    context.startActivity(intent)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = themeColors.accent
-                ),
-                shape = RoundedCornerShape(28.dp)
-            ) {
-                Text(
-                    text = if (currentLevel != null) "Continue" else "Play",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
+            PlayButton(currentLevel != null, themeColors)
             Spacer(modifier = Modifier.height(48.dp))
         }
+    }
+}
+
+@Composable
+private fun MainBottomBar(levelNumber: Int, themeColors: ThemeColors) {
+    val context = LocalContext.current
+    NavigationBar(
+        containerColor = themeColors.bottomBar,
+        contentColor = White
+    ) {
+        NavigationBarItem(
+            icon = { Icon(Icons.Default.Lock, contentDescription = "Levels") },
+            label = { Text("Level $levelNumber") },
+            selected = false,
+            onClick = { },
+            colors = NavigationBarItemDefaults.colors(
+                unselectedIconColor = InactiveIcon, unselectedTextColor = InactiveIcon
+            )
+        )
+        NavigationBarItem(
+            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+            label = { Text("Home") },
+            selected = true,
+            onClick = { },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = White, indicatorColor = NavigationIndicator, selectedTextColor = White
+            )
+        )
+        NavigationBarItem(
+            icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
+            label = { Text("Settings") },
+            selected = false,
+            onClick = {
+                val intent = Intent(context, SettingsActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                context.startActivity(intent)
+            },
+            colors = NavigationBarItemDefaults.colors(
+                unselectedIconColor = InactiveIcon, unselectedTextColor = InactiveIcon
+            )
+        )
+    }
+}
+
+@Composable
+private fun LogoSection(levelNumber: Int, themeColors: ThemeColors) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            TriangleIcon(modifier = Modifier.size(40.dp), color = White)
+            Text(text = "rrows", fontSize = 40.sp, fontWeight = FontWeight.Bold, color = White)
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Level $levelNumber", fontSize = 24.sp,
+            fontWeight = FontWeight.Bold, color = themeColors.accent
+        )
+    }
+}
+
+@Composable
+private fun PlayButton(isContinue: Boolean, themeColors: ThemeColors) {
+    val context = LocalContext.current
+    Button(
+        onClick = {
+            val intent = Intent(context, GameActivity::class.java)
+            context.startActivity(intent)
+        },
+        modifier = Modifier.fillMaxWidth().height(56.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = themeColors.accent),
+        shape = RoundedCornerShape(28.dp)
+    ) {
+        Text(
+            text = if (isContinue) "Continue" else "Play",
+            fontSize = 20.sp, fontWeight = FontWeight.Bold
+        )
     }
 }
 

@@ -1,30 +1,29 @@
 package com.batodev.arrows.engine
 
-import android.graphics.Bitmap
-import com.batodev.arrows.data.UserPreferencesRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.*
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 import kotlin.random.Random
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
-
 class GameEngineShapeLogicTest {
 
     @Test
     fun `test getRandomShape is called for large boards when probability rolls high`() = runTest {
         val testDispatcher = UnconfinedTestDispatcher(testScheduler)
         val repo = FakeUserPreferencesRepository()
-        repo.saveLevelNumber(100) // 25x24 board
+        repo.saveLevelNumber(100) // Large board
 
         val shapeProvider = mock<BoardShapeProvider>()
         val generator = mock<GameGenerator>()
@@ -90,7 +89,7 @@ class GameEngineShapeLogicTest {
     fun `test getRandomShape is NOT called when probability rolls low`() = runTest {
         val testDispatcher = UnconfinedTestDispatcher(testScheduler)
         val repo = FakeUserPreferencesRepository()
-        repo.saveLevelNumber(100) // 25x24 board
+        repo.saveLevelNumber(100) // Large board
 
         val shapeProvider = mock<BoardShapeProvider>()
         val generator = mock<GameGenerator>()

@@ -5,28 +5,35 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import com.batodev.arrows.engine.DEFAULT_TOLERANCE
 import com.batodev.arrows.engine.Direction
 import com.batodev.arrows.engine.GameLevel
+import com.batodev.arrows.engine.Snake
 import com.batodev.arrows.ui.theme.FlashingRed
 import com.batodev.arrows.ui.theme.LightGray
+import com.batodev.arrows.ui.theme.LocalThemeColors
+import com.batodev.arrows.ui.theme.ThemeColors
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sin
 import kotlin.system.measureTimeMillis
 
 /**
  * Factor to determine the tail length for single-block snakes.
- * The tail length is calculated as: cellWidth * singleBlockTailFactor
+ * The tail length is calculated as: cellWidth * SINGLE_BLOCK_TAIL_FACTOR
  */
-const val singleBlockTailFactor: Float = 0.2f
+const val SINGLE_BLOCK_TAIL_FACTOR: Float = 0.2f
 
 /**
  * Factor to determine the arrow head size relative to cell width.
@@ -41,10 +48,29 @@ const val ARROW_HEAD_SIZE_FACTOR = 0.2f
  */
 const val TAP_AREA_OFFSET_FACTOR = 0.3f
 
+private const val BOARD_BORDER_WIDTH = 2f
+private const val GUIDANCE_LINE_ALPHA_FACTOR = 0.4f
+private const val GUIDANCE_DASH_ON = 10f
+private const val GUIDANCE_DASH_OFF = 10f
+private const val TAP_AREA_ALPHA = 0.3f
+private const val BOARD_STROKE_WIDTH_FACTOR = 0.15f
+private const val BOARD_CORNER_RADIUS_FACTOR = 0.3f
+private const val SNAKE_MOVE_DIST_FACTOR = 1.2f
+private const val ARROW_HEAD_STROKE_WIDTH_FACTOR = 0.3f
+
+private const val ANGLE_UP = 270.0
+private const val ANGLE_DOWN = 90.0
+private const val ANGLE_LEFT = 180.0
+private const val ANGLE_RIGHT = 0.0
+private const val ANGLE_TRIANGLE_OFFSET = 2.094 // 120 degrees in radians
+private const val DEG_TO_RAD = PI / 180.0
+
 /**
  * Renderer responsible for drawing the arrows game board including snakes, arrow heads,
  * tap areas, and animations.
  */
+private const val ARROW_HEAD_CENTER_FACTOR = 0.5f
+
 object ArrowsBoardRenderer {
     /**
      * Renders the game board with all snakes, arrows, and interactive elements.
@@ -69,11 +95,11 @@ object ArrowsBoardRenderer {
         removalProgress: Map<Int, Float> = emptyMap(),
         guidanceAlpha: Float = 0f,
     ) {
-        val themeColors = com.batodev.arrows.ui.theme.LocalThemeColors.current
+        val themeColors = LocalThemeColors.current
         Canvas(modifier = modifier) {
             val totalDrawTime = measureTimeMillis {
                 // Calculate uniform cell size to maintain aspect ratio
-                val cellSize = kotlin.math.min(size.width / level.width, size.height / level.height)
+                val cellSize = min(size.width / level.width, size.height / level.height)
                 val boardWidth = cellSize * level.width
                 val boardHeight = cellSize * level.height
 
@@ -84,10 +110,10 @@ object ArrowsBoardRenderer {
                 val metrics = BoardMetrics(
                     cellWidth = cellSize,
                     cellHeight = cellSize,
-                    strokeWidth = cellSize * 0.15f,
-                    cornerRadius = cellSize * 0.3f,
+                    strokeWidth = cellSize * BOARD_STROKE_WIDTH_FACTOR,
+                    cornerRadius = cellSize * BOARD_CORNER_RADIUS_FACTOR,
                     arrowHeadSize = cellSize * ARROW_HEAD_SIZE_FACTOR,
-                    moveDist = max(size.width, size.height) * 1.2f,
+                    moveDist = max(size.width, size.height) * SNAKE_MOVE_DIST_FACTOR,
                     boardWidth = boardWidth,
                     boardHeight = boardHeight
                 )
@@ -129,7 +155,7 @@ object ArrowsBoardRenderer {
         }
     }
 
-    private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawDebugBorder(
+    private fun DrawScope.drawDebugBorder(
         leftOffset: Float,
         topOffset: Float,
         metrics: BoardMetrics
@@ -137,12 +163,12 @@ object ArrowsBoardRenderer {
         drawRect(
             color = Color.Gray,
             topLeft = Offset(leftOffset, topOffset),
-            size = androidx.compose.ui.geometry.Size(metrics.boardWidth, metrics.boardHeight),
-            style = Stroke(width = 2f)
+            size = Size(metrics.boardWidth, metrics.boardHeight),
+            style = Stroke(width = BOARD_BORDER_WIDTH)
         )
     }
 
-    private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawGuidanceLines(
+    private fun DrawScope.drawGuidanceLines(
         level: GameLevel,
         metrics: BoardMetrics,
         removalProgress: Map<Int, Float>,
@@ -157,9 +183,15 @@ object ArrowsBoardRenderer {
 
             val fullEndPoint = when (snake.headDirection) {
                 Direction.UP -> Offset(headCx, -config.topOffset)
-                Direction.DOWN -> Offset(headCx, metrics.boardHeight + (config.totalHeight - metrics.boardHeight - config.topOffset))
+                Direction.DOWN -> Offset(
+                    headCx,
+                    metrics.boardHeight + (config.totalHeight - metrics.boardHeight - config.topOffset)
+                )
                 Direction.LEFT -> Offset(-config.leftOffset, headCy)
-                Direction.RIGHT -> Offset(metrics.boardWidth + (config.totalWidth - metrics.boardWidth - config.leftOffset), headCy)
+                Direction.RIGHT -> Offset(
+                    metrics.boardWidth + (config.totalWidth - metrics.boardWidth - config.leftOffset),
+                    headCy
+                )
             }
 
             val endPoint = Offset(
@@ -168,19 +200,19 @@ object ArrowsBoardRenderer {
             )
 
             drawLine(
-                color = config.accentColor.copy(alpha = 0.4f * config.guidanceAlpha),
+                color = config.accentColor.copy(alpha = GUIDANCE_LINE_ALPHA_FACTOR * config.guidanceAlpha),
                 start = Offset(headCx, headCy),
                 end = endPoint,
                 strokeWidth = 2.dp.toPx(),
                 cap = StrokeCap.Round,
-                pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(
-                    floatArrayOf(10f, 10f), 0f
+                pathEffect = PathEffect.dashPathEffect(
+                    floatArrayOf(GUIDANCE_DASH_ON, GUIDANCE_DASH_OFF), 0f
                 )
             )
         }
     }
 
-    private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawDebugTapAreas(
+    private fun DrawScope.drawDebugTapAreas(
         level: GameLevel,
         metrics: BoardMetrics
     ) {
@@ -194,19 +226,19 @@ object ArrowsBoardRenderer {
             val tapOffsetY = headCy + snake.headDirection.dy * metrics.cellHeight * TAP_AREA_OFFSET_FACTOR
 
             drawCircle(
-                color = LightGray.copy(alpha = 0.3f),
+                color = LightGray.copy(alpha = TAP_AREA_ALPHA),
                 radius = tapRadius,
                 center = Offset(tapOffsetX, tapOffsetY)
             )
         }
     }
 
-    private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawSnakes(
+    private fun DrawScope.drawSnakes(
         level: GameLevel,
         metrics: BoardMetrics,
         removalProgress: Map<Int, Float>,
         flashingSnakeId: Int?,
-        themeColors: com.batodev.arrows.ui.theme.ThemeColors
+        themeColors: ThemeColors
     ) {
         level.snakes.forEach { snake ->
             val p = (removalProgress[snake.id] ?: 0f).coerceIn(0f, 1f)
@@ -246,8 +278,8 @@ object ArrowsBoardRenderer {
             }
 
             // Draw arrow head
-            val triangleCenterX = lineEndX + snake.headDirection.dx * (metrics.arrowHeadSize * 0.5f)
-            val triangleCenterY = lineEndY + snake.headDirection.dy * (metrics.arrowHeadSize * 0.5f)
+            val triangleCenterX = lineEndX + snake.headDirection.dx * (metrics.arrowHeadSize * ARROW_HEAD_CENTER_FACTOR)
+            val triangleCenterY = lineEndY + snake.headDirection.dy * (metrics.arrowHeadSize * ARROW_HEAD_CENTER_FACTOR)
 
             drawArrowHead(
                 centerX = triangleCenterX,
@@ -259,8 +291,8 @@ object ArrowsBoardRenderer {
         }
     }
 
-    private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawSnakeBody(
-        snake: com.batodev.arrows.engine.Snake,
+    private fun DrawScope.drawSnakeBody(
+        snake: Snake,
         p: Float,
         metrics: BoardMetrics,
         headCoords: SnakeHeadCoordinates,
@@ -318,14 +350,14 @@ object ArrowsBoardRenderer {
         )
     }
 
-    private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawSingleBlockSnakeTail(
-        snake: com.batodev.arrows.engine.Snake,
+    private fun DrawScope.drawSingleBlockSnakeTail(
+        snake: Snake,
         metrics: BoardMetrics,
         lineEndX: Float,
         lineEndY: Float,
         snakeColor: Color
     ) {
-        val tailLength = metrics.cellWidth * singleBlockTailFactor
+        val tailLength = metrics.cellWidth * SINGLE_BLOCK_TAIL_FACTOR
         val tailStartX = lineEndX - snake.headDirection.dx * (tailLength + metrics.cornerRadius)
         val tailStartY = lineEndY - snake.headDirection.dy * (tailLength + metrics.cornerRadius)
 
@@ -379,7 +411,7 @@ object ArrowsBoardRenderer {
      * @param arrowHeadSize The radius of the inscribed circle (distance from center to vertices)
      * @param color The color to draw the arrow head (respects alpha for fade animations)
      */
-    private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawArrowHead(
+    private fun DrawScope.drawArrowHead(
         centerX: Float,
         centerY: Float,
         direction: Direction,
@@ -388,14 +420,11 @@ object ArrowsBoardRenderer {
     ) {
         // Convert direction to angle in radians (0° = RIGHT, 90° = DOWN, etc.)
         val angle = when (direction) {
-            Direction.UP -> 270.0
-            Direction.DOWN -> 90.0
-            Direction.LEFT -> 180.0
-            Direction.RIGHT -> 0.0
-        } * (PI / 180.0)
-
-        // 120 degrees in radians for equilateral triangle
-        val angleOffset = 2.094
+            Direction.UP -> ANGLE_UP
+            Direction.DOWN -> ANGLE_DOWN
+            Direction.LEFT -> ANGLE_LEFT
+            Direction.RIGHT -> ANGLE_RIGHT
+        } * DEG_TO_RAD
 
         // Create triangular path with three vertices equally spaced around the center
         val path = Path().apply {
@@ -406,13 +435,13 @@ object ArrowsBoardRenderer {
             )
             // Second vertex (120 degrees clockwise)
             lineTo(
-                centerX + (arrowHeadSize * cos(angle + angleOffset)).toFloat(),
-                centerY + (arrowHeadSize * sin(angle + angleOffset)).toFloat()
+                centerX + (arrowHeadSize * cos(angle + ANGLE_TRIANGLE_OFFSET)).toFloat(),
+                centerY + (arrowHeadSize * sin(angle + ANGLE_TRIANGLE_OFFSET)).toFloat()
             )
             // Third vertex (120 degrees counter-clockwise)
             lineTo(
-                centerX + (arrowHeadSize * cos(angle - angleOffset)).toFloat(),
-                centerY + (arrowHeadSize * sin(angle - angleOffset)).toFloat()
+                centerX + (arrowHeadSize * cos(angle - ANGLE_TRIANGLE_OFFSET)).toFloat(),
+                centerY + (arrowHeadSize * sin(angle - ANGLE_TRIANGLE_OFFSET)).toFloat()
             )
             close()
         }
@@ -425,7 +454,7 @@ object ArrowsBoardRenderer {
             path = path,
             color = color,
             style = Stroke(
-                width = arrowHeadSize * 0.3f,
+                width = arrowHeadSize * ARROW_HEAD_STROKE_WIDTH_FACTOR,
                 cap = StrokeCap.Round,
                 join = StrokeJoin.Round
             )

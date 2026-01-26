@@ -3,19 +3,22 @@ package com.batodev.arrows.ui
 import com.batodev.arrows.engine.FakeUserPreferencesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
-
 class AppViewModelTest {
 
     private val repository = FakeUserPreferencesRepository()
@@ -51,12 +54,12 @@ class AppViewModelTest {
     }
 
     @Test
-    fun `test saveDebugForcedWidth updates state`() = runTest {
+    fun `test saveDebugOption width updates state`() = runTest {
         val collectJob = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.debugForcedWidth.collect {}
         }
         
-        viewModel.saveDebugForcedWidth(10)
+        viewModel.saveDebugOption(AppViewModel.DebugOption.WIDTH, 10)
         assertEquals(10, repository.debugForcedWidthFlow.value)
         assertEquals(10, viewModel.debugForcedWidth.value)
         
@@ -64,12 +67,12 @@ class AppViewModelTest {
     }
 
     @Test
-    fun `test saveDebugForcedShape updates state`() = runTest {
+    fun `test saveDebugOption shape updates state`() = runTest {
         val collectJob = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.debugForcedShape.collect {}
         }
         
-        viewModel.saveDebugForcedShape("heart")
+        viewModel.saveDebugOption(AppViewModel.DebugOption.SHAPE, "heart")
         assertEquals("heart", repository.debugForcedShapeFlow.value)
         assertEquals("heart", viewModel.debugForcedShape.value)
         

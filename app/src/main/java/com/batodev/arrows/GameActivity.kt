@@ -13,7 +13,9 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -42,6 +44,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -56,12 +59,17 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.batodev.arrows.data.AndroidResourceBoardShapeProvider
 import com.batodev.arrows.engine.GameEngine
+import com.batodev.arrows.engine.GameEngineConfig
+import com.batodev.arrows.engine.GameEngineFeatures
+import com.batodev.arrows.engine.TapParams
 import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.game.GameProgressBar
 import com.batodev.arrows.ui.game.GameTopBar
 import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.HeartRed
+import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.ProgressBarGreen
+import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
 import kotlinx.coroutines.delay
 import nl.dionsegijn.konfetti.compose.KonfettiView
@@ -69,6 +77,27 @@ import nl.dionsegijn.konfetti.core.Party
 import nl.dionsegijn.konfetti.core.Position
 import nl.dionsegijn.konfetti.core.emitter.Emitter
 import java.util.concurrent.TimeUnit
+
+private const val GAME_WON_EXIT_DELAY = 3000L
+private const val GUIDANCE_ANIM_DURATION = 500
+private const val PROGRESS_BAR_WIDTH = 200
+private const val DEBUG_CIRCLE_RADIUS = 20f
+private const val PERCENT_MULTIPLIER = 100
+
+private const val CONFETTI_MAX_SPEED = 30f
+private const val CONFETTI_DAMPING = 0.9f
+private const val CONFETTI_SPREAD = 360
+private const val CONFETTI_DURATION_MS = 100L
+private const val CONFETTI_EMITTER_MAX = 100
+private const val CONFETTI_REL_X = 0.5
+private const val CONFETTI_REL_Y = 0.3
+
+private const val CONFETTI_COLOR_1 = 0xfce18a
+private const val CONFETTI_COLOR_2 = 0xff726d
+private const val CONFETTI_COLOR_3 = 0xf4306d
+private const val CONFETTI_COLOR_4 = 0xb48def
+
+private val CONFETTI_COLORS = listOf(CONFETTI_COLOR_1, CONFETTI_COLOR_2, CONFETTI_COLOR_3, CONFETTI_COLOR_4)
 
 class GameActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,18 +111,13 @@ class GameActivity : ComponentActivity() {
             val currentTheme by viewModel.theme.collectAsState()
 
             ArrowsTheme(themeName = currentTheme) {
-                val themeColors = com.batodev.arrows.ui.theme.LocalThemeColors.current
+                val themeColors = LocalThemeColors.current
                 Scaffold(
-                    modifier = Modifier.fillMaxSize(), containerColor = themeColors.background
+                    modifier = Modifier.fillMaxSize(),
+                    containerColor = themeColors.background
                 ) { innerPadding ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding)
-                    ) {
-                        ArrowsGameView(
-                            repository = application.userPreferencesRepository
-                        )
+                    Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+                        ArrowsGameView(application.userPreferencesRepository)
                     }
                 }
             }
@@ -108,59 +132,31 @@ fun ArrowsGameView(
     val coroutineScope = rememberCoroutineScope()
     val view = LocalView.current
     val context = LocalContext.current
-    val soundManager = remember { SoundManager(context) }
     val engine = remember {
         GameEngine(
-            config = com.batodev.arrows.engine.GameEngineConfig(
-                coroutineScope = coroutineScope,
-                repository = repository
-            ),
-            features = com.batodev.arrows.engine.GameEngineFeatures(
+            config = GameEngineConfig(coroutineScope = coroutineScope, repository = repository),
+            features = GameEngineFeatures(
                 onVibrate = { view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK) },
-                soundManager = soundManager,
+                soundManager = SoundManager(context),
                 shapeProvider = AndroidResourceBoardShapeProvider(context)
             )
         )
     }
-    var state by remember { mutableStateOf<List<Party>>(emptyList()) }
+
+    var confettiState by remember { mutableStateOf<List<Party>>(emptyList()) }
     var showGuidanceLines by remember { mutableStateOf(false) }
     val guidanceAlpha by animateFloatAsState(
         targetValue = if (showGuidanceLines) 1f else 0f,
-        animationSpec = tween(durationMillis = 500),
+        animationSpec = tween(durationMillis = GUIDANCE_ANIM_DURATION),
         label = "GuidanceAlphaAnimation"
     )
-    val tapAnimations =
-        remember { androidx.compose.runtime.mutableStateListOf<TapAnimationState>() }
+    val tapAnimations = remember { androidx.compose.runtime.mutableStateListOf<TapAnimationState>() }
+    val themeColors = LocalThemeColors.current
 
-    val themeColors = com.batodev.arrows.ui.theme.LocalThemeColors.current
+    HandleGameWonState(engine, context)
+    confettiState = UpdateConfettiState(engine, confettiState)
 
-    LaunchedEffect(engine.isGameWon) {
-        if (engine.isGameWon) {
-            delay(3000) // Wait for confetti
-            (context as? Activity)?.finish()
-        }
-    }
-
-    if (engine.isGameWon && state.isEmpty()) {
-        state = listOf(
-            Party(
-                speed = 0f,
-                maxSpeed = 30f,
-                damping = 0.9f,
-                spread = 360,
-                colors = listOf(0xfce18a, 0xff726d, 0xf4306d, 0xb48def),
-                position = Position.Relative(0.5, 0.3),
-                emitter = Emitter(duration = 100, TimeUnit.MILLISECONDS).max(100)
-            )
-        )
-    } else if (!engine.isGameWon && state.isNotEmpty()) {
-        state = emptyList()
-    }
-
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // Top Bar
+    Column(modifier = Modifier.fillMaxSize()) {
         GameTopBar(
             lives = engine.lives,
             maxLives = engine.maxLives,
@@ -168,151 +164,155 @@ fun ArrowsGameView(
             onBack = { (context as? Activity)?.finish() }
         )
 
-        // Progress Bar
         GameProgressBar(
             totalSnakes = engine.totalSnakesInLevel,
             currentSnakes = engine.level.snakes.size
         )
 
-        // Game Area
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1f)
-                .padding(16.dp)
-                .clipToBounds()
-                .pointerInput(Unit) {
-                    detectTransformGestures { _, pan, zoom, _ ->
-                        engine.onTransform(pan, zoom)
-                    }
-                }
-                .pointerInput(
-                    engine.scale, engine.offsetX, engine.offsetY, engine.level
-                ) {
-                    detectTapGestures { tapOffset ->
-                        if (BuildConfig.DRAW_DEBUG_STUFF) {
-                            Log.v(
-                                "TapDebug",
-                                "Container tap: $tapOffset, containerSize: ${size.width}x${size.height}"
-                            )
-                        }
+        GameArea(GameAreaParams(engine, tapAnimations, guidanceAlpha, showGuidanceLines, themeColors) {
+            showGuidanceLines = !showGuidanceLines
+        })
+    }
+}
 
-                        // Pass raw tap offset and container size to engine
-                        // Engine will handle all coordinate transformations
-                        engine.onTap(
-                            tapOffset,
-                            size.width.toFloat(),
-                            size.height.toFloat()
-                        )
-
-
-                        // Store tap position in container coordinates for animation
-                        tapAnimations.add(
-                            TapAnimationState(
-                                System.nanoTime(), tapOffset
-                            )
-                        )
-                    }
-                }
-        ) {
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer(
-                    scaleX = engine.scale,
-                    scaleY = engine.scale,
-                    translationX = engine.offsetX,
-                    translationY = engine.offsetY
-                )) {
-                ArrowsBoardRenderer.Board(
-                    level = engine.level,
-                    flashingSnakeId = engine.flashingSnakeId,
-                    removalProgress = engine.removalProgress,
-                    guidanceAlpha = guidanceAlpha,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(10.dp)
-                )
-
-                if (BuildConfig.DRAW_DEBUG_STUFF) {
-                    Canvas(modifier = Modifier.fillMaxSize()) {
-                        drawCircle(
-                            color = Color.Red,
-                            radius = 20f,
-                            center = Offset(0f, 0f)
-                        )
-                    }
-                }
-            }
-
-            // Guidance Lines Toggle Button
-            IconButton(
-                onClick = { showGuidanceLines = !showGuidanceLines },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(8.dp)
-                    .size(48.dp),
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = if (showGuidanceLines) themeColors.accent else themeColors.topBarButton,
-                    contentColor = White
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Grid4x4,
-                    contentDescription = "Guidance Lines",
-                    tint = White
-                )
-            }
-
-            // DEBUG: Draw marker at last tapOffset in container coordinates
-            if (BuildConfig.DRAW_DEBUG_STUFF && tapAnimations.isNotEmpty()) {
-                val lastTap = tapAnimations.last().offset
-                Canvas(modifier = Modifier.fillMaxSize()) {
-                    drawCircle(
-                        color = Color.Green,
-                        radius = 20f,
-                        center = lastTap
-                    )
-                }
-            }
-
-            // Tap animations rendered in container coordinate space
-            tapAnimations.forEach { anim ->
-                key(anim.id) {
-                    TapRipple(
-                        offset = anim.offset,
-                        onFinished = { tapAnimations.remove(anim) })
-                }
-            }
-
-            if (engine.isLoading) {
-                Column(
-                    modifier = Modifier.align(Alignment.Center),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text("Generating... ${(engine.loadingProgress * 100).toInt()}%", color = White)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    LinearProgressIndicator(
-                        progress = { engine.loadingProgress },
-                        modifier = Modifier.width(200.dp),
-                        color = ProgressBarGreen,
-                        trackColor = themeColors.topBarButton
-                    )
-                }
-            }
-
-            if (state.isNotEmpty()) {
-                KonfettiView(
-                    modifier = Modifier.fillMaxSize(),
-                    parties = state,
-                )
-            }
-
-            if (engine.lives <= 0) {
-                GameOverDialog(
-                    onRestart = { engine.restartLevel() },
-                    onWatchAd = { engine.addLife() })
-            }
+@Composable
+private fun HandleGameWonState(engine: GameEngine, context: android.content.Context) {
+    LaunchedEffect(engine.isGameWon) {
+        if (engine.isGameWon) {
+            delay(GAME_WON_EXIT_DELAY)
+            (context as? android.app.Activity)?.finish()
         }
+    }
+}
+
+@Composable
+private fun UpdateConfettiState(engine: GameEngine, currentState: List<Party>): List<Party> {
+    return if (engine.isGameWon && currentState.isEmpty()) {
+        listOf(
+            Party(
+                speed = 0f, maxSpeed = CONFETTI_MAX_SPEED, damping = CONFETTI_DAMPING, 
+                spread = CONFETTI_SPREAD,
+                colors = CONFETTI_COLORS,
+                position = Position.Relative(CONFETTI_REL_X, CONFETTI_REL_Y),
+                emitter = Emitter(
+                    duration = CONFETTI_DURATION_MS, TimeUnit.MILLISECONDS
+                ).max(CONFETTI_EMITTER_MAX)
+            )
+        )
+    } else if (!engine.isGameWon && currentState.isNotEmpty()) {
+        emptyList()
+    } else {
+        currentState
+    }
+}
+
+@Composable
+private fun ColumnScope.GameArea(params: GameAreaParams) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .weight(1f)
+            .padding(16.dp)
+            .clipToBounds()
+            .pointerInput(Unit) {
+                detectTransformGestures { _, pan, zoom, _ -> params.engine.onTransform(pan, zoom) }
+            }
+            .pointerInput(params.engine.scale, params.engine.offsetX, params.engine.offsetY, params.engine.level) {
+                detectTapGestures { tapOffset ->
+                    params.engine.onTap(tapOffset, size.width.toFloat(), size.height.toFloat())
+                    params.tapAnimations.add(TapAnimationState(System.nanoTime(), tapOffset))
+                }
+            }
+    ) {
+        BoardLayer(params.engine, params.guidanceAlpha)
+        GuidanceToggleButton(params.showGuidanceLines, params.themeColors, params.onToggleGuidance)
+        if (BuildConfig.DRAW_DEBUG_STUFF) DebugOverlay(params.tapAnimations)
+        TapAnimationsLayer(params.tapAnimations)
+        if (params.engine.isLoading) LoadingOverlay(params.engine.loadingProgress, params.themeColors)
+        if (params.engine.isGameWon) {
+            KonfettiView(
+                modifier = Modifier.fillMaxSize(), 
+                parties = UpdateConfettiState(params.engine, emptyList())
+            )
+        }
+        if (params.engine.lives <= 0) {
+            GameOverDialog(
+                onRestart = { params.engine.restartLevel() }, 
+                onWatchAd = { params.engine.addLife() }
+            )
+        }
+    }
+}
+
+@Composable
+private fun BoardLayer(engine: GameEngine, guidanceAlpha: Float) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .graphicsLayer(
+            scaleX = engine.scale, scaleY = engine.scale,
+            translationX = engine.offsetX, translationY = engine.offsetY
+        )) {
+        ArrowsBoardRenderer.Board(
+            level = engine.level,
+            flashingSnakeId = engine.flashingSnakeId,
+            removalProgress = engine.removalProgress,
+            guidanceAlpha = guidanceAlpha,
+            modifier = Modifier.fillMaxSize().padding(10.dp)
+        )
+    }
+}
+
+@Composable
+private fun BoxScope.GuidanceToggleButton(
+    showGuidanceLines: Boolean,
+    themeColors: ThemeColors,
+    onToggleGuidance: () -> Unit
+) {
+    IconButton(
+        onClick = onToggleGuidance,
+        modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp).size(48.dp),
+        colors = IconButtonDefaults.iconButtonColors(
+            containerColor = if (showGuidanceLines) themeColors.accent else themeColors.topBarButton,
+            contentColor = White
+        )
+    ) {
+        Icon(imageVector = Icons.Default.Grid4x4, contentDescription = "Guidance Lines", tint = White)
+    }
+}
+
+@Composable
+private fun DebugOverlay(tapAnimations: SnapshotStateList<TapAnimationState>) {
+    if (tapAnimations.isNotEmpty()) {
+        val lastTap = tapAnimations.last().offset
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            drawCircle(color = Color.Green, radius = DEBUG_CIRCLE_RADIUS, center = lastTap)
+        }
+    }
+}
+
+@Composable
+private fun TapAnimationsLayer(tapAnimations: SnapshotStateList<TapAnimationState>) {
+    tapAnimations.forEach { anim ->
+        key(anim.id) {
+            TapRipple(offset = anim.offset, onFinished = { tapAnimations.remove(anim) })
+        }
+    }
+}
+
+@Composable
+private fun BoxScope.LoadingOverlay(progress: Float, themeColors: ThemeColors) {
+    Column(
+        modifier = Modifier.align(Alignment.Center),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("Generating... ${(progress * PERCENT_MULTIPLIER).toInt()}%", color = White)
+        Spacer(modifier = Modifier.height(8.dp))
+        LinearProgressIndicator(
+            progress = { progress },
+            modifier = Modifier.width(PROGRESS_BAR_WIDTH.dp),
+            color = ProgressBarGreen,
+            trackColor = themeColors.topBarButton
+        )
     }
 }
 
@@ -321,18 +321,14 @@ fun GameOverDialog(
     onRestart: () -> Unit,
     onWatchAd: () -> Unit,
 ) {
-    val themeColors = com.batodev.arrows.ui.theme.LocalThemeColors.current
+    val themeColors = LocalThemeColors.current
     AlertDialog(
-        onDismissRequest = { /* Don't dismiss by clicking outside */ },
+        onDismissRequest = { },
         containerColor = themeColors.bottomBar,
-        title = {
-            Text(
-                text = "Game Over", color = White, fontWeight = FontWeight.Bold
-            )
-        },
+        title = { Text(text = "Game Over", color = White, fontWeight = FontWeight.Bold) },
         text = {
             Text(
-                text = "You are out of lives! Would you like to restart the board or watch an ad to get one more life?",
+                text = "You are out of lives! Would you like to restart the board or watch an ad?",
                 color = White
             )
         },
@@ -342,8 +338,8 @@ fun GameOverDialog(
                 colors = ButtonDefaults.buttonColors(containerColor = ProgressBarGreen)
             ) {
                 Icon(
-                    Icons.Default.VideoLabel,
-                    contentDescription = null,
+                    Icons.Default.VideoLabel, 
+                    contentDescription = null, 
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -354,5 +350,6 @@ fun GameOverDialog(
             TextButton(onClick = onRestart) {
                 Text("Restart Board", color = HeartRed)
             }
-        })
+        }
+    )
 }

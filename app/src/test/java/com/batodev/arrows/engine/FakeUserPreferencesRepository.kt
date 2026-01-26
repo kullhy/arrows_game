@@ -1,16 +1,24 @@
 package com.batodev.arrows.engine
 
+import androidx.datastore.core.DataStoreFactory
+import androidx.datastore.core.Serializer
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.emptyPreferences
 import com.batodev.arrows.data.UserPreferencesRepository
+import java.io.InputStream
+import java.io.OutputStream
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class FakeUserPreferencesRepository : UserPreferencesRepository(
-    androidx.datastore.core.DataStoreFactory.create(
-        serializer = object : androidx.datastore.core.Serializer<androidx.datastore.preferences.core.Preferences> {
-            override val defaultValue: androidx.datastore.preferences.core.Preferences
-                get() = androidx.datastore.preferences.core.emptyPreferences()
-            override suspend fun readFrom(input: java.io.InputStream): androidx.datastore.preferences.core.Preferences = defaultValue
-            override suspend fun writeTo(t: androidx.datastore.preferences.core.Preferences, output: java.io.OutputStream) {}
+    DataStoreFactory.create(
+        serializer = object : Serializer<Preferences> {
+            override val defaultValue: Preferences
+                get() = emptyPreferences()
+            override suspend fun readFrom(input: InputStream): Preferences = defaultValue
+            override suspend fun writeTo(t: Preferences, output: OutputStream) {
+                // no-op
+            }
         }
     ) { null!! }
 ) {

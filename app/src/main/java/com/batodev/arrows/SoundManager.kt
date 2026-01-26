@@ -1,7 +1,9 @@
 package com.batodev.arrows
 
 import android.content.Context
+import android.content.res.Resources
 import android.media.MediaPlayer
+import android.util.Log
 import kotlin.random.Random
 
 class SoundManager(private val context: Context) {
@@ -56,8 +58,10 @@ class SoundManager(private val context: Context) {
                 }
                 start()
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
+        } catch (e: IllegalStateException) {
+            Log.e("SoundManager", "Failed to play sound: Illegal state", e)
+        } catch (e: Resources.NotFoundException) {
+            Log.e("SoundManager", "Failed to play sound: Resource not found", e)
         }
     }
 }
