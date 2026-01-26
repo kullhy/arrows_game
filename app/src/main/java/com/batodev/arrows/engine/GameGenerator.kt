@@ -356,8 +356,7 @@ class GameGenerator {
                                 headDir,
                                 occupied,
                                 config.width,
-                                config.height,
-                                config.walls
+                                config.height
                             )
                         ) {
                             frontier.add(Pair(neighbor, headDir))
@@ -399,8 +398,7 @@ class GameGenerator {
                     direction,
                     occupied,
                     config.width,
-                    config.height,
-                    config.walls
+                    config.height
                 )
             ) continue
 
@@ -438,17 +436,12 @@ class GameGenerator {
         occupied: Array<BooleanArray>,
         width: Int,
         height: Int,
-        walls: Array<BooleanArray>,
     ): Boolean {
         var current = possibleHead
         while (true) {
             current = current.copy(x = current.x + direction.dx, y = current.y + direction.dy)
             if (current.x !in 0..<width || current.y !in 0..<height) {
                 break
-            }
-            // If we hit a wall, it counts as reaching the edge (escaping the play area)
-            if (walls[current.x][current.y]) {
-                return true
             }
             if (occupied[current.x][current.y]) {
                 return false
