@@ -27,17 +27,40 @@ private const val LEVELS_PER_PROGRESSION_STEP = 10
 private const val MIN_BOARD_SIZE_FOR_SHAPES = 20
 private const val SHAPE_APPLICATION_PROBABILITY = 0.6f
 
+/**
+ * Configuration for GameEngine dependencies and callbacks.
+ */
+data class GameEngineConfig(
+    val coroutineScope: CoroutineScope,
+    val repository: UserPreferencesRepository,
+    val gameGenerator: GameGenerator = GameGenerator(),
+    val autoLoad: Boolean = true,
+    val backgroundDispatcher: kotlinx.coroutines.CoroutineDispatcher = kotlinx.coroutines.Dispatchers.Default
+)
+
+/**
+ * Optional features and integrations for GameEngine.
+ */
+data class GameEngineFeatures(
+    val onVibrate: () -> Unit = {},
+    val soundManager: com.batodev.arrows.SoundManager? = null,
+    val shapeProvider: BoardShapeProvider? = null,
+    val random: kotlin.random.Random = kotlin.random.Random.Default
+)
+
 class GameEngine(
-    private val coroutineScope: CoroutineScope,
-    private val repository: UserPreferencesRepository,
-    private val gameGenerator: GameGenerator = GameGenerator(),
-    autoLoad: Boolean = true,
-    private val backgroundDispatcher: kotlinx.coroutines.CoroutineDispatcher = kotlinx.coroutines.Dispatchers.Default,
-    private val onVibrate: () -> Unit = {},
-    private val soundManager: com.batodev.arrows.SoundManager? = null,
-    private val shapeProvider: BoardShapeProvider? = null,
-    private val random: kotlin.random.Random = kotlin.random.Random.Default
+    config: GameEngineConfig,
+    features: GameEngineFeatures = GameEngineFeatures()
 ) {
+    private val coroutineScope = config.coroutineScope
+    private val repository = config.repository
+    private val gameGenerator = config.gameGenerator
+    private val backgroundDispatcher = config.backgroundDispatcher
+    private val onVibrate = features.onVibrate
+    private val soundManager = features.soundManager
+    private val shapeProvider = features.shapeProvider
+    private val random = features.random
+
     private val gson = Gson()
     private var initialLevel: GameLevel? = null
     private var isVibrationEnabled = true
@@ -85,7 +108,7 @@ class GameEngine(
 
     init {
         observePreferences()
-        if (autoLoad) {
+        if (config.autoLoad) {
             loadOrRegenerateLevel()
         }
     }
@@ -133,7 +156,7 @@ class GameEngine(
                 try {
                     val currentLevelNum = repository.levelNumber.firstOrNull() ?: 1
                     val config = calculateLevelConfiguration(currentLevelNum)
-                    
+
                     initialLevel = gson.fromJson(savedInitial, GameLevel::class.java)
                     level = gson.fromJson(savedCurrent, GameLevel::class.java)
                     totalSnakesInLevel = initialLevel?.snakes?.size ?: 0
@@ -321,13 +344,13 @@ class GameEngine(
         // L1: 5x5, L2: 5x6, L3: 6x6, L4: 6x7, L5: 7x7...
         val baseH = BASE_BOARD_SIZE + (levelNum - 1) / 2
         val baseW = BASE_BOARD_SIZE + levelNum / 2
-        
+
         val h = forcedHeight ?: (baseH - sizeReduction).coerceAtLeast(1)
         val w = forcedWidth ?: (baseW - sizeReduction).coerceAtLeast(1)
-        
+
         val maxLives = forcedLives ?: (INITIAL_LIVES - livesReduction).coerceAtLeast(1)
         val maxSnakeLength = (3 + levelNum / 2).coerceIn(4, 30)
-        
+
         return LevelConfiguration(w, h, maxSnakeLength, maxLives)
     }
 
@@ -403,7 +426,7 @@ class GameEngine(
         while (current.x in 0 until level.width && current.y in 0 until level.height) {
             // Check if any snake occupies this position, ignoring those being removed
             val occupied = level.snakes.any { otherSnake ->
-                !removalProgress.containsKey(otherSnake.id) && 
+                !removalProgress.containsKey(otherSnake.id) &&
                 otherSnake.body.any { segment -> segment == current }
             }
             if (occupied) {

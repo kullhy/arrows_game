@@ -25,27 +25,31 @@ class GameEngineShapeLogicTest {
         val testDispatcher = UnconfinedTestDispatcher(testScheduler)
         val repo = FakeUserPreferencesRepository()
         repo.saveLevelNumber(100) // 25x24 board
-        
+
         val shapeProvider = mock<BoardShapeProvider>()
         val generator = mock<GameGenerator>()
         val random = mock<Random> {
             on { nextFloat() } doReturn 0.5f // Less than 0.6
         }
-        
+
         val engine = GameEngine(
-            coroutineScope = CoroutineScope(testDispatcher),
-            repository = repo,
-            gameGenerator = generator,
-            autoLoad = false,
-            backgroundDispatcher = testDispatcher,
-            shapeProvider = shapeProvider,
-            random = random
+            config = GameEngineConfig(
+                coroutineScope = CoroutineScope(testDispatcher),
+                repository = repo,
+                gameGenerator = generator,
+                autoLoad = false,
+                backgroundDispatcher = testDispatcher
+            ),
+            features = GameEngineFeatures(
+                shapeProvider = shapeProvider,
+                random = random
+            )
         )
-        
+
         runCurrent()
         engine.regenerateLevel()
         runCurrent()
-        
+
         verify(shapeProvider, times(1)).getRandomShape()
     }
 
@@ -54,27 +58,31 @@ class GameEngineShapeLogicTest {
         val testDispatcher = UnconfinedTestDispatcher(testScheduler)
         val repo = FakeUserPreferencesRepository()
         repo.saveLevelNumber(1) // 5x5 board
-        
+
         val shapeProvider = mock<BoardShapeProvider>()
         val generator = mock<GameGenerator>()
         val random = mock<Random> {
             on { nextFloat() } doReturn 0.1f
         }
-        
+
         val engine = GameEngine(
-            coroutineScope = CoroutineScope(testDispatcher),
-            repository = repo,
-            gameGenerator = generator,
-            autoLoad = false,
-            backgroundDispatcher = testDispatcher,
-            shapeProvider = shapeProvider,
-            random = random
+            config = GameEngineConfig(
+                coroutineScope = CoroutineScope(testDispatcher),
+                repository = repo,
+                gameGenerator = generator,
+                autoLoad = false,
+                backgroundDispatcher = testDispatcher
+            ),
+            features = GameEngineFeatures(
+                shapeProvider = shapeProvider,
+                random = random
+            )
         )
-        
+
         runCurrent()
         engine.regenerateLevel()
         runCurrent()
-        
+
         verify(shapeProvider, never()).getRandomShape()
     }
 
@@ -83,27 +91,31 @@ class GameEngineShapeLogicTest {
         val testDispatcher = UnconfinedTestDispatcher(testScheduler)
         val repo = FakeUserPreferencesRepository()
         repo.saveLevelNumber(100) // 25x24 board
-        
+
         val shapeProvider = mock<BoardShapeProvider>()
         val generator = mock<GameGenerator>()
         val random = mock<Random> {
             on { nextFloat() } doReturn 0.7f // More than 0.6
         }
-        
+
         val engine = GameEngine(
-            coroutineScope = CoroutineScope(testDispatcher),
-            repository = repo,
-            gameGenerator = generator,
-            autoLoad = false,
-            backgroundDispatcher = testDispatcher,
-            shapeProvider = shapeProvider,
-            random = random
+            config = GameEngineConfig(
+                coroutineScope = CoroutineScope(testDispatcher),
+                repository = repo,
+                gameGenerator = generator,
+                autoLoad = false,
+                backgroundDispatcher = testDispatcher
+            ),
+            features = GameEngineFeatures(
+                shapeProvider = shapeProvider,
+                random = random
+            )
         )
-        
+
         runCurrent()
         engine.regenerateLevel()
         runCurrent()
-        
+
         verify(shapeProvider, never()).getRandomShape()
     }
 }

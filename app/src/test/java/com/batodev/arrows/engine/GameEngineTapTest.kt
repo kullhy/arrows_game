@@ -46,10 +46,12 @@ class GameEngineTapTest {
 
         val testDispatcher = UnconfinedTestDispatcher(testScheduler)
         val engine = GameEngine(
-            coroutineScope = CoroutineScope(testDispatcher),
-            repository = repo,
-            autoLoad = false,
-            backgroundDispatcher = testDispatcher
+            config = GameEngineConfig(
+                coroutineScope = CoroutineScope(testDispatcher),
+                repository = repo,
+                autoLoad = false,
+                backgroundDispatcher = testDispatcher
+            )
         )
 
         // Load level
@@ -68,31 +70,31 @@ class GameEngineTapTest {
         // Snake 2: x = 3.0 + 0.5 - 0.3 = 3.2.  y = 1.5.
 
                 // Tap closer to Snake 1
-                // Tap at x = 2.4. 
+                // Tap at x = 2.4.
                 // Dist to S1 (1.8): 0.6.
                 // Dist to S2 (3.2): 0.8.
                 // Both are within tolerance 1.3.
                 // Should pick S1.
-                
+
                 val tapOffset = Offset(2.4f * cellWidth, 1.5f * cellWidth)
                 engine.onTap(tapOffset, boardSize, boardSize)
-                
+
                 // Check if S1 flashed (id 1)
                 assertEquals("Should have picked snake 1", 1, engine.flashingSnakeId)
-                
+
                 // Reset flashing
                 engine.restartLevel()
                 runCurrent()
-                
+
                 // Tap closer to Snake 2
                 // Tap at x = 2.6.
                 // Dist to S1 (1.8): 0.8.
                 // Dist to S2 (3.2): 0.6.
                 // Should pick S2.
-                
+
                 val tapOffset2 = Offset(2.6f * cellWidth, 1.5f * cellWidth)
                 engine.onTap(tapOffset2, boardSize, boardSize)
-                
+
                 // S2 should flash (id 2)
                 assertEquals("Should have picked snake 2", 2, engine.flashingSnakeId)
             }
@@ -120,10 +122,12 @@ class GameEngineTapTest {
 
         val testDispatcher = UnconfinedTestDispatcher(testScheduler)
         val engine = GameEngine(
-            coroutineScope = CoroutineScope(testDispatcher),
-            repository = repo,
-            autoLoad = false,
-            backgroundDispatcher = testDispatcher
+            config = GameEngineConfig(
+                coroutineScope = CoroutineScope(testDispatcher),
+                repository = repo,
+                autoLoad = false,
+                backgroundDispatcher = testDispatcher
+            )
         )
 
         engine.loadOrRegenerateLevel()
@@ -139,7 +143,7 @@ class GameEngineTapTest {
         // Tap S1 (obstructed by S2)
         val tapS1 = Offset(1.8f * cellWidth, 1.5f * cellWidth)
         engine.onTap(tapS1, boardSize, boardSize)
-        
+
         assertEquals("S1 should flash when obstructed", 1, engine.flashingSnakeId)
         engine.restartLevel()
         runCurrent()

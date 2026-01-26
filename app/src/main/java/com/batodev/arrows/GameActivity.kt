@@ -111,11 +111,15 @@ fun ArrowsGameView(
     val soundManager = remember { SoundManager(context) }
     val engine = remember {
         GameEngine(
-            coroutineScope,
-            repository,
-            onVibrate = { view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK) },
-            soundManager = soundManager,
-            shapeProvider = AndroidResourceBoardShapeProvider(context)
+            config = com.batodev.arrows.engine.GameEngineConfig(
+                coroutineScope = coroutineScope,
+                repository = repository
+            ),
+            features = com.batodev.arrows.engine.GameEngineFeatures(
+                onVibrate = { view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK) },
+                soundManager = soundManager,
+                shapeProvider = AndroidResourceBoardShapeProvider(context)
+            )
         )
     }
     var state by remember { mutableStateOf<List<Party>>(emptyList()) }

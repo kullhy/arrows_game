@@ -26,26 +26,28 @@ class GameEngineDebugParamsTest {
         repo.saveDebugForcedWidth(20)
         repo.saveDebugForcedHeight(30)
         repo.saveDebugForcedLives(10)
-        
+
         val engine = GameEngine(
-            coroutineScope = CoroutineScope(testDispatcher),
-            repository = repo,
-            autoLoad = false
+            config = GameEngineConfig(
+                coroutineScope = CoroutineScope(testDispatcher),
+                repository = repo,
+                autoLoad = false
+            )
         )
-        
+
         // Wait for flows to be collected
         runCurrent()
-        
+
         val calcFunc = engine::class.declaredMemberFunctions.find { it.name == "calculateLevelConfiguration" }!!
         calcFunc.isAccessible = true
         val config = calcFunc.call(engine, 1)!!
-        
+
         // Access properties of private data class
         val configClass = config::class
         val widthProp = configClass.members.find { it.name == "width" }!!
         val heightProp = configClass.members.find { it.name == "height" }!!
         val maxLivesProp = configClass.members.find { it.name == "maxLives" }!!
-        
+
         widthProp.isAccessible = true
         heightProp.isAccessible = true
         maxLivesProp.isAccessible = true
@@ -60,23 +62,27 @@ class GameEngineDebugParamsTest {
         val testDispatcher = UnconfinedTestDispatcher(testScheduler)
         val repo = FakeUserPreferencesRepository()
         repo.saveDebugForcedShape("heart")
-        
+
         val shapeProvider = mock<BoardShapeProvider>()
         val generator = mock<GameGenerator>()
-        
+
         val engine = GameEngine(
-            coroutineScope = CoroutineScope(testDispatcher),
-            repository = repo,
-            gameGenerator = generator,
-            autoLoad = false,
-            backgroundDispatcher = testDispatcher,
-            shapeProvider = shapeProvider
+            config = GameEngineConfig(
+                coroutineScope = CoroutineScope(testDispatcher),
+                repository = repo,
+                gameGenerator = generator,
+                autoLoad = false,
+                backgroundDispatcher = testDispatcher
+            ),
+            features = GameEngineFeatures(
+                shapeProvider = shapeProvider
+            )
         )
-        
+
         runCurrent()
         engine.regenerateLevel()
         runCurrent()
-        
+
         verify(shapeProvider).getShapeByName("heart")
         verify(shapeProvider, never()).getRandomShape()
     }

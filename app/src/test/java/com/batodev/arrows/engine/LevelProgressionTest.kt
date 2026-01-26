@@ -24,9 +24,11 @@ class LevelProgressionTest {
         val testDispatcher = UnconfinedTestDispatcher()
         val repo = FakeUserPreferencesRepository()
         val engine = GameEngine(
-            coroutineScope = CoroutineScope(testDispatcher),
-            repository = repo,
-            autoLoad = false
+            config = GameEngineConfig(
+                coroutineScope = CoroutineScope(testDispatcher),
+                repository = repo,
+                autoLoad = false
+            )
         )
 
         // Test L1: Base 5x5, Step 0. Reduction 0. Expected 5x5, 5 lives.
@@ -39,7 +41,7 @@ class LevelProgressionTest {
         verifyLevel(engine, 11, expectedW = 7, expectedH = 7, expectedLives = 4)
 
         // Test L20: Base 15x14, Step 2. Reduction 6. Expected 9x8, 3 lives.
-        // BaseW: 5 + 20/2 = 15. BaseH: 5 + 19/2 = 14. Reduction: 2 * 3 = 6. 
+        // BaseW: 5 + 20/2 = 15. BaseH: 5 + 19/2 = 14. Reduction: 2 * 3 = 6.
         // 15-6=9, 14-6=8. Lives: 5 - 2 = 3.
         verifyLevel(engine, 20, expectedW = 9, expectedH = 8, expectedLives = 3)
 
@@ -53,13 +55,13 @@ class LevelProgressionTest {
         val calcFunc = engine::class.declaredMemberFunctions.find { it.name == "calculateLevelConfiguration" }!!
         calcFunc.isAccessible = true
         val config = calcFunc.call(engine, levelNum)!!
-        
+
         // Get properties from the private data class via reflection
         val configClass = config::class
         val widthProp = configClass.memberProperties.find { it.name == "width" }!!
         val heightProp = configClass.memberProperties.find { it.name == "height" }!!
         val maxLivesProp = configClass.memberProperties.find { it.name == "maxLives" }!!
-        
+
         widthProp.isAccessible = true
         heightProp.isAccessible = true
         maxLivesProp.isAccessible = true
