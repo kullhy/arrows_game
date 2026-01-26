@@ -23,7 +23,7 @@ import org.robolectric.annotation.Config
 class GameEngineTapTest {
 
     @Test
-    fun `test closest snake is selected within tolerance`() {
+    fun `test closest snake is selected within tolerance`() = runTest {
         val gson = Gson()
         // Setup levels
         // Snake 1 (1,1) RIGHT -> target center roughly (1.8, 1.5)
@@ -34,18 +34,17 @@ class GameEngineTapTest {
         val levelJson = gson.toJson(level)
 
         // Mock repo
-        val repo = mock<UserPreferencesRepository> {
-            on { initialLevel } doReturn MutableStateFlow(levelJson)
-            on { currentLevel } doReturn MutableStateFlow(levelJson)
-            on { isVibrationEnabled } doReturn MutableStateFlow(false)
-            on { isSoundsEnabled } doReturn MutableStateFlow(true)
-            on { isFillBoardEnabled } doReturn MutableStateFlow(false)
-            on { levelNumber } doReturn MutableStateFlow(1)
-            on { currentLives } doReturn MutableStateFlow(5)
-            on { animationSpeed } doReturn MutableStateFlow("Medium")
-        }
+        val repo = FakeUserPreferencesRepository()
+        repo.saveInitialLevel(levelJson)
+        repo.saveCurrentLevel(levelJson)
+        repo.saveVibrationPreference(false)
+        repo.saveSoundsPreference(true)
+        repo.saveFillBoardPreference(false)
+        repo.saveLevelNumber(1)
+        repo.saveCurrentLives(5)
+        repo.saveAnimationSpeed("Medium")
 
-        val testDispatcher = UnconfinedTestDispatcher()
+        val testDispatcher = UnconfinedTestDispatcher(testScheduler)
         val engine = GameEngine(
             coroutineScope = CoroutineScope(testDispatcher),
             repository = repo,
@@ -55,6 +54,7 @@ class GameEngineTapTest {
 
         // Load level
         engine.loadOrRegenerateLevel()
+        runCurrent()
 
         // Ensure level loaded
         assertEquals(2, engine.level.snakes.size)
@@ -82,6 +82,7 @@ class GameEngineTapTest {
                 
                 // Reset flashing
                 engine.restartLevel()
+                runCurrent()
                 
                 // Tap closer to Snake 2
                 // Tap at x = 2.6.
@@ -107,16 +108,15 @@ class GameEngineTapTest {
         val level = GameLevel(5, 5, listOf(s1, s2))
         val levelJson = gson.toJson(level)
 
-        val repo = mock<UserPreferencesRepository> {
-            on { initialLevel } doReturn MutableStateFlow(levelJson)
-            on { currentLevel } doReturn MutableStateFlow(levelJson)
-            on { isVibrationEnabled } doReturn MutableStateFlow(false)
-            on { isSoundsEnabled } doReturn MutableStateFlow(false)
-            on { isFillBoardEnabled } doReturn MutableStateFlow(false)
-            on { levelNumber } doReturn MutableStateFlow(1)
-            on { currentLives } doReturn MutableStateFlow(5)
-            on { animationSpeed } doReturn MutableStateFlow("Medium")
-        }
+        val repo = FakeUserPreferencesRepository()
+        repo.saveInitialLevel(levelJson)
+        repo.saveCurrentLevel(levelJson)
+        repo.saveVibrationPreference(false)
+        repo.saveSoundsPreference(false)
+        repo.saveFillBoardPreference(false)
+        repo.saveLevelNumber(1)
+        repo.saveCurrentLives(5)
+        repo.saveAnimationSpeed("Medium")
 
         val testDispatcher = UnconfinedTestDispatcher(testScheduler)
         val engine = GameEngine(

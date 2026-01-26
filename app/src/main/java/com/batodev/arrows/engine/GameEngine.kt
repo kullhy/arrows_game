@@ -44,6 +44,10 @@ class GameEngine(
     private var isSoundsEnabled = true
     private var isFillBoardEnabled by mutableStateOf(false)
     private var animationSpeed = "Medium"
+    private var forcedWidth: Int? = null
+    private var forcedHeight: Int? = null
+    private var forcedLives: Int? = null
+    private var forcedShape: String? = null
 
     var levelNumber by mutableIntStateOf(1)
         private set
@@ -104,6 +108,18 @@ class GameEngine(
         }
         coroutineScope.launch {
             repository.animationSpeed.collect { animationSpeed = it }
+        }
+        coroutineScope.launch {
+            repository.debugForcedWidth.collect { forcedWidth = it }
+        }
+        coroutineScope.launch {
+            repository.debugForcedHeight.collect { forcedHeight = it }
+        }
+        coroutineScope.launch {
+            repository.debugForcedLives.collect { forcedLives = it }
+        }
+        coroutineScope.launch {
+            repository.debugForcedShape.collect { forcedShape = it }
         }
     }
 
@@ -273,7 +289,9 @@ class GameEngine(
 
             val config = calculateLevelConfiguration(currentLevelNum)
 
-            val shape = if ((config.width >= MIN_BOARD_SIZE_FOR_SHAPES || config.height >= MIN_BOARD_SIZE_FOR_SHAPES) &&
+            val shape = if (forcedShape != null) {
+                shapeProvider?.getShapeByName(forcedShape!!)
+            } else if ((config.width >= MIN_BOARD_SIZE_FOR_SHAPES || config.height >= MIN_BOARD_SIZE_FOR_SHAPES) &&
                 random.nextFloat() < SHAPE_APPLICATION_PROBABILITY
             ) {
                 shapeProvider?.getRandomShape()
@@ -304,10 +322,10 @@ class GameEngine(
         val baseH = BASE_BOARD_SIZE + (levelNum - 1) / 2
         val baseW = BASE_BOARD_SIZE + levelNum / 2
         
-        val h = (baseH - sizeReduction).coerceAtLeast(1)
-        val w = (baseW - sizeReduction).coerceAtLeast(1)
+        val h = forcedHeight ?: (baseH - sizeReduction).coerceAtLeast(1)
+        val w = forcedWidth ?: (baseW - sizeReduction).coerceAtLeast(1)
         
-        val maxLives = (INITIAL_LIVES - livesReduction).coerceAtLeast(1)
+        val maxLives = forcedLives ?: (INITIAL_LIVES - livesReduction).coerceAtLeast(1)
         val maxSnakeLength = (3 + levelNum / 2).coerceIn(4, 30)
         
         return LevelConfiguration(w, h, maxSnakeLength, maxLives)

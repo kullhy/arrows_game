@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,17 +22,9 @@ class GameEngineShapeLogicTest {
 
     @Test
     fun `test getRandomShape is called for large boards when probability rolls high`() = runTest {
-        val testDispatcher = UnconfinedTestDispatcher()
-        val repo = mock<UserPreferencesRepository> {
-            on { isVibrationEnabled } doReturn MutableStateFlow(false)
-            on { isFillBoardEnabled } doReturn MutableStateFlow(false)
-            on { isSoundsEnabled } doReturn MutableStateFlow(false)
-            on { levelNumber } doReturn MutableStateFlow(100) // 25x24 board
-            on { animationSpeed } doReturn MutableStateFlow("Medium")
-            on { initialLevel } doReturn MutableStateFlow(null)
-            on { currentLevel } doReturn MutableStateFlow(null)
-            on { currentLives } doReturn MutableStateFlow(5)
-        }
+        val testDispatcher = UnconfinedTestDispatcher(testScheduler)
+        val repo = FakeUserPreferencesRepository()
+        repo.saveLevelNumber(100) // 25x24 board
         
         val shapeProvider = mock<BoardShapeProvider>()
         val generator = mock<GameGenerator>()
@@ -49,24 +42,18 @@ class GameEngineShapeLogicTest {
             random = random
         )
         
+        runCurrent()
         engine.regenerateLevel()
+        runCurrent()
         
         verify(shapeProvider, times(1)).getRandomShape()
     }
 
     @Test
     fun `test getRandomShape is NOT called for small boards`() = runTest {
-        val testDispatcher = UnconfinedTestDispatcher()
-        val repo = mock<UserPreferencesRepository> {
-            on { isVibrationEnabled } doReturn MutableStateFlow(false)
-            on { isFillBoardEnabled } doReturn MutableStateFlow(false)
-            on { isSoundsEnabled } doReturn MutableStateFlow(false)
-            on { levelNumber } doReturn MutableStateFlow(1) // 5x5 board
-            on { animationSpeed } doReturn MutableStateFlow("Medium")
-            on { initialLevel } doReturn MutableStateFlow(null)
-            on { currentLevel } doReturn MutableStateFlow(null)
-            on { currentLives } doReturn MutableStateFlow(5)
-        }
+        val testDispatcher = UnconfinedTestDispatcher(testScheduler)
+        val repo = FakeUserPreferencesRepository()
+        repo.saveLevelNumber(1) // 5x5 board
         
         val shapeProvider = mock<BoardShapeProvider>()
         val generator = mock<GameGenerator>()
@@ -84,24 +71,18 @@ class GameEngineShapeLogicTest {
             random = random
         )
         
+        runCurrent()
         engine.regenerateLevel()
+        runCurrent()
         
         verify(shapeProvider, never()).getRandomShape()
     }
 
     @Test
     fun `test getRandomShape is NOT called when probability rolls low`() = runTest {
-        val testDispatcher = UnconfinedTestDispatcher()
-        val repo = mock<UserPreferencesRepository> {
-            on { isVibrationEnabled } doReturn MutableStateFlow(false)
-            on { isFillBoardEnabled } doReturn MutableStateFlow(false)
-            on { isSoundsEnabled } doReturn MutableStateFlow(false)
-            on { levelNumber } doReturn MutableStateFlow(100) // 25x24 board
-            on { animationSpeed } doReturn MutableStateFlow("Medium")
-            on { initialLevel } doReturn MutableStateFlow(null)
-            on { currentLevel } doReturn MutableStateFlow(null)
-            on { currentLives } doReturn MutableStateFlow(5)
-        }
+        val testDispatcher = UnconfinedTestDispatcher(testScheduler)
+        val repo = FakeUserPreferencesRepository()
+        repo.saveLevelNumber(100) // 25x24 board
         
         val shapeProvider = mock<BoardShapeProvider>()
         val generator = mock<GameGenerator>()
@@ -119,7 +100,9 @@ class GameEngineShapeLogicTest {
             random = random
         )
         
+        runCurrent()
         engine.regenerateLevel()
+        runCurrent()
         
         verify(shapeProvider, never()).getRandomShape()
     }

@@ -11,6 +11,8 @@ import kotlinx.coroutines.launch
 
 class AppViewModel(private val userPreferencesRepository: UserPreferencesRepository) : ViewModel() {
 
+    var shapeProvider: com.batodev.arrows.engine.BoardShapeProvider? = null
+
     val theme: StateFlow<String> = userPreferencesRepository.theme.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -41,6 +43,36 @@ class AppViewModel(private val userPreferencesRepository: UserPreferencesReposit
         initialValue = false
     )
 
+    val levelNumber: StateFlow<Int> = userPreferencesRepository.levelNumber.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = 1
+    )
+
+    val debugForcedWidth: StateFlow<Int?> = userPreferencesRepository.debugForcedWidth.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
+
+    val debugForcedHeight: StateFlow<Int?> = userPreferencesRepository.debugForcedHeight.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
+
+    val debugForcedLives: StateFlow<Int?> = userPreferencesRepository.debugForcedLives.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
+
+    val debugForcedShape: StateFlow<String?> = userPreferencesRepository.debugForcedShape.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
+
     fun saveTheme(theme: String) {
         viewModelScope.launch {
             userPreferencesRepository.saveThemePreference(theme)
@@ -68,6 +100,42 @@ class AppViewModel(private val userPreferencesRepository: UserPreferencesReposit
     fun saveAnimationSpeed(speed: String) {
         viewModelScope.launch {
             userPreferencesRepository.saveAnimationSpeed(speed)
+        }
+    }
+
+    fun saveLevelNumber(level: Int) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveLevelNumber(level)
+        }
+    }
+
+    fun regenerateCurrentLevel() {
+        viewModelScope.launch {
+            userPreferencesRepository.clearSavedLevel()
+        }
+    }
+
+    fun saveDebugForcedWidth(width: Int?) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveDebugForcedWidth(width)
+        }
+    }
+
+    fun saveDebugForcedHeight(height: Int?) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveDebugForcedHeight(height)
+        }
+    }
+
+    fun saveDebugForcedLives(lives: Int?) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveDebugForcedLives(lives)
+        }
+    }
+
+    fun saveDebugForcedShape(shape: String?) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveDebugForcedShape(shape)
         }
     }
 

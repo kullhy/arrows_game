@@ -69,6 +69,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.batodev.arrows.ui.AppViewModel
+import com.batodev.arrows.data.AndroidResourceBoardShapeProvider
 import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.InactiveIcon
 import com.batodev.arrows.ui.theme.LocalThemeColors
@@ -81,10 +82,12 @@ class SettingsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val application = applicationContext as ArrowsApplication
+        val shapeProvider = AndroidResourceBoardShapeProvider(this)
         setContent {
             val viewModel: AppViewModel = viewModel(
                 factory = AppViewModel.Factory(application.userPreferencesRepository)
             )
+            viewModel.shapeProvider = shapeProvider
             val currentTheme by viewModel.theme.collectAsState()
 
             ArrowsTheme(themeName = currentTheme) {
@@ -258,8 +261,201 @@ fun SettingsScreen(viewModel: AppViewModel) {
                     onClick = { launchBrowser(context, "https://robmat.github.io/privacy_policy.html") }
                 )
             }
+
+            if (BuildConfig.DRAW_DEBUG_STUFF) {
+                DebugMenu(viewModel)
+            }
         }
     }
+}
+
+@Composable
+fun DebugMenu(viewModel: AppViewModel) {
+    val themeColors = LocalThemeColors.current
+    val levelNumber by viewModel.levelNumber.collectAsState()
+    val forcedWidth by viewModel.debugForcedWidth.collectAsState()
+    val forcedHeight by viewModel.debugForcedHeight.collectAsState()
+    val forcedLives by viewModel.debugForcedLives.collectAsState()
+    val forcedShape by viewModel.debugForcedShape.collectAsState()
+    
+    var showLevelDialog by remember { mutableStateOf(false) }
+    var showWidthDialog by remember { mutableStateOf(false) }
+    var showHeightDialog by remember { mutableStateOf(false) }
+    var showLivesDialog by remember { mutableStateOf(false) }
+    var showShapeDialog by remember { mutableStateOf(false) }
+
+    Text(
+        text = "DEBUG MENU",
+        color = themeColors.accent,
+        fontWeight = FontWeight.Bold,
+        fontSize = 18.sp,
+        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+    )
+
+    SettingsGroup(themeColors.topBarButton) {
+        SettingsClickableItem(
+            icon = Icons.Default.Settings,
+            title = "Current Level",
+            valueText = levelNumber.toString(),
+            onClick = { showLevelDialog = true }
+        )
+        SettingsClickableItem(
+            icon = Icons.Default.Settings,
+            title = "Forced Width",
+            valueText = forcedWidth?.toString() ?: "Auto",
+            onClick = { showWidthDialog = true }
+        )
+        SettingsClickableItem(
+            icon = Icons.Default.Settings,
+            title = "Forced Height",
+            valueText = forcedHeight?.toString() ?: "Auto",
+            onClick = { showHeightDialog = true }
+        )
+        SettingsClickableItem(
+            icon = Icons.Default.Settings,
+            title = "Forced Lives",
+            valueText = forcedLives?.toString() ?: "Auto",
+            onClick = { showLivesDialog = true }
+        )
+        SettingsClickableItem(
+            icon = Icons.Default.Settings,
+            title = "Forced Shape",
+            valueText = forcedShape ?: "None",
+            onClick = { showShapeDialog = true }
+        )
+        SettingsClickableItem(
+            icon = Icons.Default.Settings,
+            title = "Regenerate Level",
+            onClick = { viewModel.regenerateCurrentLevel() }
+        )
+    }
+
+    if (showLevelDialog) {
+        NumberInputDialog("Level", levelNumber, onDismiss = { showLevelDialog = false }) {
+            viewModel.saveLevelNumber(it)
+        }
+    }
+    if (showWidthDialog) {
+        NumberInputDialog("Width (0 for Auto)", forcedWidth ?: 0, onDismiss = { showWidthDialog = false }) {
+            viewModel.saveDebugForcedWidth(if (it > 0) it else null)
+        }
+    }
+    if (showHeightDialog) {
+        NumberInputDialog("Height (0 for Auto)", forcedHeight ?: 0, onDismiss = { showHeightDialog = false }) {
+            viewModel.saveDebugForcedHeight(if (it > 0) it else null)
+        }
+    }
+    if (showLivesDialog) {
+        NumberInputDialog("Lives (0 for Auto)", forcedLives ?: 0, onDismiss = { showLivesDialog = false }) {
+            viewModel.saveDebugForcedLives(if (it > 0) it else null)
+        }
+    }
+    if (showShapeDialog) {
+        ShapeSelectionDialog(viewModel, forcedShape, onDismiss = { showShapeDialog = false }) {
+            viewModel.saveDebugForcedShape(it)
+        }
+    }
+}
+
+@Composable
+fun NumberInputDialog(
+    title: String,
+    initialValue: Int,
+    onDismiss: () -> Unit,
+    onConfirm: (Int) -> Unit
+) {
+    var text by remember { mutableStateOf(initialValue.toString()) }
+    val themeColors = LocalThemeColors.current
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = themeColors.bottomBar,
+        title = { Text(title, color = White) },
+        text = {
+            androidx.compose.material3.TextField(
+                value = text,
+                onValueChange = { if (it.all { char -> char.isDigit() }) text = it },
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                    keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
+                ),
+                colors = androidx.compose.material3.TextFieldDefaults.colors(
+                    focusedTextColor = White,
+                    unfocusedTextColor = White,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent
+                )
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                text.toIntOrNull()?.let { onConfirm(it) }
+                onDismiss()
+            }) {
+                Text("OK", color = themeColors.accent)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel", color = themeColors.accent)
+            }
+        }
+    )
+}
+
+@Composable
+fun ShapeSelectionDialog(
+    viewModel: AppViewModel,
+    currentShape: String?,
+    onDismiss: () -> Unit,
+    onShapeSelected: (String?) -> Unit
+) {
+    val themeColors = LocalThemeColors.current
+    val shapes = listOf(null) + (viewModel.shapeProvider?.getAllShapeNames() ?: emptyList())
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = themeColors.bottomBar,
+        title = { Text("Choose Forced Shape", color = White) },
+        text = {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                shapes.forEach { shape ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onShapeSelected(shape)
+                                onDismiss()
+                            }
+                            .padding(vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = shape == currentShape,
+                            onClick = {
+                                onShapeSelected(shape)
+                                onDismiss()
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = themeColors.accent,
+                                unselectedColor = InactiveIcon
+                            )
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = shape ?: "None (Auto)",
+                            color = White,
+                            fontSize = 16.sp
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel", color = themeColors.accent)
+            }
+        }
+    )
 }
 
 fun launchBrowser(context: Context, url: String) {

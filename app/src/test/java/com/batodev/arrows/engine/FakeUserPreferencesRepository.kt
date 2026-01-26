@@ -41,6 +41,18 @@ class FakeUserPreferencesRepository : UserPreferencesRepository(
     val currentLevelFlow = MutableStateFlow<String?>(null)
     override val currentLevel: Flow<String?> = currentLevelFlow
 
+    val debugForcedWidthFlow = MutableStateFlow<Int?>(null)
+    override val debugForcedWidth: Flow<Int?> = debugForcedWidthFlow
+
+    val debugForcedHeightFlow = MutableStateFlow<Int?>(null)
+    override val debugForcedHeight: Flow<Int?> = debugForcedHeightFlow
+
+    val debugForcedLivesFlow = MutableStateFlow<Int?>(null)
+    override val debugForcedLives: Flow<Int?> = debugForcedLivesFlow
+
+    val debugForcedShapeFlow = MutableStateFlow<String?>(null)
+    override val debugForcedShape: Flow<String?> = debugForcedShapeFlow
+
     override suspend fun saveThemePreference(theme: String) {
         themeFlow.value = theme
     }
@@ -75,6 +87,22 @@ class FakeUserPreferencesRepository : UserPreferencesRepository(
 
     override suspend fun saveCurrentLevel(levelJson: String) {
         currentLevelFlow.value = levelJson
+    }
+
+    override suspend fun saveDebugForcedWidth(width: Int?) {
+        debugForcedWidthFlow.value = width
+    }
+
+    override suspend fun saveDebugForcedHeight(height: Int?) {
+        debugForcedHeightFlow.value = height
+    }
+
+    override suspend fun saveDebugForcedLives(lives: Int?) {
+        debugForcedLivesFlow.value = lives
+    }
+
+    override suspend fun saveDebugForcedShape(shape: String?) {
+        debugForcedShapeFlow.value = shape
     }
 
     override suspend fun clearSavedLevel() {

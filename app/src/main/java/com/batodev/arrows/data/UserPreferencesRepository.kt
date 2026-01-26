@@ -22,6 +22,10 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
         val FILL_BOARD_ENABLED = androidx.datastore.preferences.core.booleanPreferencesKey("fill_board_enabled")
         val LEVEL_NUMBER = androidx.datastore.preferences.core.intPreferencesKey("level_number")
         val CURRENT_LIVES = androidx.datastore.preferences.core.intPreferencesKey("current_lives")
+        val DEBUG_FORCED_WIDTH = androidx.datastore.preferences.core.intPreferencesKey("debug_forced_width")
+        val DEBUG_FORCED_HEIGHT = androidx.datastore.preferences.core.intPreferencesKey("debug_forced_height")
+        val DEBUG_FORCED_LIVES = androidx.datastore.preferences.core.intPreferencesKey("debug_forced_lives")
+        val DEBUG_FORCED_SHAPE = stringPreferencesKey("debug_forced_shape")
     }
 
     open val theme: Flow<String> = dataStore.data
@@ -58,6 +62,18 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
         .map { preferences ->
             preferences[PreferencesKeys.CURRENT_LIVES] ?: 5
         }
+
+    open val debugForcedWidth: Flow<Int?> = dataStore.data
+        .map { preferences -> preferences[PreferencesKeys.DEBUG_FORCED_WIDTH] }
+
+    open val debugForcedHeight: Flow<Int?> = dataStore.data
+        .map { preferences -> preferences[PreferencesKeys.DEBUG_FORCED_HEIGHT] }
+
+    open val debugForcedLives: Flow<Int?> = dataStore.data
+        .map { preferences -> preferences[PreferencesKeys.DEBUG_FORCED_LIVES] }
+
+    open val debugForcedShape: Flow<String?> = dataStore.data
+        .map { preferences -> preferences[PreferencesKeys.DEBUG_FORCED_SHAPE] }
 
     open val initialLevel: Flow<String?> = dataStore.data
         .map { preferences -> preferences[PreferencesKeys.INITIAL_LEVEL] }
@@ -104,6 +120,34 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
     open suspend fun saveCurrentLives(lives: Int) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.CURRENT_LIVES] = lives
+        }
+    }
+
+    open suspend fun saveDebugForcedWidth(width: Int?) {
+        dataStore.edit { preferences ->
+            if (width == null) preferences.remove(PreferencesKeys.DEBUG_FORCED_WIDTH)
+            else preferences[PreferencesKeys.DEBUG_FORCED_WIDTH] = width
+        }
+    }
+
+    open suspend fun saveDebugForcedHeight(height: Int?) {
+        dataStore.edit { preferences ->
+            if (height == null) preferences.remove(PreferencesKeys.DEBUG_FORCED_HEIGHT)
+            else preferences[PreferencesKeys.DEBUG_FORCED_HEIGHT] = height
+        }
+    }
+
+    open suspend fun saveDebugForcedLives(lives: Int?) {
+        dataStore.edit { preferences ->
+            if (lives == null) preferences.remove(PreferencesKeys.DEBUG_FORCED_LIVES)
+            else preferences[PreferencesKeys.DEBUG_FORCED_LIVES] = lives
+        }
+    }
+
+    open suspend fun saveDebugForcedShape(shape: String?) {
+        dataStore.edit { preferences ->
+            if (shape == null) preferences.remove(PreferencesKeys.DEBUG_FORCED_SHAPE)
+            else preferences[PreferencesKeys.DEBUG_FORCED_SHAPE] = shape
         }
     }
 
