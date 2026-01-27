@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
@@ -41,6 +40,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.batodev.arrows.R
 import com.batodev.arrows.MainActivity
 import com.batodev.arrows.ui.theme.InactiveIcon
 import com.batodev.arrows.ui.theme.LocalThemeColors
@@ -48,12 +49,19 @@ import com.batodev.arrows.ui.theme.NavigationIndicator
 import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
 
+private const val LEVEL_TWENTY = 20
+
 @Composable
 fun SettingsBottomBar(context: Context, themeColors: ThemeColors) {
     NavigationBar(containerColor = themeColors.bottomBar, contentColor = White) {
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Lock, contentDescription = "Levels") },
-            label = { Text("Level 20") },
+            icon = {
+                Icon(
+                    Icons.Default.Lock,
+                    contentDescription = stringResource(R.string.content_description_levels)
+                )
+            },
+            label = { Text(stringResource(R.string.level_label, LEVEL_TWENTY)) },
             selected = false,
             onClick = { },
             colors = NavigationBarItemDefaults.colors(
@@ -62,8 +70,13 @@ fun SettingsBottomBar(context: Context, themeColors: ThemeColors) {
             )
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-            label = { Text("Home") },
+            icon = {
+                Icon(
+                    Icons.Default.Home,
+                    contentDescription = stringResource(R.string.home_label)
+                )
+            },
+            label = { Text(stringResource(R.string.home_label)) },
             selected = false,
             onClick = {
                 val intent = Intent(context, MainActivity::class.java)
@@ -76,8 +89,13 @@ fun SettingsBottomBar(context: Context, themeColors: ThemeColors) {
             )
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
-            label = { Text("Settings") },
+            icon = {
+                Icon(
+                    Icons.Default.Settings,
+                    contentDescription = stringResource(R.string.settings_label)
+                )
+            },
+            label = { Text(stringResource(R.string.settings_label)) },
             selected = true,
             onClick = { },
             colors = NavigationBarItemDefaults.colors(
@@ -106,38 +124,61 @@ fun PreferencesSection(params: PreferencesParams) {
 
     SettingsGroup(params.themeColors.topBarButton) {
         SettingsSwitchItem(
-            Icons.Default.Vibration, "Vibrations",
+            Icons.Default.Vibration, stringResource(R.string.vibrations_label),
             isVibrationEnabled, params.themeColors.accent
         ) { params.viewModel.saveVibration(it) }
         SettingsSwitchItem(
-            Icons.AutoMirrored.Filled.VolumeUp, "Sounds",
+            Icons.AutoMirrored.Filled.VolumeUp, stringResource(R.string.sounds_label),
             isSoundsEnabled, params.themeColors.accent
         ) { params.viewModel.saveSounds(it) }
         SettingsSwitchItem(
-            Icons.Default.Grid4x4, "Fill board (slower)",
+            Icons.Default.Grid4x4, stringResource(R.string.fill_board_label),
             isFillBoardEnabled, params.themeColors.accent
         ) { params.viewModel.saveFillBoard(it) }
         SettingsClickableItem(
-            Icons.Default.Palette, "Theme",
-            params.currentTheme, params.onThemeClick
+            Icons.Default.Palette, stringResource(R.string.theme_label),
+            getLocalizedThemeName(params.currentTheme), params.onThemeClick
         )
         SettingsClickableItem(
-            Icons.Default.Speed, "Animation Speed",
-            params.currentSpeed, params.onSpeedClick
+            Icons.Default.Speed, stringResource(R.string.animation_speed_label),
+            getLocalizedSpeedName(params.currentSpeed), params.onSpeedClick
         )
+    }
+}
+
+@Composable
+private fun getLocalizedThemeName(theme: String): String {
+    return when (theme) {
+        "Dark" -> stringResource(R.string.theme_dark)
+        "Green" -> stringResource(R.string.theme_green)
+        "Red" -> stringResource(R.string.theme_red)
+        "Yellow" -> stringResource(R.string.theme_yellow)
+        "Orange" -> stringResource(R.string.theme_orange)
+        "Black and White" -> stringResource(R.string.theme_bw)
+        else -> theme
+    }
+}
+
+@Composable
+private fun getLocalizedSpeedName(speed: String): String {
+    return when (speed) {
+        "High" -> stringResource(R.string.speed_high)
+        "Medium" -> stringResource(R.string.speed_medium)
+        "Low" -> stringResource(R.string.speed_low)
+        else -> speed
     }
 }
 
 @Composable
 fun FeedbackSection(context: Context, themeColors: ThemeColors) {
     SettingsGroup(themeColors.topBarButton) {
-        SettingsClickableItem(Icons.Default.Star, "Rate us") {
+        SettingsClickableItem(Icons.Default.Star, stringResource(R.string.rate_us_label)) {
             SettingsUtils.launchReviewFlow(context)
         }
-        SettingsClickableItem(Icons.Default.Edit, "Write us") {
+        SettingsClickableItem(Icons.Default.Edit, stringResource(R.string.write_us_label)) {
             SettingsUtils.launchEmail(context)
         }
-        SettingsClickableItem(Icons.Default.Apps, "More Games") {
+        SettingsClickableItem(Icons.Default.Apps, stringResource(R.string.more_games_label)) {
             SettingsUtils.launchBrowser(
                 context,
                 "https://play.google.com/store/apps/dev?id=8228670503574649511"
@@ -149,14 +190,17 @@ fun FeedbackSection(context: Context, themeColors: ThemeColors) {
 @Composable
 fun PurchasesSection(themeColors: ThemeColors) {
     SettingsGroup(themeColors.topBarButton) {
-        SettingsSwitchItem(Icons.Default.Block, "Remove Ads", false, themeColors.accent)
+        SettingsSwitchItem(
+            Icons.Default.Block, stringResource(R.string.remove_ads_label),
+            false, themeColors.accent
+        )
     }
 }
 
 @Composable
 fun LegalSection(context: Context, themeColors: ThemeColors) {
     SettingsGroup(themeColors.topBarButton) {
-        SettingsClickableItem(Icons.Default.Description, "Privacy") {
+        SettingsClickableItem(Icons.Default.Description, stringResource(R.string.privacy_label)) {
             SettingsUtils.launchBrowser(context, "https://robmat.github.io/privacy_policy.html")
         }
     }
@@ -168,7 +212,13 @@ fun ThemeSelectionDialog(currentTheme: String, onDismiss: () -> Unit, onThemeSel
     val themes = listOf("Dark", "Green", "Red", "Yellow", "Orange", "Black and White")
     AlertDialog(
         onDismissRequest = onDismiss, containerColor = themeColors.bottomBar,
-        title = { Text(text = "Choose Theme", color = White, fontWeight = FontWeight.Bold) },
+        title = {
+            Text(
+                text = stringResource(R.string.choose_theme_title),
+                color = White,
+                fontWeight = FontWeight.Bold
+            )
+        },
         text = {
             Column {
                 themes.forEach { theme ->
@@ -186,13 +236,15 @@ fun ThemeSelectionDialog(currentTheme: String, onDismiss: () -> Unit, onThemeSel
                             )
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = theme, color = White, fontSize = 16.sp)
+                        Text(text = getLocalizedThemeName(theme), color = White, fontSize = 16.sp)
                     }
                 }
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel", color = themeColors.accent) }
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel_label), color = themeColors.accent)
+            }
         }
     )
 }
@@ -203,7 +255,13 @@ fun AnimationSpeedSelectionDialog(currentSpeed: String, onDismiss: () -> Unit, o
     val speeds = listOf("High", "Medium", "Low")
     AlertDialog(
         onDismissRequest = onDismiss, containerColor = themeColors.bottomBar,
-        title = { Text(text = "Animation Speed", color = White, fontWeight = FontWeight.Bold) },
+        title = {
+            Text(
+                text = stringResource(R.string.choose_animation_speed_title),
+                color = White,
+                fontWeight = FontWeight.Bold
+            )
+        },
         text = {
             Column {
                 speeds.forEach { speed ->
@@ -221,13 +279,15 @@ fun AnimationSpeedSelectionDialog(currentSpeed: String, onDismiss: () -> Unit, o
                             )
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = speed, color = White, fontSize = 16.sp)
+                        Text(text = getLocalizedSpeedName(speed), color = White, fontSize = 16.sp)
                     }
                 }
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel", color = themeColors.accent) }
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel_label), color = themeColors.accent)
+            }
         }
     )
 }

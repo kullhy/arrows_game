@@ -5,7 +5,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,6 +32,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.batodev.arrows.R
 import com.batodev.arrows.ui.theme.HeartRed
 import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.ProgressBarGreen
@@ -69,7 +70,11 @@ private fun GameControls(onBack: () -> Unit, onRestart: () -> Unit, themeColors:
             colors = IconButtonDefaults.iconButtonColors(containerColor = themeColors.topBarButton),
             modifier = Modifier.size(40.dp)
         ) {
-            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = White)
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = stringResource(R.string.content_description_back),
+                tint = White
+            )
         }
         Spacer(modifier = Modifier.width(8.dp))
         IconButton(
@@ -77,7 +82,11 @@ private fun GameControls(onBack: () -> Unit, onRestart: () -> Unit, themeColors:
             colors = IconButtonDefaults.iconButtonColors(containerColor = themeColors.topBarButton),
             modifier = Modifier.size(40.dp)
         ) {
-            Icon(imageVector = Icons.Default.Refresh, contentDescription = "Restart", tint = White)
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = stringResource(R.string.content_description_restart),
+                tint = White
+            )
         }
     }
 }
@@ -88,7 +97,7 @@ private fun HeartsDisplay(lives: Int, maxLives: Int) {
         repeat(maxLives) { index ->
             Icon(
                 imageVector = if (index < lives) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                contentDescription = "Life",
+                contentDescription = stringResource(R.string.content_description_life),
                 tint = HeartRed,
                 modifier = Modifier.size(24.dp)
             )
@@ -108,9 +117,13 @@ private fun HintButton(themeColors: ThemeColors) {
         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
         modifier = Modifier.height(40.dp)
     ) {
-        Icon(imageVector = Icons.Default.VideoLabel, contentDescription = "Ad", modifier = Modifier.size(16.dp))
+        Icon(
+            imageVector = Icons.Default.VideoLabel,
+            contentDescription = stringResource(R.string.content_description_ad),
+            modifier = Modifier.size(16.dp)
+        )
         Spacer(modifier = Modifier.width(4.dp))
-        Text(text = "Loading..", fontSize = 12.sp)
+        Text(text = stringResource(R.string.loading_label), fontSize = 12.sp)
     }
 }
 

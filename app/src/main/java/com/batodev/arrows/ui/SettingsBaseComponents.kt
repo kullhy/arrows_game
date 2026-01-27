@@ -30,6 +30,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.batodev.arrows.R
 import com.batodev.arrows.ui.theme.InactiveIcon
 import com.batodev.arrows.ui.theme.White
 
@@ -130,7 +132,7 @@ fun SettingsClickableItem(
         }
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-            contentDescription = "Open",
+            contentDescription = stringResource(R.string.content_description_open),
             tint = White.copy(alpha = 0.5f),
             modifier = Modifier.size(16.dp)
         )

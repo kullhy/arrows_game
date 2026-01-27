@@ -54,6 +54,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.batodev.arrows.data.AndroidResourceBoardShapeProvider
 import com.batodev.arrows.engine.GameEngine
@@ -145,7 +146,7 @@ fun ArrowsGameView(
     val guidanceAlpha by animateFloatAsState(
         targetValue = if (showGuidanceLines) 1f else 0f,
         animationSpec = tween(durationMillis = GUIDANCE_ANIM_DURATION),
-        label = "GuidanceAlphaAnimation"
+        label = stringResource(R.string.content_description_guidance_lines)
     )
     val tapAnimations = remember { androidx.compose.runtime.mutableStateListOf<TapAnimationState>() }
     val themeColors = LocalThemeColors.current
@@ -177,7 +178,7 @@ private fun HandleGameWonState(engine: GameEngine, context: android.content.Cont
     LaunchedEffect(engine.isGameWon) {
         if (engine.isGameWon) {
             delay(GAME_WON_EXIT_DELAY)
-            (context as? android.app.Activity)?.finish()
+            (context as? Activity)?.finish()
         }
     }
 }
@@ -273,7 +274,11 @@ private fun BoxScope.GuidanceToggleButton(
             contentColor = White
         )
     ) {
-        Icon(imageVector = Icons.Default.Grid4x4, contentDescription = "Guidance Lines", tint = White)
+        Icon(
+            imageVector = Icons.Default.Grid4x4,
+            contentDescription = stringResource(R.string.content_description_guidance_lines),
+            tint = White
+        )
     }
 }
 
@@ -302,7 +307,7 @@ private fun BoxScope.LoadingOverlay(progress: Float, themeColors: ThemeColors) {
         modifier = Modifier.align(Alignment.Center),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Generating... ${(progress * PERCENT_MULTIPLIER).toInt()}%", color = White)
+        Text(stringResource(R.string.generating_progress, (progress * PERCENT_MULTIPLIER).toInt()), color = White)
         Spacer(modifier = Modifier.height(8.dp))
         LinearProgressIndicator(
             progress = { progress },
@@ -322,10 +327,10 @@ fun GameOverDialog(
     AlertDialog(
         onDismissRequest = { },
         containerColor = themeColors.bottomBar,
-        title = { Text(text = "Game Over", color = White, fontWeight = FontWeight.Bold) },
+        title = { Text(text = stringResource(R.string.game_over_title), color = White, fontWeight = FontWeight.Bold) },
         text = {
             Text(
-                text = "You are out of lives! Would you like to restart the board or watch an ad?",
+                text = stringResource(R.string.game_over_message),
                 color = White
             )
         },
@@ -340,12 +345,12 @@ fun GameOverDialog(
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Watch Ad", color = White)
+                Text(stringResource(R.string.watch_ad_label), color = White)
             }
         },
         dismissButton = {
             TextButton(onClick = onRestart) {
-                Text("Restart Board", color = HeartRed)
+                Text(stringResource(R.string.restart_board_label), color = HeartRed)
             }
         }
     )

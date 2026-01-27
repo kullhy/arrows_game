@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.theme.ArrowsTheme
@@ -105,8 +106,13 @@ private fun MainBottomBar(levelNumber: Int, themeColors: ThemeColors) {
         contentColor = White
     ) {
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Lock, contentDescription = "Levels") },
-            label = { Text("Level $levelNumber") },
+            icon = {
+                Icon(
+                    Icons.Default.Lock,
+                    contentDescription = stringResource(R.string.content_description_levels)
+                )
+            },
+            label = { Text(stringResource(R.string.level_label, levelNumber)) },
             selected = false,
             onClick = { },
             colors = NavigationBarItemDefaults.colors(
@@ -114,17 +120,29 @@ private fun MainBottomBar(levelNumber: Int, themeColors: ThemeColors) {
             )
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-            label = { Text("Home") },
+            icon = {
+                Icon(
+                    Icons.Default.Home,
+                    contentDescription = stringResource(R.string.home_label)
+                )
+            },
+            label = { Text(stringResource(R.string.home_label)) },
             selected = true,
             onClick = { },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = White, indicatorColor = NavigationIndicator, selectedTextColor = White
+                selectedIconColor = White,
+                indicatorColor = NavigationIndicator,
+                selectedTextColor = White
             )
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
-            label = { Text("Settings") },
+            icon = {
+                Icon(
+                    Icons.Default.Settings,
+                    contentDescription = stringResource(R.string.settings_label)
+                )
+            },
+            label = { Text(stringResource(R.string.settings_label)) },
             selected = false,
             onClick = {
                 val intent = Intent(context, SettingsActivity::class.java)
@@ -143,11 +161,16 @@ private fun LogoSection(levelNumber: Int, themeColors: ThemeColors) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             TriangleIcon(modifier = Modifier.size(40.dp), color = White)
-            Text(text = "rrows", fontSize = 40.sp, fontWeight = FontWeight.Bold, color = White)
+            Text(
+                text = stringResource(R.string.logo_text),
+                fontSize = 40.sp,
+                fontWeight = FontWeight.Bold,
+                color = White
+            )
         }
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Level $levelNumber", fontSize = 24.sp,
+            text = stringResource(R.string.level_label, levelNumber), fontSize = 24.sp,
             fontWeight = FontWeight.Bold, color = themeColors.accent
         )
     }
@@ -165,9 +188,15 @@ private fun PlayButton(isContinue: Boolean, themeColors: ThemeColors) {
         colors = ButtonDefaults.buttonColors(containerColor = themeColors.accent),
         shape = RoundedCornerShape(28.dp)
     ) {
+        val text = if (isContinue) {
+            stringResource(R.string.continue_label)
+        } else {
+            stringResource(R.string.play_label)
+        }
         Text(
-            text = if (isContinue) "Continue" else "Play",
-            fontSize = 20.sp, fontWeight = FontWeight.Bold
+            text = text,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
         )
     }
 }

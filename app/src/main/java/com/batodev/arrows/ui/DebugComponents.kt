@@ -28,6 +28,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.batodev.arrows.R
 import com.batodev.arrows.ui.theme.InactiveIcon
 import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.White
@@ -45,7 +47,7 @@ fun DebugMenu(viewModel: AppViewModel) {
     var dialogToShow by remember { mutableStateOf<String?>(null) }
 
     Text(
-        "DEBUG MENU",
+        stringResource(R.string.debug_menu_title),
         color = themeColors.accent,
         fontWeight = FontWeight.Bold,
         fontSize = 18.sp,
@@ -53,24 +55,35 @@ fun DebugMenu(viewModel: AppViewModel) {
     )
 
     SettingsGroup(themeColors.topBarButton) {
-        SettingsClickableItem(Icons.Default.Settings, "Current Level", levelNumber.toString()) {
-            dialogToShow = "level"
-        }
-        SettingsClickableItem(Icons.Default.Settings, "Forced Width", forcedWidth?.toString() ?: "Auto") {
-            dialogToShow = "width"
-        }
-        SettingsClickableItem(Icons.Default.Settings, "Forced Height", forcedHeight?.toString() ?: "Auto") {
-            dialogToShow = "height"
-        }
-        SettingsClickableItem(Icons.Default.Settings, "Forced Lives", forcedLives?.toString() ?: "Auto") {
-            dialogToShow = "lives"
-        }
-        SettingsClickableItem(Icons.Default.Settings, "Forced Shape", forcedShape ?: "None") {
-            dialogToShow = "shape"
-        }
-        SettingsClickableItem(Icons.Default.Settings, "Regenerate Level") {
-            viewModel.regenerateCurrentLevel()
-        }
+        SettingsClickableItem(
+            Icons.Default.Settings,
+            stringResource(R.string.current_level_label),
+            levelNumber.toString()
+        ) { dialogToShow = "level" }
+        SettingsClickableItem(
+            Icons.Default.Settings,
+            stringResource(R.string.forced_width_label),
+            forcedWidth?.toString() ?: stringResource(R.string.auto_label)
+        ) { dialogToShow = "width" }
+        SettingsClickableItem(
+            Icons.Default.Settings,
+            stringResource(R.string.forced_height_label),
+            forcedHeight?.toString() ?: stringResource(R.string.auto_label)
+        ) { dialogToShow = "height" }
+        SettingsClickableItem(
+            Icons.Default.Settings,
+            stringResource(R.string.forced_lives_label),
+            forcedLives?.toString() ?: stringResource(R.string.auto_label)
+        ) { dialogToShow = "lives" }
+        SettingsClickableItem(
+            Icons.Default.Settings,
+            stringResource(R.string.forced_shape_label),
+            forcedShape ?: stringResource(R.string.none_label)
+        ) { dialogToShow = "shape" }
+        SettingsClickableItem(
+            Icons.Default.Settings,
+            stringResource(R.string.regenerate_level_label)
+        ) { viewModel.regenerateCurrentLevel() }
     }
 
     DebugDialogs(
@@ -86,16 +99,32 @@ fun DebugMenu(viewModel: AppViewModel) {
 @Composable
 private fun DebugDialogs(params: DebugDialogParams) {
     when (params.dialogToShow) {
-        "level" -> NumberInputDialog("Level", params.levelNumber, params.onDismiss) {
+        "level" -> NumberInputDialog(
+            stringResource(R.string.level_dialog_title),
+            params.levelNumber,
+            params.onDismiss
+        ) {
             params.viewModel.saveLevelNumber(it)
         }
-        "width" -> NumberInputDialog("Width (0 for Auto)", params.forcedWidth ?: 0, params.onDismiss) {
+        "width" -> NumberInputDialog(
+            stringResource(R.string.width_auto_label),
+            params.forcedWidth ?: 0,
+            params.onDismiss
+        ) {
             params.viewModel.saveDebugOption(AppViewModel.DebugOption.WIDTH, if (it > 0) it else null)
         }
-        "height" -> NumberInputDialog("Height (0 for Auto)", params.forcedHeight ?: 0, params.onDismiss) {
+        "height" -> NumberInputDialog(
+            stringResource(R.string.height_auto_label),
+            params.forcedHeight ?: 0,
+            params.onDismiss
+        ) {
             params.viewModel.saveDebugOption(AppViewModel.DebugOption.HEIGHT, if (it > 0) it else null)
         }
-        "lives" -> NumberInputDialog("Lives (0 for Auto)", params.forcedLives ?: 0, params.onDismiss) {
+        "lives" -> NumberInputDialog(
+            stringResource(R.string.lives_auto_label),
+            params.forcedLives ?: 0,
+            params.onDismiss
+        ) {
             params.viewModel.saveDebugOption(AppViewModel.DebugOption.LIVES, if (it > 0) it else null)
         }
         "shape" -> ShapeSelectionDialog(params.viewModel, params.forcedShape, params.onDismiss) {
@@ -132,12 +161,12 @@ fun NumberInputDialog(title: String, initialValue: Int, onDismiss: () -> Unit, o
                 text.toIntOrNull()?.let { onConfirm(it) }
                 onDismiss()
             }) {
-                Text("OK", color = themeColors.accent)
+                Text(stringResource(R.string.ok_label), color = themeColors.accent)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel", color = themeColors.accent)
+                Text(stringResource(R.string.cancel_label), color = themeColors.accent)
             }
         }
     )
@@ -155,7 +184,7 @@ fun ShapeSelectionDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = themeColors.bottomBar,
-        title = { Text("Choose Forced Shape", color = White) },
+        title = { Text(stringResource(R.string.choose_forced_shape_title), color = White) },
         text = {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 shapes.forEach { shape ->
@@ -175,14 +204,18 @@ fun ShapeSelectionDialog(
                             )
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = shape ?: "None (Auto)", color = White, fontSize = 16.sp)
+                        Text(
+                            text = shape ?: stringResource(R.string.none_auto_label),
+                            color = White,
+                            fontSize = 16.sp
+                        )
                     }
                 }
             }
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel", color = themeColors.accent)
+                Text(stringResource(R.string.cancel_label), color = themeColors.accent)
             }
         }
     )

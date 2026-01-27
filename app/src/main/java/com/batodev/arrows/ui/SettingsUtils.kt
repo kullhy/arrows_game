@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Build
 import android.widget.Toast
 import androidx.core.net.toUri
+import com.batodev.arrows.R
 import com.google.android.play.core.review.ReviewManagerFactory
 
 object SettingsUtils {
@@ -13,7 +14,8 @@ object SettingsUtils {
         try {
             context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
         } catch (_: Exception) {
-            Toast.makeText(context, "Could not open browser", Toast.LENGTH_SHORT).show()
+            val error = context.getString(R.string.error_could_not_open_browser)
+            Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -25,12 +27,16 @@ object SettingsUtils {
             val intent = Intent(Intent.ACTION_SENDTO).apply {
                 data = "mailto:".toUri()
                 putExtra(Intent.EXTRA_EMAIL, arrayOf("support@emberfox.online"))
-                putExtra(Intent.EXTRA_SUBJECT, "Arrows Game Support")
-                putExtra(Intent.EXTRA_TEXT, "\n\n\n---\nApp Version: $version\nDevice: $device")
+                putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_subject))
+                val body = context.getString(
+                    R.string.email_body_template, version, device
+                )
+                putExtra(Intent.EXTRA_TEXT, body)
             }
             context.startActivity(intent)
         } catch (_: Exception) {
-            Toast.makeText(context, "Could not open email app", Toast.LENGTH_SHORT).show()
+            val error = context.getString(R.string.error_could_not_open_email)
+            Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -41,7 +47,8 @@ object SettingsUtils {
             if (task.isSuccessful) {
                 manager.launchReviewFlow(context, task.result)
             } else {
-                Toast.makeText(context, "Could not launch review flow", Toast.LENGTH_SHORT).show()
+                val error = context.getString(R.string.error_could_not_launch_review)
+                Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
             }
         }
     }
