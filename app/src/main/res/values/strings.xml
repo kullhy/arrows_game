@@ -8,7 +8,7 @@
     <!-- Debug Menu -->
     <!-- Errors and Utils -->
     <string name="animation_speed_label">Animation Speed</string>
-    <string name="app_name">Arrows</string>
+    <string name="app_name" translatable="false">Arrows</string>
     <string name="auto_label">Auto</string>
     <string name="cancel_label">Cancel</string>
     <string name="choose_forced_shape_title">Choose Forced Shape</string>

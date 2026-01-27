@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
     <string name="animation_speed_label">حرکت پذیری کی رفتار</string>
-    <string name="app_name">تیر</string>
     <string name="auto_label">آٹو</string>
     <string name="cancel_label">منسوخ کریں۔</string>
     <string name="choose_forced_shape_title">جبری شکل کا انتخاب کریں۔</string>

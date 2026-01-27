@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
     <string name="animation_speed_label">سرعة الرسوم المتحركة</string>
-    <string name="app_name">الأسهم</string>
     <string name="auto_label">آلي</string>
     <string name="cancel_label">يلغي</string>
     <string name="choose_forced_shape_title">اختر الشكل القسري</string>

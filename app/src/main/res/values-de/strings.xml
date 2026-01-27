@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
     <string name="animation_speed_label">Animationsgeschwindigkeit</string>
-    <string name="app_name">Pfeile</string>
     <string name="auto_label">Auto</string>
     <string name="cancel_label">Stornieren</string>
     <string name="choose_forced_shape_title">Erzwungene Form auswählen</string>

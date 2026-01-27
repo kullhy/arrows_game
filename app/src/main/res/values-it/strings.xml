@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
     <string name="animation_speed_label">Velocità di animazione</string>
-    <string name="app_name">Frecce</string>
     <string name="auto_label">Auto</string>
     <string name="cancel_label">Cancellare</string>
     <string name="choose_forced_shape_title">Scegli la forma forzata</string>

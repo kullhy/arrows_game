@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
     <string name="animation_speed_label">एनीमेशन गति</string>
-    <string name="app_name">तीर</string>
     <string name="auto_label">ऑटो</string>
     <string name="cancel_label">रद्द करना</string>
     <string name="choose_forced_shape_title">बाध्य आकार चुनें</string>

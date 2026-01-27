@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
     <string name="animation_speed_label">Kecepatan Animasi</string>
-    <string name="app_name">Anak panah</string>
     <string name="auto_label">Mobil</string>
     <string name="cancel_label">Membatalkan</string>
     <string name="choose_forced_shape_title">Pilih Bentuk Paksa</string>

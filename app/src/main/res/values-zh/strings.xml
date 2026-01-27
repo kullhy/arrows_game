@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
     <string name="animation_speed_label">动画速度</string>
-    <string name="app_name">箭头</string>
     <string name="auto_label">汽车</string>
     <string name="cancel_label">取消</string>
     <string name="choose_forced_shape_title">选择强制形状</string>

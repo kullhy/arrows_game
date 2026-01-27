@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
     <string name="animation_speed_label">Скорость анимации</string>
-    <string name="app_name">Стрелы</string>
     <string name="auto_label">Авто</string>
     <string name="cancel_label">Отмена</string>
     <string name="choose_forced_shape_title">Выберите принудительную форму</string>

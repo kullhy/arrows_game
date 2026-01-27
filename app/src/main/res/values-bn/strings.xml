@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
     <string name="animation_speed_label">অ্যানিমেশনের গতি</string>
-    <string name="app_name">তীর</string>
     <string name="auto_label">স্বয়ংক্রিয়</string>
     <string name="cancel_label">বাতিল করুন</string>
     <string name="choose_forced_shape_title">জোরপূর্বক আকৃতি নির্বাচন করুন</string>

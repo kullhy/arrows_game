@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
     <string name="animation_speed_label">アニメーション速度</string>
-    <string name="app_name">矢印</string>
     <string name="auto_label">オート</string>
     <string name="cancel_label">キャンセル</string>
     <string name="choose_forced_shape_title">強制形状を選択</string>
