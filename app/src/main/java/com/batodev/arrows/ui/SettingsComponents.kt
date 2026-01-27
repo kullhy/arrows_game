@@ -257,7 +257,7 @@ fun AnimationSpeedSelectionDialog(currentSpeed: String, onDismiss: () -> Unit, o
         onDismissRequest = onDismiss, containerColor = themeColors.bottomBar,
         title = {
             Text(
-                text = stringResource(R.string.choose_animation_speed_title),
+                text = stringResource(R.string.animation_speed_label),
                 color = White,
                 fontWeight = FontWeight.Bold
             )
