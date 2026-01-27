@@ -13,12 +13,11 @@ playReview = "2.0.2"
 datastore = "1.2.0"
 lifecycleViewmodelCompose = "2.10.0"
 gson = "2.13.2"
-jacocoVersion = "0.8.12"
+jacocoVersion = "0.8.13"
 detekt = "1.23.8"
 coroutinesTest = "1.10.2"
 mockito = "5.21.0"
 mockitoKotlin = "6.2.3"
-robolectric = "4.16.1"
 kotlinReflect = "2.3.0"
 
 [libraries]
@@ -46,7 +45,6 @@ androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
-robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

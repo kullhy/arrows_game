@@ -57,7 +57,7 @@ class LevelManager(
         val newLevel = gameGenerator.generateSolvableLevel(
             GenerationParams(
                 width = config.width, height = config.height, maxSnakeLength = config.maxSnakeLength,
-                onProgress = params.onProgress, fillTheBoard = fillBoard, shapeBitmap = shape
+                onProgress = params.onProgress, fillTheBoard = fillBoard, boardShape = shape
             )
         )
 
@@ -66,7 +66,7 @@ class LevelManager(
         }
     }
 
-    private fun determineShape(config: LevelConfiguration, forcedShape: String?): android.graphics.Bitmap? {
+    private fun determineShape(config: LevelConfiguration, forcedShape: String?): BoardShape? {
         return if (forcedShape != null) {
             shapeProvider?.getShapeByName(forcedShape)
         } else if (shouldApplyShape(config)) {

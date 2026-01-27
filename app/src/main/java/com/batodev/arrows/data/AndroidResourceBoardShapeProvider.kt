@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.batodev.arrows.R
+import com.batodev.arrows.engine.AndroidBoardShape
+import com.batodev.arrows.engine.BoardShape
 import com.batodev.arrows.engine.BoardShapeProvider
 
 class AndroidResourceBoardShapeProvider(private val context: Context) : BoardShapeProvider {
@@ -30,16 +32,16 @@ class AndroidResourceBoardShapeProvider(private val context: Context) : BoardSha
         "water_bottle" to R.drawable.water_bottle_large_256dp_000000_fill1_wght400_grad0_opsz48
     )
 
-    override fun getRandomShape(): Bitmap? {
+    override fun getRandomShape(): BoardShape? {
         val resId = shapeMap.values.random()
-        return decodeResource(resId)
+        return decodeResource(resId)?.let { AndroidBoardShape(it) }
     }
 
     override fun getAllShapeNames(): List<String> = shapeMap.keys.toList().sorted()
 
-    override fun getShapeByName(name: String): Bitmap? {
+    override fun getShapeByName(name: String): BoardShape? {
         val resId = shapeMap[name] ?: return null
-        return decodeResource(resId)
+        return decodeResource(resId)?.let { AndroidBoardShape(it) }
     }
 
     private fun decodeResource(resId: Int): Bitmap? {

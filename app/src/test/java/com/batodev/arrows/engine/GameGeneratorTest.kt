@@ -8,8 +8,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.Timeout
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -19,7 +17,6 @@ private const val TEST_SNAKE_LEN = 7
 private const val SIMULATIONS_OCCUPIED = 10
 private const val SIMULATIONS_SOLVABLE = 50
 
-@RunWith(RobolectricTestRunner::class)
 class GameGeneratorTest {
 
     @get:Rule
@@ -33,7 +30,7 @@ class GameGeneratorTest {
             Runtime.getRuntime().availableProcessors()
         )
 
-        (1..SIMULATIONS_OCCUPIED).map { sim ->
+        (1..SIMULATIONS_OCCUPIED).map { _ ->
             async(dispatcher) {
                 val params = GenerationParams(TEST_WIDTH, TEST_HEIGHT, TEST_SNAKE_LEN, true)
                 val level = generator.generateSolvableLevel(params)
@@ -41,7 +38,6 @@ class GameGeneratorTest {
 
                 if (occupiedCount != TEST_WIDTH * TEST_HEIGHT) {
                     failures.incrementAndGet()
-                    println("Sim $sim: FAILED - Occupied: $occupiedCount, Total: ${TEST_WIDTH * TEST_HEIGHT}")
                 }
             }
         }.awaitAll()
@@ -57,13 +53,12 @@ class GameGeneratorTest {
             Runtime.getRuntime().availableProcessors()
         )
 
-        (1..SIMULATIONS_SOLVABLE).map { sim ->
+        (1..SIMULATIONS_SOLVABLE).map { _ ->
             async(dispatcher) {
                 val params = GenerationParams(TEST_WIDTH, TEST_HEIGHT, TEST_SNAKE_LEN)
                 val level = generator.generateSolvableLevel(params)
                 if (!SolvabilityChecker.isResolvable(level)) {
                     failures.incrementAndGet()
-                    println("Sim $sim: FAILED - No removable snake found.")
                 }
             }
         }.awaitAll()

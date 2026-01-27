@@ -6,16 +6,18 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
-import org.robolectric.RobolectricTestRunner
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(RobolectricTestRunner::class)
 class GameEngineDebugParamsTest {
+
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
 
     @Test
     fun `test forced debug parameters override calculation`() = runTest {
@@ -39,7 +41,9 @@ class GameEngineDebugParamsTest {
         repo.saveDebugForcedShape("heart")
 
         val shapeProvider = mock<BoardShapeProvider>()
-        val generator = mock<GameGenerator>()
+        val generator = mock<GameGenerator> {
+            on { generateSolvableLevel(org.mockito.kotlin.any()) } doReturn GameLevel(20, 20, emptyList())
+        }
 
         val engine = GameEngine(
             config = GameEngineConfig(

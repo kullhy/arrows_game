@@ -2,18 +2,16 @@ package com.batodev.arrows
 
 import com.batodev.arrows.engine.Direction
 import com.batodev.arrows.engine.GameGenerator
+import com.batodev.arrows.engine.GenerationParams
 import com.batodev.arrows.engine.Point
 import com.batodev.arrows.engine.Snake
-import com.batodev.arrows.engine.GenerationParams
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.Timeout
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-@RunWith(RobolectricTestRunner::class)
+
 class GameBoardAsciiTest {
 
     @get:Rule
@@ -73,7 +71,7 @@ class GameBoardAsciiTest {
             val params = GenerationParams(width = 6, height = 8, maxSnakeLength = 4)
             val level = GameGenerator().generateSolvableLevel(params)
             println("\nBoard #$i - ${level.width}x${level.height} with ${level.snakes.size} snakes")
-            
+
             val grid = Array(level.width) { IntArray(level.height) }
             val snakeMap = level.snakes.associateBy { it.id }
             level.snakes.forEach { s -> s.body.forEach { p -> grid[p.x][p.y] = s.id } }

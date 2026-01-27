@@ -25,15 +25,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
 import com.batodev.arrows.R
+import com.batodev.arrows.engine.DebugDialogParams
 import com.batodev.arrows.ui.theme.InactiveIcon
 import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.White
-import com.batodev.arrows.engine.DebugDialogParams
 
 @Composable
 fun DebugMenu(viewModel: AppViewModel) {
@@ -43,7 +43,7 @@ fun DebugMenu(viewModel: AppViewModel) {
     val forcedHeight by viewModel.debugForcedHeight.collectAsState()
     val forcedLives by viewModel.debugForcedLives.collectAsState()
     val forcedShape by viewModel.debugForcedShape.collectAsState()
-    
+
     var dialogToShow by remember { mutableStateOf<String?>(null) }
 
     Text(

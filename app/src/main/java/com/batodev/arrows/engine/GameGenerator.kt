@@ -16,13 +16,11 @@ class GameGenerator {
 
     private val ids = AtomicInteger(0)
     private val rnd = Random(System.currentTimeMillis())
-    private val imageProcessor = BoardImageProcessor()
     private var snakeBuilder = SnakeBuilder(ids, rnd, straightPreference)
 
     fun generateSolvableLevel(params: GenerationParams): GameLevel {
-        val walls = params.shapeBitmap?.let {
-            imageProcessor.createWallsFromImage(it, params.width, params.height)
-        } ?: Array(params.width) { BooleanArray(params.height) }
+        val walls = params.boardShape?.getWalls(params.width, params.height)
+            ?: Array(params.width) { BooleanArray(params.height) }
 
         val config = GameGeneratorConfig(
             params.width, params.height, params.maxSnakeLength, params.fillTheBoard, walls

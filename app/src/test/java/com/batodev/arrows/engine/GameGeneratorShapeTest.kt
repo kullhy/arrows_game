@@ -1,15 +1,9 @@
 package com.batodev.arrows.engine
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 import java.util.Locale
 
-@RunWith(RobolectricTestRunner::class)
 class GameGeneratorShapeTest {
 
     private val boardWidth = 20
@@ -18,25 +12,23 @@ class GameGeneratorShapeTest {
 
     @Test
     fun testGenerateLevelWithHeartShapeAndPrintAscii() {
-        val context = RuntimeEnvironment.getApplication()
-        val resId = context.resources.getIdentifier(
-            "favorite_256dp_000000_fill1_wght400_grad0_opsz48",
-            "drawable", context.packageName)
-        assertTrue("Heart drawable not found", resId != 0)
-
-        val options = BitmapFactory.Options().apply { inScaled = false }
-        val heartBitmap = BitmapFactory.decodeResource(context.resources, resId, options)
-        assertTrue("Failed to decode heart bitmap", heartBitmap != null)
+        val possiblePaths = listOf(
+            "app/src/main/res/drawable-nodpi/favorite_256dp_000000_fill1_wght400_grad0_opsz48.png",
+            "src/main/res/drawable-nodpi/favorite_256dp_000000_fill1_wght400_grad0_opsz48.png"
+        )
+        val path = possiblePaths.find { java.io.File(it).exists() } 
+            ?: throw java.io.FileNotFoundException("Could not find heart shape image in $possiblePaths")
+            
+        val shape = JvmBoardShape.fromFile(path)
 
         val generator = GameGenerator()
-        val params = GenerationParams(boardWidth, boardHeight, maxSnakeLen, true, heartBitmap)
+        val params = GenerationParams(boardWidth, boardHeight, maxSnakeLen, true, shape)
         val level = generator.generateSolvableLevel(params)
 
-        val imageProcessor = BoardImageProcessor()
-        val walls = imageProcessor.createWallsFromImage(heartBitmap!!, boardWidth, boardHeight)
+        val walls = shape.getWalls(boardWidth, boardHeight)
 
         printLevelAscii(level, walls)
-        validateSnakesOnNonWallCells(level, heartBitmap)
+        validateSnakesOnNonWallCells(level, walls)
     }
 
     private fun printLevelAscii(level: GameLevel, walls: Array<BooleanArray>) {
@@ -76,9 +68,7 @@ class GameGeneratorShapeTest {
         }
     }
 
-    private fun validateSnakesOnNonWallCells(level: GameLevel, heartBitmap: Bitmap) {
-        val imageProcessor = BoardImageProcessor()
-        val walls = imageProcessor.createWallsFromImage(heartBitmap, boardWidth, boardHeight)
+    private fun validateSnakesOnNonWallCells(level: GameLevel, walls: Array<BooleanArray>) {
         level.snakes.forEach { snake ->
             snake.body.forEach { point ->
                 assertTrue(

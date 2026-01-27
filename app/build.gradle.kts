@@ -53,6 +53,10 @@ android {
 
 tasks.withType<Test> {
     jvmArgs("-XX:+EnableDynamicAgentLoading")
+    configure<JacocoTaskExtension> {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
+    }
 }
 
 jacoco {
@@ -79,10 +83,10 @@ tasks.register<JacocoReport>("testDebugUnitTestCoverage") {
         "**/data/models/*"
     )
 
-    val javaClasses = fileTree("${project.layout.buildDirectory.get()}/intermediates/javac/debug/compileDebugJavaWithJavac/classes") {
+    val javaClasses = fileTree("${project.layout.buildDirectory.get().asFile}/intermediates/javac/debug/compileDebugJavaWithJavac/classes") {
         exclude(excludes)
     }
-    val kotlinClasses = fileTree("${project.layout.buildDirectory.get()}/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes") {
+    val kotlinClasses = fileTree("${project.layout.buildDirectory.get().asFile}/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes") {
         exclude(excludes)
     }
 
@@ -93,8 +97,8 @@ tasks.register<JacocoReport>("testDebugUnitTestCoverage") {
         "$projectDir/src/main/kotlin"
     ))
 
-    executionData.setFrom(fileTree(project.layout.buildDirectory.get()) {
-        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+    executionData.setFrom(fileTree("${project.layout.buildDirectory.get().asFile}/outputs/unit_test_code_coverage/debugUnitTest") {
+        include("*.exec")
     })
 }
 
@@ -117,7 +121,6 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
-    testImplementation(libs.robolectric)
     testImplementation(libs.kotlin.reflect)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -5,10 +5,10 @@ import androidx.datastore.core.Serializer
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import com.batodev.arrows.data.UserPreferencesRepository
-import java.io.InputStream
-import java.io.OutputStream
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import java.io.InputStream
+import java.io.OutputStream
 
 class FakeUserPreferencesRepository : UserPreferencesRepository(
     DataStoreFactory.create(
@@ -20,7 +20,9 @@ class FakeUserPreferencesRepository : UserPreferencesRepository(
                 // no-op
             }
         }
-    ) { null!! }
+    ) { 
+        java.io.File.createTempFile("test_datastore", ".preferences_pb").apply { deleteOnExit() }
+    }
 ) {
     val themeFlow = MutableStateFlow("Dark")
     override val theme: Flow<String> = themeFlow

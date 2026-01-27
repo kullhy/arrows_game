@@ -5,19 +5,21 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.robolectric.RobolectricTestRunner
 import kotlin.random.Random
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(RobolectricTestRunner::class)
 class GameEngineShapeLogicTest {
+
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
 
     @Test
     fun `test getRandomShape is called for large boards when probability rolls high`() = runTest {
@@ -26,7 +28,9 @@ class GameEngineShapeLogicTest {
         repo.saveLevelNumber(100) // Large board
 
         val shapeProvider = mock<BoardShapeProvider>()
-        val generator = mock<GameGenerator>()
+        val generator = mock<GameGenerator> {
+            on { generateSolvableLevel(any()) } doReturn GameLevel(20, 20, emptyList())
+        }
         val random = mock<Random> {
             on { nextFloat() } doReturn 0.5f // Less than 0.6
         }
@@ -59,7 +63,9 @@ class GameEngineShapeLogicTest {
         repo.saveLevelNumber(1) // 5x5 board
 
         val shapeProvider = mock<BoardShapeProvider>()
-        val generator = mock<GameGenerator>()
+        val generator = mock<GameGenerator> {
+            on { generateSolvableLevel(any()) } doReturn GameLevel(20, 20, emptyList())
+        }
         val random = mock<Random> {
             on { nextFloat() } doReturn 0.1f
         }
@@ -92,7 +98,9 @@ class GameEngineShapeLogicTest {
         repo.saveLevelNumber(100) // Large board
 
         val shapeProvider = mock<BoardShapeProvider>()
-        val generator = mock<GameGenerator>()
+        val generator = mock<GameGenerator> {
+            on { generateSolvableLevel(any()) } doReturn GameLevel(20, 20, emptyList())
+        }
         val random = mock<Random> {
             on { nextFloat() } doReturn 0.7f // More than 0.6
         }

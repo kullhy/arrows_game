@@ -3,7 +3,6 @@ package com.batodev.arrows.ui
 import com.batodev.arrows.engine.FakeUserPreferencesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -14,11 +13,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
+
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(RobolectricTestRunner::class)
+
 class AppViewModelTest {
 
     private val repository = FakeUserPreferencesRepository()
@@ -45,11 +43,11 @@ class AppViewModelTest {
         val collectJob = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.theme.collect {}
         }
-        
+
         viewModel.saveTheme("Light")
         assertEquals("Light", repository.themeFlow.value)
         assertEquals("Light", viewModel.theme.value)
-        
+
         collectJob.cancel()
     }
 
@@ -58,11 +56,11 @@ class AppViewModelTest {
         val collectJob = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.debugForcedWidth.collect {}
         }
-        
+
         viewModel.saveDebugOption(AppViewModel.DebugOption.WIDTH, 10)
         assertEquals(10, repository.debugForcedWidthFlow.value)
         assertEquals(10, viewModel.debugForcedWidth.value)
-        
+
         collectJob.cancel()
     }
 
@@ -71,11 +69,11 @@ class AppViewModelTest {
         val collectJob = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.debugForcedShape.collect {}
         }
-        
+
         viewModel.saveDebugOption(AppViewModel.DebugOption.SHAPE, "heart")
         assertEquals("heart", repository.debugForcedShapeFlow.value)
         assertEquals("heart", viewModel.debugForcedShape.value)
-        
+
         collectJob.cancel()
     }
 
@@ -83,9 +81,9 @@ class AppViewModelTest {
     fun `test regenerateCurrentLevel clears saved level`() = runTest {
         repository.saveInitialLevel("{}")
         repository.saveCurrentLevel("{}")
-        
+
         viewModel.regenerateCurrentLevel()
-        
+
         assertNull(repository.initialLevelFlow.value)
         assertNull(repository.currentLevelFlow.value)
     }

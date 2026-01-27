@@ -1,7 +1,5 @@
 package com.batodev.arrows.engine
 
-import androidx.compose.ui.graphics.Color
-
 data class SnakeRecursiveParams(
     val config: GameGeneratorConfig,
     val occupied: Array<BooleanArray>,
