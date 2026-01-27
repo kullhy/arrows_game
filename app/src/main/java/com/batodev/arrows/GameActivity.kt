@@ -2,7 +2,6 @@ package com.batodev.arrows
 
 import android.app.Activity
 import android.os.Bundle
-import android.util.Log
 import android.view.HapticFeedbackConstants
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -48,7 +47,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -61,7 +59,6 @@ import com.batodev.arrows.data.AndroidResourceBoardShapeProvider
 import com.batodev.arrows.engine.GameEngine
 import com.batodev.arrows.engine.GameEngineConfig
 import com.batodev.arrows.engine.GameEngineFeatures
-import com.batodev.arrows.engine.TapParams
 import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.game.GameProgressBar
 import com.batodev.arrows.ui.game.GameTopBar
@@ -154,7 +151,7 @@ fun ArrowsGameView(
     val themeColors = LocalThemeColors.current
 
     HandleGameWonState(engine, context)
-    confettiState = UpdateConfettiState(engine, confettiState)
+    confettiState = updateConfettiState(engine, confettiState)
 
     Column(modifier = Modifier.fillMaxSize()) {
         GameTopBar(
@@ -186,11 +183,11 @@ private fun HandleGameWonState(engine: GameEngine, context: android.content.Cont
 }
 
 @Composable
-private fun UpdateConfettiState(engine: GameEngine, currentState: List<Party>): List<Party> {
+private fun updateConfettiState(engine: GameEngine, currentState: List<Party>): List<Party> {
     return if (engine.isGameWon && currentState.isEmpty()) {
         listOf(
             Party(
-                speed = 0f, maxSpeed = CONFETTI_MAX_SPEED, damping = CONFETTI_DAMPING, 
+                speed = 0f, maxSpeed = CONFETTI_MAX_SPEED, damping = CONFETTI_DAMPING,
                 spread = CONFETTI_SPREAD,
                 colors = CONFETTI_COLORS,
                 position = Position.Relative(CONFETTI_REL_X, CONFETTI_REL_Y),
@@ -231,13 +228,13 @@ private fun ColumnScope.GameArea(params: GameAreaParams) {
         if (params.engine.isLoading) LoadingOverlay(params.engine.loadingProgress, params.themeColors)
         if (params.engine.isGameWon) {
             KonfettiView(
-                modifier = Modifier.fillMaxSize(), 
-                parties = UpdateConfettiState(params.engine, emptyList())
+                modifier = Modifier.fillMaxSize(),
+                parties = updateConfettiState(params.engine, emptyList())
             )
         }
         if (params.engine.lives <= 0) {
             GameOverDialog(
-                onRestart = { params.engine.restartLevel() }, 
+                onRestart = { params.engine.restartLevel() },
                 onWatchAd = { params.engine.addLife() }
             )
         }
@@ -338,8 +335,8 @@ fun GameOverDialog(
                 colors = ButtonDefaults.buttonColors(containerColor = ProgressBarGreen)
             ) {
                 Icon(
-                    Icons.Default.VideoLabel, 
-                    contentDescription = null, 
+                    Icons.Default.VideoLabel,
+                    contentDescription = null,
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))

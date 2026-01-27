@@ -19,7 +19,9 @@ class GameGeneratorShapeTest {
     @Test
     fun testGenerateLevelWithHeartShapeAndPrintAscii() {
         val context = RuntimeEnvironment.getApplication()
-        val resId = context.resources.getIdentifier("heart", "drawable", context.packageName)
+        val resId = context.resources.getIdentifier(
+            "favorite_256dp_000000_fill1_wght400_grad0_opsz48",
+            "drawable", context.packageName)
         assertTrue("Heart drawable not found", resId != 0)
 
         val options = BitmapFactory.Options().apply { inScaled = false }

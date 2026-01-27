@@ -5,10 +5,9 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.batodev.arrows.R
 import com.batodev.arrows.engine.BoardShapeProvider
-import kotlin.random.Random
 
 class AndroidResourceBoardShapeProvider(private val context: Context) : BoardShapeProvider {
-    
+
     private val shapeMap = mapOf(
         "bolt" to R.drawable.bolt_256dp_000000_fill1_wght400_grad0_opsz48,
         "brick" to R.drawable.brick_256dp_000000_fill1_wght400_grad0_opsz48,
@@ -18,7 +17,6 @@ class AndroidResourceBoardShapeProvider(private val context: Context) : BoardSha
         "chess_rook" to R.drawable.chess_rook_256dp_000000_fill1_wght400_grad0_opsz48,
         "disabled" to R.drawable.disabled_by_default_256dp_000000_fill1_wght400_grad0_opsz48,
         "favorite" to R.drawable.favorite_256dp_000000_fill1_wght400_grad0_opsz48,
-        "heart" to R.drawable.heart,
         "home" to R.drawable.home_256dp_000000_fill1_wght400_grad0_opsz48,
         "humerus" to R.drawable.humerus_256dp_000000_fill1_wght400_grad0_opsz48,
         "key" to R.drawable.key_vertical_256dp_000000_fill1_wght400_grad0_opsz48,
