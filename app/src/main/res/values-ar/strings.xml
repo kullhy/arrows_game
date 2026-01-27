@@ -34,7 +34,6 @@
     <string name="level_label">المستوى %1$d</string>
     <string name="lives_auto_label">الأرواح (0 للسيارة)</string>
     <string name="loading_label">تحميل..</string>
-    <string name="logo_text">صفوف</string>
     <string name="more_games_label">المزيد من الألعاب</string>
     <string name="none_auto_label">لا شيء (تلقائي)</string>
     <string name="none_label">لا أحد</string>

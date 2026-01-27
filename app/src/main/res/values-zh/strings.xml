@@ -34,7 +34,6 @@
     <string name="level_label">级别 %1$d</string>
     <string name="lives_auto_label">生命值（0 代表自动）</string>
     <string name="loading_label">加载中..</string>
-    <string name="logo_text">悲伤</string>
     <string name="more_games_label">更多游戏</string>
     <string name="none_auto_label">无（自动）</string>
     <string name="none_label">没有任何</string>

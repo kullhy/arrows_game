@@ -34,7 +34,6 @@
     <string name="level_label">Niveau %1$d</string>
     <string name="lives_auto_label">Vies (0 pour Auto)</string>
     <string name="loading_label">Chargement..</string>
-    <string name="logo_text">flèches</string>
     <string name="more_games_label">Plus de jeux</string>
     <string name="none_auto_label">Aucun (Auto)</string>
     <string name="none_label">Aucun</string>

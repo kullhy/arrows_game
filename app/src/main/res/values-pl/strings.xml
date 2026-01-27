@@ -34,7 +34,6 @@
     <string name="level_label">Poziom %1$d</string>
     <string name="lives_auto_label">Życia (0 dla Auto)</string>
     <string name="loading_label">Załadunek..</string>
-    <string name="logo_text">strzały</string>
     <string name="more_games_label">Więcej gier</string>
     <string name="none_auto_label">Brak (automatyczne)</string>
     <string name="none_label">Nic</string>

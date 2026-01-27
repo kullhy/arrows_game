@@ -42,7 +42,7 @@
     <string name="level_label">Level %1$d</string>
     <string name="lives_auto_label">Lives (0 for Auto)</string>
     <string name="loading_label">Loading..</string>
-    <string name="logo_text">rrows</string>
+    <string name="logo_text" translatable="false">rrows</string>
     <string name="more_games_label">More Games</string>
     <string name="none_auto_label">None (Auto)</string>
     <string name="none_label">None</string>
