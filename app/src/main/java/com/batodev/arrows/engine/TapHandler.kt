@@ -1,18 +1,21 @@
 package com.batodev.arrows.engine
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.batodev.arrows.SoundManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-private const val FLASH_DURATION_MS = 500L
+private const val FLASH_DURATION_MS = 1000L
 
 class TapHandler(
     private val coroutineScope: CoroutineScope,
     private val soundManager: SoundManager?,
     private val onVibrate: () -> Unit
 ) {
-    var flashingSnakeId: Int? = null
+    var flashingSnakeId by mutableStateOf<Int?>(null)
         private set
 
     fun handleSnakeTap(params: TapParams) {
@@ -24,16 +27,20 @@ class TapHandler(
         }
     }
 
+    fun flashSnake(snakeId: Int) {
+        flashingSnakeId = snakeId
+        coroutineScope.launch {
+            delay(FLASH_DURATION_MS)
+            if (flashingSnakeId == snakeId) flashingSnakeId = null
+        }
+    }
+
     private fun handleObstructed(snake: Snake, lives: Int, onPenalty: () -> Unit) {
         if (lives > 0) {
             onPenalty()
             if (lives > 1) soundManager?.playLiveLost() else soundManager?.playGameLost()
         }
-        flashingSnakeId = snake.id
-        coroutineScope.launch {
-            delay(FLASH_DURATION_MS)
-            if (flashingSnakeId == snake.id) flashingSnakeId = null
-        }
+        flashSnake(snake.id)
     }
 
     private fun handleSuccessful(onSuccess: () -> Unit) {

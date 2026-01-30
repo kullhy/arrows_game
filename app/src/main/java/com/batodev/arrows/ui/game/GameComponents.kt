@@ -47,6 +47,7 @@ fun GameTopBar(
     lives: Int,
     maxLives: Int,
     onRestart: () -> Unit,
+    onHint: () -> Unit,
     onBack: () -> Unit
 ) {
     val themeColors = LocalThemeColors.current
@@ -58,7 +59,7 @@ fun GameTopBar(
     ) {
         GameControls(onBack, onRestart, themeColors)
         HeartsDisplay(lives, maxLives)
-        HintButton(themeColors)
+        HintButton(themeColors, onHint)
     }
 }
 
@@ -109,9 +110,9 @@ private fun HeartsDisplay(lives: Int, maxLives: Int) {
 }
 
 @Composable
-private fun HintButton(themeColors: ThemeColors) {
+private fun HintButton(themeColors: ThemeColors, onClick: () -> Unit) {
     Button(
-        onClick = { /* TODO */ },
+        onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = themeColors.topBarButton, contentColor = White),
         shape = RoundedCornerShape(12.dp),
         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),

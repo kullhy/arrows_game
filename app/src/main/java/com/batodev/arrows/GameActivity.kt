@@ -159,6 +159,7 @@ fun ArrowsGameView(
             lives = engine.lives,
             maxLives = engine.maxLives,
             onRestart = { engine.restartLevel() },
+            onHint = { engine.showHint() },
             onBack = { (context as? Activity)?.finish() }
         )
 

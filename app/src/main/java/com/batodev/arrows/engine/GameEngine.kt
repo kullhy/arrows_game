@@ -109,6 +109,13 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
         }
     }
 
+    fun showHint() {
+        transformationState.reset()
+        SolvabilityChecker.findRemovableSnake(level)?.let { removableId ->
+            tapHandler.flashSnake(removableId)
+        }
+    }
+
     fun onTransform(pan: Offset, zoom: Float) = transformationState.transform(pan, zoom)
 
     fun addLife() { if (lives < maxLives) { lives++; saveState() } }
@@ -119,12 +126,15 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
             TapTransformationParams(tapOffset, containerWidthPx, containerHeightPx, level, scale, offsetX, offsetY)
         )
         val tappedSnake = inputHandler.findTappedSnake(gridCoords.x, gridCoords.y, level.snakes) {
-            isLineOfSightObstructed(it)
+            SolvabilityChecker.isLineOfSightObstructed(level, it, removalAnimator.removalProgress.keys)
         }
         if (tappedSnake != null) {
+            val isObstructed = SolvabilityChecker.isLineOfSightObstructed(
+                level, tappedSnake, removalAnimator.removalProgress.keys
+            )
             tapHandler.handleSnakeTap(
                 TapParams(
-                    tappedSnake, isVibrationEnabled, isLineOfSightObstructed(tappedSnake), lives,
+                    tappedSnake, isVibrationEnabled, isObstructed, lives,
                     onPenalty = { lives--; saveState() },
                     onSuccess = {
                         if (!removalProgress.containsKey(tappedSnake.id)) {
@@ -170,19 +180,5 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
 
     private fun saveState() {
         coroutineScope.launch(backgroundDispatcher) { levelManager.saveState(level, lives) }
-    }
-
-    private fun isLineOfSightObstructed(snake: Snake): Boolean {
-        val head = snake.body.first()
-        val direction = snake.headDirection
-        var current = Point(head.x + direction.dx, head.y + direction.dy)
-        while (current.x in 0 until level.width && current.y in 0 until level.height) {
-            val occupied = level.snakes.any { otherSnake ->
-                !removalProgress.containsKey(otherSnake.id) && otherSnake.body.any { it == current }
-            }
-            if (occupied) return true
-            current = Point(current.x + direction.dx, current.y + direction.dy)
-        }
-        return false
     }
 }
