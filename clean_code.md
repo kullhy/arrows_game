@@ -6,6 +6,7 @@ _____________________________________
 2. Keep it simple stupid. Simpler is always better. Reduce complexity as much as possible.
 3. Boy scout rule. Leave the campground cleaner than you found it.
 4. Always find root cause. Always look for the root cause of a problem.
+5. Always run `gradlew.bat test lint detekt` to check for potential problems.
 
 ## Design rules
 1. Keep configurable data at high levels.
