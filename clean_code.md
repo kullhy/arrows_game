@@ -79,6 +79,7 @@ _____________________________________
 3. Fast.
 4. Independent.
 5. Repeatable.
+6. Cover new code with unit test when possible.
 
 ## Code smells
 1. Rigidity. The software is difficult to change. A small change causes a cascade of subsequent changes.
