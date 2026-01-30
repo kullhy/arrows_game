@@ -125,4 +125,42 @@ class GameEngineShapeLogicTest {
 
         verify(shapeProvider, never()).getRandomShape()
     }
+
+    @Test
+    fun `test getRandomShape is ALWAYS called for very large boards (100x100)`() = runTest {
+        val testDispatcher = UnconfinedTestDispatcher(testScheduler)
+        val repo = FakeUserPreferencesRepository()
+        
+        // Force 100x100 board
+        repo.saveDebugForcedWidth(100)
+        repo.saveDebugForcedHeight(100)
+
+        val shapeProvider = mock<BoardShapeProvider>()
+        val generator = mock<GameGenerator> {
+            on { generateSolvableLevel(any()) } doReturn GameLevel(100, 100, emptyList())
+        }
+        val random = mock<Random> {
+            on { nextFloat() } doReturn 0.999f // Almost 1.0
+        }
+
+        val engine = GameEngine(
+            config = GameEngineConfig(
+                coroutineScope = CoroutineScope(testDispatcher),
+                repository = repo,
+                gameGenerator = generator,
+                autoLoad = false,
+                backgroundDispatcher = testDispatcher
+            ),
+            features = GameEngineFeatures(
+                shapeProvider = shapeProvider,
+                random = random
+            )
+        )
+
+        runCurrent()
+        engine.regenerateLevel()
+        runCurrent()
+
+        verify(shapeProvider, times(1)).getRandomShape()
+    }
 }

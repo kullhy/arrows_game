@@ -7,7 +7,8 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 
 private const val MIN_BOARD_SIZE_FOR_SHAPES = 20
-private const val SHAPE_APPLICATION_PROBABILITY = 0.6f
+private const val MAX_BOARD_SIZE_FOR_ALWAYS_SHAPE = 100
+private const val BASE_SHAPE_PROBABILITY = 0.5f
 
 data class LevelConfiguration(val width: Int, val height: Int, val maxSnakeLength: Int, val maxLives: Int)
 
@@ -77,9 +78,15 @@ class LevelManager(
     }
 
     private fun shouldApplyShape(config: LevelConfiguration): Boolean {
-        val largeEnough = config.width >= MIN_BOARD_SIZE_FOR_SHAPES || 
-                config.height >= MIN_BOARD_SIZE_FOR_SHAPES
-        return largeEnough && random.nextFloat() < SHAPE_APPLICATION_PROBABILITY
+        val size = maxOf(config.width, config.height)
+        if (size < MIN_BOARD_SIZE_FOR_SHAPES) return false
+        if (size >= MAX_BOARD_SIZE_FOR_ALWAYS_SHAPE) return true
+
+        val ratio = (size - MIN_BOARD_SIZE_FOR_SHAPES).toFloat() / 
+                (MAX_BOARD_SIZE_FOR_ALWAYS_SHAPE - MIN_BOARD_SIZE_FOR_SHAPES)
+        val probability = BASE_SHAPE_PROBABILITY + (1f - BASE_SHAPE_PROBABILITY) * ratio
+        
+        return random.nextFloat() < probability
     }
 
     suspend fun saveState(level: GameLevel, lives: Int) {
