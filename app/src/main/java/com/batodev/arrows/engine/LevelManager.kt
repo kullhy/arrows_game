@@ -79,13 +79,16 @@ class LevelManager(
 
     private fun shouldApplyShape(config: LevelConfiguration): Boolean {
         val size = maxOf(config.width, config.height)
-        if (size < MIN_BOARD_SIZE_FOR_SHAPES) return false
-        if (size >= MAX_BOARD_SIZE_FOR_ALWAYS_SHAPE) return true
+        val probability = when {
+            size < MIN_BOARD_SIZE_FOR_SHAPES -> 0f
+            size >= MAX_BOARD_SIZE_FOR_ALWAYS_SHAPE -> 1f
+            else -> {
+                val ratio = (size - MIN_BOARD_SIZE_FOR_SHAPES).toFloat() /
+                        (MAX_BOARD_SIZE_FOR_ALWAYS_SHAPE - MIN_BOARD_SIZE_FOR_SHAPES)
+                BASE_SHAPE_PROBABILITY + (1f - BASE_SHAPE_PROBABILITY) * ratio
+            }
+        }
 
-        val ratio = (size - MIN_BOARD_SIZE_FOR_SHAPES).toFloat() / 
-                (MAX_BOARD_SIZE_FOR_ALWAYS_SHAPE - MIN_BOARD_SIZE_FOR_SHAPES)
-        val probability = BASE_SHAPE_PROBABILITY + (1f - BASE_SHAPE_PROBABILITY) * ratio
-        
         return random.nextFloat() < probability
     }
 
