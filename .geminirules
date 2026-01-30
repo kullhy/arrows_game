@@ -1,0 +1,2 @@
+1. Cover new code with unit test when possible.
+2. Always run `gradlew.bat test lint detekt` to check for potential problems.
