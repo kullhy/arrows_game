@@ -268,7 +268,7 @@ private fun BoardLayer(engine: GameEngine, guidanceAlpha: Float) {
             flashingSnakeId = engine.flashingSnakeId,
             removalProgress = engine.removalProgress,
             guidanceAlpha = guidanceAlpha,
-            modifier = Modifier.fillMaxSize().padding(10.dp)
+            modifier = Modifier.fillMaxSize()
         )
     }
 }
