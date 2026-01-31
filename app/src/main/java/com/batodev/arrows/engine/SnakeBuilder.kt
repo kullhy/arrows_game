@@ -45,7 +45,7 @@ class SnakeBuilder(
         val hasLoS = isFree && GenerationUtils.hasClearLoS(
             head, dir, ctx.occupied, ctx.config.width, ctx.config.height
         )
-        
+
         return if (hasLoS) {
             val forbidden = GenerationUtils.forbiddenPoints(head, dir, ctx.config.width, ctx.config.height)
             val params = SnakeRecursiveParams(
@@ -65,7 +65,7 @@ class SnakeBuilder(
         return candidates.asSequence()
             .filter { (head, _) -> !context.config.walls[head.x][head.y] }
             .mapNotNull { (head, dir) -> tryBuildBestSnake(context, head, dir, criterion) }
-            .firstOrNull { it.body.size >= context.config.maxSnakeLength } 
+            .firstOrNull { it.body.size >= context.config.maxSnakeLength }
             ?: findAnyResolvableSnake(context, candidates, criterion)
     }
 
@@ -109,7 +109,7 @@ class SnakeBuilder(
         val possible = Direction.entries.shuffled(rnd).filter { dir ->
             canPlaceSegment(params, tail + dir)
         }
-        
+
         return if (possible.isEmpty()) {
             params.body
         } else {
@@ -135,10 +135,10 @@ class SnakeBuilder(
     private fun canPlaceSegment(params: SnakeRecursiveParams, next: Point): Boolean {
         val isInside = GenerationUtils.isInside(next, params.config.width, params.config.height)
         if (!isInside) return false
-        
+
         val isBasicFree = next !in params.forbidden && next !in params.body &&
                 !params.config.walls[next.x][next.y] && !params.occupied[next.x][next.y]
-        
+
         return if (isBasicFree) {
             val cParams = CriterionParams(
                 params.body, next, params.snakes, params.config.width,
