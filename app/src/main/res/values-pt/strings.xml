@@ -7,6 +7,7 @@
     <string name="choose_theme_title">Escolha um tema</string>
     <string name="content_description_ad">Anúncio</string>
     <string name="content_description_back">Voltar</string>
+    <string name="content_description_generate">Gerar nível personalizado</string>
     <string name="content_description_guidance_lines">Linhas de orientação</string>
     <string name="content_description_levels">Níveis</string>
     <string name="content_description_life">Vida</string>
@@ -14,6 +15,9 @@
     <string name="content_description_restart">Reiniciar</string>
     <string name="continue_label">Continuar</string>
     <string name="current_level_label">Nível atual</string>
+    <string name="custom_gen_title">Gerador</string>
+    <string name="custom_gen_warning_message">Iniciar um jogo personalizado irá descartar seu jogo salvo atual. Deseja continuar?</string>
+    <string name="custom_gen_warning_title">Descartar o progresso?</string>
     <string name="debug_menu_title">MENU DE DEPURAÇÃO</string>
     <string name="email_body_template">\n\n\n---\nVersão do aplicativo: %1$s\nDispositivo: %2$s</string>
     <string name="email_subject">Suporte para jogos Arrows</string>
@@ -27,8 +31,10 @@
     <string name="forced_width_label">Largura forçada</string>
     <string name="game_over_message">Você não tem mais vidas! Deseja reiniciar o jogo ou assistir a um anúncio?</string>
     <string name="game_over_title">Game Over</string>
+    <string name="generate_start_label">Gerar e iniciar</string>
     <string name="generating_progress">Gerando… %1$d%%</string>
     <string name="height_auto_label">Altura (0 para Automático)</string>
+    <string name="height_label">Altura</string>
     <string name="home_label">Lar</string>
     <string name="level_dialog_title">Nível</string>
     <string name="level_label">Nível %1$d</string>
@@ -40,11 +46,14 @@
     <string name="ok_label">OK</string>
     <string name="play_label">Jogar</string>
     <string name="privacy_label">Privacidade</string>
+    <string name="proceed_label">Prosseguir</string>
     <string name="rate_us_label">Avalie-nos</string>
     <string name="regenerate_level_label">Regenerar nível</string>
     <string name="remove_ads_label">Remover anúncios</string>
     <string name="restart_board_label">Reiniciar placa</string>
     <string name="settings_label">Configurações</string>
+    <string name="shape_label">Forma</string>
+    <string name="shape_rectangular">Retangular</string>
     <string name="sounds_label">Sons</string>
     <string name="speed_high">Alto</string>
     <string name="speed_low">Baixo</string>
@@ -59,5 +68,6 @@
     <string name="vibrations_label">Vibrações</string>
     <string name="watch_ad_label">Veja o anúncio</string>
     <string name="width_auto_label">Largura (0 para Automático)</string>
+    <string name="width_label">Largura</string>
     <string name="write_us_label">Escreva-nos</string>
 </resources>

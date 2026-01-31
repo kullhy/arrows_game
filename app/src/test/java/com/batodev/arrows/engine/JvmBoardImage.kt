@@ -1,8 +1,8 @@
 package com.batodev.arrows.engine
 
 import java.awt.image.BufferedImage
-import javax.imageio.ImageIO
 import java.io.File
+import javax.imageio.ImageIO
 
 class JvmNativeImage(val image: BufferedImage) : NativeImage {
     override val width: Int get() = image.width

@@ -7,6 +7,7 @@
     <string name="choose_theme_title">选择主题</string>
     <string name="content_description_ad">广告</string>
     <string name="content_description_back">后退</string>
+    <string name="content_description_generate">生成自定义级别</string>
     <string name="content_description_guidance_lines">指导原则</string>
     <string name="content_description_levels">级别</string>
     <string name="content_description_life">生活</string>
@@ -14,6 +15,9 @@
     <string name="content_description_restart">重启</string>
     <string name="continue_label">继续</string>
     <string name="current_level_label">当前级别</string>
+    <string name="custom_gen_title">发电机</string>
+    <string name="custom_gen_warning_message">开始自定义游戏将会丢弃您当前保存的游戏进度。是否继续？</string>
+    <string name="custom_gen_warning_title">放弃进步？</string>
     <string name="debug_menu_title">调试菜单</string>
     <string name="email_body_template">\n\n\n---\n应用程序版本: %1$s\n设备: %2$s</string>
     <string name="email_subject">箭头游戏支持</string>
@@ -27,8 +31,10 @@
     <string name="forced_width_label">强制宽度</string>
     <string name="game_over_message">你的生命值已用完！你想重新开始游戏还是观看广告？</string>
     <string name="game_over_title">游戏结束</string>
+    <string name="generate_start_label">生成并开始</string>
     <string name="generating_progress">正在生成… %1$d%%</string>
     <string name="height_auto_label">高度（0 表示自动）</string>
+    <string name="height_label">高度</string>
     <string name="home_label">家</string>
     <string name="level_dialog_title">等级</string>
     <string name="level_label">级别 %1$d</string>
@@ -40,11 +46,14 @@
     <string name="ok_label">好的</string>
     <string name="play_label">玩</string>
     <string name="privacy_label">隐私</string>
+    <string name="proceed_label">继续</string>
     <string name="rate_us_label">请给我们评分</string>
     <string name="regenerate_level_label">再生等级</string>
     <string name="remove_ads_label">移除广告</string>
     <string name="restart_board_label">重启板</string>
     <string name="settings_label">设置</string>
+    <string name="shape_label">形状</string>
+    <string name="shape_rectangular">矩形的</string>
     <string name="sounds_label">声音</string>
     <string name="speed_high">高的</string>
     <string name="speed_low">低的</string>
@@ -59,5 +68,6 @@
     <string name="vibrations_label">振动</string>
     <string name="watch_ad_label">观看广告</string>
     <string name="width_auto_label">宽度（0 表示自动）</string>
+    <string name="width_label">宽度</string>
     <string name="write_us_label">请联系我们</string>
 </resources>

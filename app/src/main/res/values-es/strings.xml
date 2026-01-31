@@ -7,6 +7,7 @@
     <string name="choose_theme_title">Elija el tema</string>
     <string name="content_description_ad">Anuncio</string>
     <string name="content_description_back">Atrás</string>
+    <string name="content_description_generate">Generar nivel personalizado</string>
     <string name="content_description_guidance_lines">Líneas de orientación</string>
     <string name="content_description_levels">Niveles</string>
     <string name="content_description_life">Vida</string>
@@ -14,6 +15,9 @@
     <string name="content_description_restart">Reanudar</string>
     <string name="continue_label">Continuar</string>
     <string name="current_level_label">Nivel actual</string>
+    <string name="custom_gen_title">Generador</string>
+    <string name="custom_gen_warning_message">Al iniciar una partida personalizada, se descartará la partida guardada. ¿Quieres continuar?</string>
+    <string name="custom_gen_warning_title">¿Descartar el progreso?</string>
     <string name="debug_menu_title">MENÚ DE DEPURACIÓN</string>
     <string name="email_body_template">\n\n\n---\nVersión de la aplicación: %1$s\nDispositivo: %2$s</string>
     <string name="email_subject">Soporte del juego Arrows</string>
@@ -27,8 +31,10 @@
     <string name="forced_width_label">Ancho forzado</string>
     <string name="game_over_message">¡Te quedaste sin vidas! ¿Quieres reiniciar el tablero o ver un anuncio?</string>
     <string name="game_over_title">Juego terminado</string>
+    <string name="generate_start_label">Generar y comenzar</string>
     <string name="generating_progress">Generando… %1$d%%</string>
     <string name="height_auto_label">Altura (0 para Automático)</string>
+    <string name="height_label">Altura</string>
     <string name="home_label">Hogar</string>
     <string name="level_dialog_title">Nivel</string>
     <string name="level_label">Nivel %1$d</string>
@@ -40,11 +46,14 @@
     <string name="ok_label">DE ACUERDO</string>
     <string name="play_label">Jugar</string>
     <string name="privacy_label">Privacidad</string>
+    <string name="proceed_label">Proceder</string>
     <string name="rate_us_label">Calificanos</string>
     <string name="regenerate_level_label">Nivel de regeneración</string>
     <string name="remove_ads_label">Eliminar anuncios</string>
     <string name="restart_board_label">Tablero de reinicio</string>
     <string name="settings_label">Ajustes</string>
+    <string name="shape_label">Forma</string>
+    <string name="shape_rectangular">Rectangular</string>
     <string name="sounds_label">Sonidos</string>
     <string name="speed_high">Alto</string>
     <string name="speed_low">Bajo</string>
@@ -59,5 +68,6 @@
     <string name="vibrations_label">Vibraciones</string>
     <string name="watch_ad_label">Ver anuncio</string>
     <string name="width_auto_label">Ancho (0 para automático)</string>
+    <string name="width_label">Ancho</string>
     <string name="write_us_label">Escríbenos</string>
 </resources>

@@ -7,6 +7,7 @@
     <string name="choose_theme_title">Scegli il tema</string>
     <string name="content_description_ad">A.D</string>
     <string name="content_description_back">Indietro</string>
+    <string name="content_description_generate">Genera livello personalizzato</string>
     <string name="content_description_guidance_lines">Linee guida</string>
     <string name="content_description_levels">Livelli</string>
     <string name="content_description_life">Vita</string>
@@ -14,6 +15,9 @@
     <string name="content_description_restart">Ricomincia</string>
     <string name="continue_label">Continuare</string>
     <string name="current_level_label">Livello attuale</string>
+    <string name="custom_gen_title">Generatore</string>
+    <string name="custom_gen_warning_message">Avviando una partita personalizzata, la partita attualmente salvata verrà eliminata. Vuoi procedere?</string>
+    <string name="custom_gen_warning_title">Scartare i progressi?</string>
     <string name="debug_menu_title">MENU DI DEBUG</string>
     <string name="email_body_template">\n\n\n---\nVersione app: %1$s\nDispositivo: %2$s</string>
     <string name="email_subject">Supporto per il gioco Arrows</string>
@@ -27,8 +31,10 @@
     <string name="forced_width_label">Larghezza forzata</string>
     <string name="game_over_message">Hai esaurito le vite! Vuoi riavviare il forum o guardare una pubblicità?</string>
     <string name="game_over_title">Game Over</string>
+    <string name="generate_start_label">Genera e avvia</string>
     <string name="generating_progress">Generazione in corso… %1$d%%</string>
     <string name="height_auto_label">Altezza (0 per Auto)</string>
+    <string name="height_label">Altezza</string>
     <string name="home_label">Casa</string>
     <string name="level_dialog_title">Livello</string>
     <string name="level_label">Livello %1$d</string>
@@ -40,11 +46,14 @@
     <string name="ok_label">OK</string>
     <string name="play_label">Giocare</string>
     <string name="privacy_label">Riservatezza</string>
+    <string name="proceed_label">Procedere</string>
     <string name="rate_us_label">Valutaci</string>
     <string name="regenerate_level_label">Livello di rigenerazione</string>
     <string name="remove_ads_label">Rimuovi annunci</string>
     <string name="restart_board_label">Riavvia il tabellone</string>
     <string name="settings_label">Impostazioni</string>
+    <string name="shape_label">Forma</string>
+    <string name="shape_rectangular">Rettangolare</string>
     <string name="sounds_label">Suoni</string>
     <string name="speed_high">Alto</string>
     <string name="speed_low">Basso</string>
@@ -59,5 +68,6 @@
     <string name="vibrations_label">Vibrazioni</string>
     <string name="watch_ad_label">Guarda l\'annuncio</string>
     <string name="width_auto_label">Larghezza (0 per Auto)</string>
+    <string name="width_label">Larghezza</string>
     <string name="write_us_label">Scrivici</string>
 </resources>

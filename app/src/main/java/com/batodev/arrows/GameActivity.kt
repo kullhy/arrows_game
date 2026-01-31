@@ -130,13 +130,25 @@ fun ArrowsGameView(
     val coroutineScope = rememberCoroutineScope()
     val view = LocalView.current
     val context = LocalContext.current
+    val intent = (context as? Activity)?.intent
+    val isCustom = intent?.getBooleanExtra("IS_CUSTOM", false) ?: false
+    val customWidth = intent?.getIntExtra("CUSTOM_WIDTH", 0)?.takeIf { it > 0 }
+    val customHeight = intent?.getIntExtra("CUSTOM_HEIGHT", 0)?.takeIf { it > 0 }
+    val customShape = intent?.getStringExtra("CUSTOM_SHAPE")
+
     val engine = remember {
         GameEngine(
-            config = GameEngineConfig(coroutineScope = coroutineScope, repository = repository),
+            config = GameEngineConfig(
+                coroutineScope = coroutineScope, repository = repository,
+                isCustomGame = isCustom
+            ),
             features = GameEngineFeatures(
                 onVibrate = { view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK) },
                 soundManager = SoundManager(context),
-                shapeProvider = AndroidResourceBoardShapeProvider(context)
+                shapeProvider = AndroidResourceBoardShapeProvider(context),
+                forcedWidth = customWidth,
+                forcedHeight = customHeight,
+                forcedShape = customShape
             )
         )
     }

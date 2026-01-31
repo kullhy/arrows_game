@@ -19,6 +19,7 @@ data class GameEngineConfig(
     val repository: UserPreferencesRepository,
     val gameGenerator: GameGenerator = GameGenerator(),
     val autoLoad: Boolean = true,
+    val isCustomGame: Boolean = false,
     val backgroundDispatcher: kotlinx.coroutines.CoroutineDispatcher = kotlinx.coroutines.Dispatchers.Default
 )
 
@@ -26,12 +27,16 @@ data class GameEngineFeatures(
     val onVibrate: () -> Unit = {},
     val soundManager: SoundManager? = null,
     val shapeProvider: BoardShapeProvider? = null,
-    val random: kotlin.random.Random = kotlin.random.Random.Default
+    val random: kotlin.random.Random = kotlin.random.Random.Default,
+    val forcedWidth: Int? = null,
+    val forcedHeight: Int? = null,
+    val forcedShape: String? = null
 )
 
 class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEngineFeatures()) {
     private val coroutineScope = config.coroutineScope
     private val repository = config.repository
+    private val isCustomGame = config.isCustomGame
     private val backgroundDispatcher = config.backgroundDispatcher
     private val soundManager = features.soundManager
     private val gson = Gson()
@@ -46,10 +51,10 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
     private var initialLevel: GameLevel? = null
     private var isVibrationEnabled = true
     private var animationSpeed = "Medium"
-    private var forcedWidth: Int? = null
-    private var forcedHeight: Int? = null
+    private var forcedWidth: Int? = features.forcedWidth
+    private var forcedHeight: Int? = features.forcedHeight
     private var forcedLives: Int? = null
-    private var forcedShape: String? = null
+    private var forcedShape: String? = features.forcedShape
 
     var levelNumber by mutableIntStateOf(1)
         private set
@@ -84,13 +89,17 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
         coroutineScope.launch { repository.levelNumber.collect { levelNumber = it } }
         coroutineScope.launch { repository.isSoundsEnabled.collect { soundManager?.setSoundsEnabled(it) } }
         coroutineScope.launch { repository.animationSpeed.collect { animationSpeed = it } }
-        coroutineScope.launch { repository.debugForcedWidth.collect { forcedWidth = it } }
-        coroutineScope.launch { repository.debugForcedHeight.collect { forcedHeight = it } }
+        coroutineScope.launch { repository.debugForcedWidth.collect { if (forcedWidth == null) forcedWidth = it } }
+        coroutineScope.launch { repository.debugForcedHeight.collect { if (forcedHeight == null) forcedHeight = it } }
         coroutineScope.launch { repository.debugForcedLives.collect { forcedLives = it } }
-        coroutineScope.launch { repository.debugForcedShape.collect { forcedShape = it } }
+        coroutineScope.launch { repository.debugForcedShape.collect { if (forcedShape == null) forcedShape = it } }
     }
 
     fun loadOrRegenerateLevel() {
+        if (isCustomGame) {
+            regenerateLevel()
+            return
+        }
         coroutineScope.launch(backgroundDispatcher) {
             levelManager.loadLevel(
                 onSuccess = { initial, current, maxL, currentL ->
@@ -153,7 +162,9 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
         if (level.snakes.isEmpty()) {
             isGameWon = true
             soundManager?.playGameWon()
-            coroutineScope.launch(backgroundDispatcher) { levelManager.advanceLevel(levelNumber) }
+            if (!isCustomGame) {
+                coroutineScope.launch(backgroundDispatcher) { levelManager.advanceLevel(levelNumber) }
+            }
         } else {
             soundManager?.playSnakeRemoved()
             saveState()
@@ -171,7 +182,11 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
                         isGameWon = false; maxLives = config.maxLives; lives = config.maxLives
                         transformationState.reset(); tapHandler.clearFlash(); removalAnimator.clear()
                         isLoading = false
-                        coroutineScope.launch(backgroundDispatcher) { levelManager.saveInitialState(newLevel, lives) }
+                        if (!isCustomGame) {
+                            coroutineScope.launch(backgroundDispatcher) {
+                                levelManager.saveInitialState(newLevel, lives)
+                            }
+                        }
                     }
                 )
             )
@@ -179,6 +194,7 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
     }
 
     private fun saveState() {
+        if (isCustomGame) return
         coroutineScope.launch(backgroundDispatcher) { levelManager.saveState(level, lives) }
     }
 }

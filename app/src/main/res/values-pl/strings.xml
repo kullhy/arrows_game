@@ -7,6 +7,7 @@
     <string name="choose_theme_title">Wybierz motyw</string>
     <string name="content_description_ad">Ogłoszenie</string>
     <string name="content_description_back">Z powrotem</string>
+    <string name="content_description_generate">Generuj poziom niestandardowy</string>
     <string name="content_description_guidance_lines">Linie pomocnicze</string>
     <string name="content_description_levels">Poziomy</string>
     <string name="content_description_life">Życie</string>
@@ -14,6 +15,9 @@
     <string name="content_description_restart">Uruchom ponownie</string>
     <string name="continue_label">Kontynuować</string>
     <string name="current_level_label">Aktualny poziom</string>
+    <string name="custom_gen_title">Generator</string>
+    <string name="custom_gen_warning_message">Rozpoczęcie gry niestandardowej spowoduje usunięcie aktualnie zapisanej gry. Czy chcesz kontynuować?</string>
+    <string name="custom_gen_warning_title">Odrzucić postęp?</string>
     <string name="debug_menu_title">MENU DEBUGOWANIA</string>
     <string name="email_body_template">\n\n\n---\nWersja aplikacji: %1$s\nUrządzenie: %2$s</string>
     <string name="email_subject">Wsparcie gry Arrows</string>
@@ -27,8 +31,10 @@
     <string name="forced_width_label">Wymuszona szerokość</string>
     <string name="game_over_message">Skończyły Ci się życia! Chcesz zrestartować planszę czy obejrzeć reklamę?</string>
     <string name="game_over_title">Koniec gry</string>
+    <string name="generate_start_label">Wygeneruj i uruchom</string>
     <string name="generating_progress">Generowanie… %1$d%%</string>
     <string name="height_auto_label">Wysokość (0 dla Auto)</string>
+    <string name="height_label">Wysokość</string>
     <string name="home_label">Dom</string>
     <string name="level_dialog_title">Poziom</string>
     <string name="level_label">Poziom %1$d</string>
@@ -40,11 +46,14 @@
     <string name="ok_label">OK</string>
     <string name="play_label">Zagraj</string>
     <string name="privacy_label">Prywatność</string>
+    <string name="proceed_label">Przystępować</string>
     <string name="rate_us_label">Oceń nas</string>
     <string name="regenerate_level_label">Poziom regeneracji</string>
     <string name="remove_ads_label">Usuń reklamy</string>
     <string name="restart_board_label">Uruchom ponownie płytę</string>
     <string name="settings_label">Ustawienia</string>
+    <string name="shape_label">Kształt</string>
+    <string name="shape_rectangular">Prostokątny</string>
     <string name="sounds_label">Dźwięki</string>
     <string name="speed_high">Wysoki</string>
     <string name="speed_low">Niski</string>
@@ -59,5 +68,6 @@
     <string name="vibrations_label">Wibracje</string>
     <string name="watch_ad_label">Obejrzyj reklamę</string>
     <string name="width_auto_label">Szerokość (0 dla Auto)</string>
+    <string name="width_label">Szerokość</string>
     <string name="write_us_label">Napisz do nas</string>
 </resources>

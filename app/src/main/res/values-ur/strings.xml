@@ -7,6 +7,7 @@
     <string name="choose_theme_title">تھیم کا انتخاب کریں۔</string>
     <string name="content_description_ad">اشتہار</string>
     <string name="content_description_back">پیچھے</string>
+    <string name="content_description_generate">کسٹم لیول تیار کریں۔</string>
     <string name="content_description_guidance_lines">گائیڈنس لائنز</string>
     <string name="content_description_levels">سطحیں</string>
     <string name="content_description_life">زندگی</string>
@@ -14,6 +15,9 @@
     <string name="content_description_restart">دوبارہ شروع کریں۔</string>
     <string name="continue_label">جاری رکھیں</string>
     <string name="current_level_label">موجودہ سطح</string>
+    <string name="custom_gen_title">جنریٹر</string>
+    <string name="custom_gen_warning_message">حسب ضرورت گیم شروع کرنے سے آپ کی فی الحال محفوظ کردہ گیم رد ہو جائے گی۔ کیا آپ آگے بڑھنا چاہتے ہیں؟</string>
+    <string name="custom_gen_warning_title">پیش رفت کو مسترد کریں؟</string>
     <string name="debug_menu_title">ڈیبگ مینو</string>
     <string name="email_body_template">\n\n\n---\nایپ ورژن: %1$s\nآلہ: %2$s</string>
     <string name="email_subject">تیر کھیل کی حمایت</string>
@@ -27,8 +31,10 @@
     <string name="forced_width_label">جبری چوڑائی</string>
     <string name="game_over_message">تم زندگی سے باہر ہو! کیا آپ بورڈ کو دوبارہ شروع کرنا چاہیں گے یا کوئی اشتہار دیکھنا چاہیں گے؟</string>
     <string name="game_over_title">کھیل ختم</string>
+    <string name="generate_start_label">پیدا کریں اور شروع کریں۔</string>
     <string name="generating_progress">تیار ہو رہا ہے… %1$d%%</string>
     <string name="height_auto_label">اونچائی (0 آٹو کے لیے)</string>
+    <string name="height_label">اونچائی</string>
     <string name="home_label">گھر</string>
     <string name="level_dialog_title">سطح</string>
     <string name="level_label">لیول %1$d</string>
@@ -40,11 +46,14 @@
     <string name="ok_label">ٹھیک ہے</string>
     <string name="play_label">کھیلیں</string>
     <string name="privacy_label">رازداری</string>
+    <string name="proceed_label">آگے بڑھیں۔</string>
     <string name="rate_us_label">ہمیں درجہ دیں۔</string>
     <string name="regenerate_level_label">سطح کو دوبارہ تخلیق کریں۔</string>
     <string name="remove_ads_label">اشتہارات کو ہٹا دیں۔</string>
     <string name="restart_board_label">بورڈ کو دوبارہ شروع کریں۔</string>
     <string name="settings_label">ترتیبات</string>
+    <string name="shape_label">شکل</string>
+    <string name="shape_rectangular">مستطیل</string>
     <string name="sounds_label">آوازیں</string>
     <string name="speed_high">اعلی</string>
     <string name="speed_low">کم</string>
@@ -59,5 +68,6 @@
     <string name="vibrations_label">وائبریشنز</string>
     <string name="watch_ad_label">اشتہار دیکھیں</string>
     <string name="width_auto_label">چوڑائی (0 آٹو کے لیے)</string>
+    <string name="width_label">چوڑائی</string>
     <string name="write_us_label">ہمیں لکھیں۔</string>
 </resources>

@@ -2,6 +2,8 @@
 <resources>
     <string name="hash_048892c080a69dcd893e82b3049ae7a22e55b29b07ee53eb4196ad44339292c3" translatable="false">forced_lives_label</string>
     <string name="hash_ac8b4b580a241f37c61d75d6621e4ca2daf6fffa62146f8f981b24454ec265f8" translatable="false">remove_ads_label</string>
+    <string name="hash_0666941148e8876aae30f0e84fea955ff02f5ad094f7e3307a5795d1c6f77435" translatable="false">generate_start_label</string>
+    <string name="hash_1ade60abe93f5cfce908a10bb2d1b474f024779843faba4bb1f2ef06f277d3c7" translatable="false">custom_gen_title</string>
     <string name="hash_d74d1fbab03598972917931757a2234bdc98bad9329c70b085be2e4cfca23283" translatable="false">theme_bw</string>
     <string name="hash_09b28e2b438c7776a82de040c579a7c78e03e39b0f4e76bdf9f527b00e84b20d" translatable="false">write_us_label</string>
     <string name="hash_8e588cd187741f1cd76f5fab77b7208782a8c21d764ce7d7a4cf3ac4e0968873" translatable="false">speed_medium</string>
@@ -13,12 +15,15 @@
     <string name="hash_60acc53f13a5d1bf115878c4a785e9a43e8286c4139a8402a6ac7d23966f9153" translatable="false">theme_dark</string>
     <string name="hash_71f10eb014cbdf8bd8d800a3e244226b92197ed0137371cddf77f5e18224b1d1" translatable="false">game_over_title</string>
     <string name="hash_1709305c9fa966d14f56f0da3c3614bbc10adcf53d72f90341bb96d24afcfca3" translatable="false">level_dialog_title</string>
+    <string name="hash_8afbc02f6fcfeadfd3339304396cf8332baf7fad5d8d3c97def0fef1b3f6a7f6" translatable="false">shape_rectangular</string>
     <string name="hash_dc937b59892604f5a86ac96936cd7ff09e25f18ae6b758e8014a24c7fa039e91" translatable="false">none_label</string>
     <string name="hash_71f52972e7c91f8dad4b323655480267e507c2b55dba17784a8733c608904f5c" translatable="false">error_could_not_launch_review</string>
+    <string name="hash_f01847dfc94126426b4849004762a12557de2332ae0ca1b4602210b341f0281b" translatable="false">proceed_label</string>
     <string name="hash_d486dfbd5fb578340bccbdd0a662527eab38550648d5f44517e5ac71b8824703" translatable="false">theme_green</string>
     <string name="hash_190a6942164012442feb71d1610c192348f7e087281d8be2aeaee488c6474b5e" translatable="false">rate_us_label</string>
     <string name="hash_19dd83f117525b931fccdafe808aaa6939af792ee549f359eff13fac0d622f5d" translatable="false">theme_yellow</string>
     <string name="hash_3b28805a389039d18839b3646cdfe63ed52eabafcd6556e1a8470bc05b7a1ca1" translatable="false">choose_forced_shape_title</string>
+    <string name="hash_0417fb241c11f5c4a45153ebc9eaf5e2b73176e5186173d1037890bca7f10237" translatable="false">content_description_generate</string>
     <string name="hash_52d46ffedcf86c4d0859f4b77883cbe66ed1dd3e7162a72a355dc7a318ce01f4" translatable="false">content_description_life</string>
     <string name="hash_ec96f212ab6ae29cc5d7e8ad97adff56a8706eaa06b0031dfdb14a14d3a1fb1e" translatable="false">none_auto_label</string>
     <string name="hash_0f2631d569298f50e252a964bd2fd48010011d99fee4c044f8f1880067d35f93" translatable="false">watch_ad_label</string>
@@ -33,12 +38,16 @@
     <string name="hash_f0a9f807ce5132c06020ccaeca76b7e6c18d76b408c1bd3fcd71f6299c69be0c" translatable="false">email_subject</string>
     <string name="hash_3f6eb51fb61533d68fa5783c5689501f551e2bf167965eab29a09ab538ab0b53" translatable="false">game_over_message</string>
     <string name="hash_f793de205ead5ac302c4a1627829dea41f176b1068b993a32373fc869918374b" translatable="false">speed_low</string>
+    <string name="hash_e0e492707f85ff1f9c23155494a54382b52bf34888091adc7a6bb338ef78f88d" translatable="false">shape_label</string>
+    <string name="hash_fde84845c947b09b1d23b510c053734f0186128679546c12dd94d6f9733be9eb" translatable="false">custom_gen_warning_title</string>
     <string name="hash_1d97c9fec35ad3ba402a8bb3548546924ce958f8f4b8a65b0f39c9c6171bdf34" translatable="false">content_description_ad</string>
     <string name="hash_565339bc4d33d72817b583024112eb7f5cdf3e5eef0252d6ec1b9c9a94e12bb3" translatable="false">ok_label</string>
     <string name="hash_436e61016e26fcb773b9725745cbbf0afe7f001ea26041a814a7712c2925c442" translatable="false">play_label</string>
+    <string name="hash_bfe2eca401797325bc268f93c7397554551de4274d5d73ed421ee36fe9cd3ae0" translatable="false">height_label</string>
     <string name="hash_846437cf55b5d7b128a4cf172c182d21ad63b3d369f3851918a12fea4a07e285" translatable="false">level_label</string>
     <string name="hash_420d9697c81d2c511d2011889240c24ef848b222eb263f66e57bfea4ca7c5482" translatable="false">error_could_not_open_browser</string>
     <string name="hash_78e7771b8b46e11ddb34ba48887e1330525215f96d94778980d1186e6f09f6b4" translatable="false">theme_orange</string>
+    <string name="hash_3019947b6daf18b0534a15d8c7ac30ab587e36cc93fb45a6e7b750348006d620" translatable="false">width_label</string>
     <string name="hash_11a24c1ef3d1df9bf00984597de0f388634ec3c0cb128700a442ec1c5b172466" translatable="false">lives_auto_label</string>
     <string name="hash_6b983a81e5e8099e4e23a368e72636e31f029f2e691e5be714106b8cf59d70a7" translatable="false">content_description_restart</string>
     <string name="hash_31fbef162594de01bab0cd525c51f74de7bcb15063029fa1a54b2cf5944c80d8" translatable="false">continue_label</string>
@@ -48,6 +57,7 @@
     <string name="hash_54a57c3147c49f33de5898b87084ad2b14c4ab308f762454bf92aca907478ad5" translatable="false">privacy_label</string>
     <string name="hash_b14821319ef8b550471f105625a6fad3291012fc6e1d01210b025bf3fd613aa3" translatable="false">content_description_levels</string>
     <string name="hash_78744b2aee1124e55eefd94ca9f22d505234d6648190c18266b222afd7b526c5" translatable="false">restart_board_label</string>
+    <string name="hash_dd8af26c0c8bbe51204590c522933461ce6385fde1c7dc3aa2bbb19bb5631015" translatable="false">custom_gen_warning_message</string>
     <string name="hash_74a883a037bc227f91891ab654a753d3a99f31ab06ae5b5d2b6e594a692b41f8" translatable="false">settings_label</string>
     <string name="hash_41c07ba1903dbd1d553a12a1a27da680449f82f97b48c06ef85f97c68f83b786" translatable="false">loading_label</string>
     <string name="hash_3a78695388b38b5cceefaf6796b0137877514593543b91af2752d5a17e3d736c" translatable="false">home_label</string>

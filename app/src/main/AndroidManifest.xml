@@ -28,6 +28,10 @@
             android:name=".SettingsActivity"
             android:exported="false"
             android:theme="@style/Theme.Arrows" />
+        <activity
+            android:name=".GenerateActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Arrows" />
     </application>
 
 </manifest>

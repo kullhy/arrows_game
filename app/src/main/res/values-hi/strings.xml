@@ -7,6 +7,7 @@
     <string name="choose_theme_title">थीम चुनें</string>
     <string name="content_description_ad">विज्ञापन</string>
     <string name="content_description_back">पीछे</string>
+    <string name="content_description_generate">कस्टम स्तर उत्पन्न करें</string>
     <string name="content_description_guidance_lines">मार्गदर्शन रेखाएँ</string>
     <string name="content_description_levels">स्तरों</string>
     <string name="content_description_life">ज़िंदगी</string>
@@ -14,6 +15,9 @@
     <string name="content_description_restart">पुनः आरंभ करें</string>
     <string name="continue_label">जारी रखना</string>
     <string name="current_level_label">वर्तमान स्तर</string>
+    <string name="custom_gen_title">जनक</string>
+    <string name="custom_gen_warning_message">कस्टम गेम शुरू करने से आपका वर्तमान में सेव किया गया गेम रद्द हो जाएगा। क्या आप आगे बढ़ना चाहते हैं?</string>
+    <string name="custom_gen_warning_title">प्रगति को त्याग दें?</string>
     <string name="debug_menu_title">डीबग मेनू</string>
     <string name="email_body_template">\n\n\n---\nऐप संस्करण: %1$s\nडिवाइस: %2$s</string>
     <string name="email_subject">एरो गेम सपोर्ट</string>
@@ -27,8 +31,10 @@
     <string name="forced_width_label">बाध्य चौड़ाई</string>
     <string name="game_over_message">आपके पास अब कोई लाइफ नहीं बची है! क्या आप बोर्ड को रीस्टार्ट करना चाहेंगे या कोई विज्ञापन देखना चाहेंगे?</string>
     <string name="game_over_title">खेल खत्म</string>
+    <string name="generate_start_label">उत्पन्न करें और प्रारंभ करें</string>
     <string name="generating_progress">जनरेट हो रहा है… %1$d%%</string>
     <string name="height_auto_label">ऊंचाई (स्वचालित के लिए 0)</string>
+    <string name="height_label">ऊंचाई</string>
     <string name="home_label">घर</string>
     <string name="level_dialog_title">स्तर</string>
     <string name="level_label">स्तर %1$d</string>
@@ -40,11 +46,14 @@
     <string name="ok_label">ठीक है</string>
     <string name="play_label">खेल</string>
     <string name="privacy_label">गोपनीयता</string>
+    <string name="proceed_label">आगे बढ़ना</string>
     <string name="rate_us_label">हमें रेटिंग दें</string>
     <string name="regenerate_level_label">पुनर्जनन स्तर</string>
     <string name="remove_ads_label">विज्ञापन हटाएँ</string>
     <string name="restart_board_label">बोर्ड को पुनः आरंभ करें</string>
     <string name="settings_label">सेटिंग्स</string>
+    <string name="shape_label">आकार</string>
+    <string name="shape_rectangular">आयताकार</string>
     <string name="sounds_label">ध्वनि</string>
     <string name="speed_high">उच्च</string>
     <string name="speed_low">कम</string>
@@ -59,5 +68,6 @@
     <string name="vibrations_label">कंपन</string>
     <string name="watch_ad_label">विज्ञापन देखें</string>
     <string name="width_auto_label">चौड़ाई (स्वचालित के लिए 0)</string>
+    <string name="width_label">चौड़ाई</string>
     <string name="write_us_label">हमें लिखना</string>
 </resources>

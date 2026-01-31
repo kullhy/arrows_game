@@ -7,6 +7,7 @@
     <string name="choose_theme_title">テーマを選択</string>
     <string name="content_description_ad">広告</string>
     <string name="content_description_back">戻る</string>
+    <string name="content_description_generate">カスタムレベルの生成</string>
     <string name="content_description_guidance_lines">ガイドライン</string>
     <string name="content_description_levels">レベル</string>
     <string name="content_description_life">人生</string>
@@ -14,6 +15,9 @@
     <string name="content_description_restart">再起動</string>
     <string name="continue_label">続く</string>
     <string name="current_level_label">現在のレベル</string>
+    <string name="custom_gen_title">ジェネレータ</string>
+    <string name="custom_gen_warning_message">カスタムゲームを開始すると、現在保存されているゲームが破棄されます。続行しますか?</string>
+    <string name="custom_gen_warning_title">進行状況を破棄しますか?</string>
     <string name="debug_menu_title">デバッグメニュー</string>
     <string name="email_body_template">\n\n\n---\nアプリのバージョン: %1$s\nデバイス: %2$s</string>
     <string name="email_subject">アローズゲームサポート</string>
@@ -27,8 +31,10 @@
     <string name="forced_width_label">強制幅</string>
     <string name="game_over_message">ライフがなくなりました！ボードを再起動するか、広告を視聴しますか？</string>
     <string name="game_over_title">ゲームオーバー</string>
+    <string name="generate_start_label">生成して開始</string>
     <string name="generating_progress">生成中…%1$d%%</string>
     <string name="height_auto_label">高さ（自動の場合は0）</string>
+    <string name="height_label">身長</string>
     <string name="home_label">家</string>
     <string name="level_dialog_title">レベル</string>
     <string name="level_label">レベル %1$d</string>
@@ -40,11 +46,14 @@
     <string name="ok_label">わかりました</string>
     <string name="play_label">遊ぶ</string>
     <string name="privacy_label">プライバシー</string>
+    <string name="proceed_label">進む</string>
     <string name="rate_us_label">評価してください</string>
     <string name="regenerate_level_label">レベル再生</string>
     <string name="remove_ads_label">広告を削除する</string>
     <string name="restart_board_label">再起動ボード</string>
     <string name="settings_label">設定</string>
+    <string name="shape_label">形</string>
+    <string name="shape_rectangular">長方形</string>
     <string name="sounds_label">音</string>
     <string name="speed_high">高い</string>
     <string name="speed_low">低い</string>
@@ -59,5 +68,6 @@
     <string name="vibrations_label">振動</string>
     <string name="watch_ad_label">広告を見る</string>
     <string name="width_auto_label">幅（自動の場合は0）</string>
+    <string name="width_label">幅</string>
     <string name="write_us_label">メールでお問い合わせください</string>
 </resources>

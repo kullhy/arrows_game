@@ -7,6 +7,7 @@
     <string name="choose_theme_title">اختر المظهر</string>
     <string name="content_description_ad">إعلان</string>
     <string name="content_description_back">خلف</string>
+    <string name="content_description_generate">إنشاء مستوى مخصص</string>
     <string name="content_description_guidance_lines">خطوط إرشادية</string>
     <string name="content_description_levels">المستويات</string>
     <string name="content_description_life">حياة</string>
@@ -14,6 +15,9 @@
     <string name="content_description_restart">إعادة تشغيل</string>
     <string name="continue_label">يكمل</string>
     <string name="current_level_label">المستوى الحالي</string>
+    <string name="custom_gen_title">مولد</string>
+    <string name="custom_gen_warning_message">بدء لعبة مخصصة سيؤدي إلى حذف ملف الحفظ الحالي. هل تريد المتابعة؟</string>
+    <string name="custom_gen_warning_title">هل نتجاهل التقدم المحرز؟</string>
     <string name="debug_menu_title">قائمة تصحيح الأخطاء</string>
     <string name="email_body_template">\n\n\n---\nإصدار التطبيق: %1$s\nالجهاز: %2$s</string>
     <string name="email_subject">دعم ألعاب آروز</string>
@@ -27,8 +31,10 @@
     <string name="forced_width_label">العرض القسري</string>
     <string name="game_over_message">لقد نفدت محاولاتك! هل ترغب في إعادة تشغيل اللوحة أم مشاهدة إعلان؟</string>
     <string name="game_over_title">انتهت اللعبة</string>
+    <string name="generate_start_label">إنشاء وبدء التشغيل</string>
     <string name="generating_progress">جارٍ إنشاء… %1$d%%</string>
     <string name="height_auto_label">الارتفاع (0 للوضع التلقائي)</string>
+    <string name="height_label">ارتفاع</string>
     <string name="home_label">بيت</string>
     <string name="level_dialog_title">مستوى</string>
     <string name="level_label">المستوى %1$d</string>
@@ -40,11 +46,14 @@
     <string name="ok_label">نعم</string>
     <string name="play_label">يلعب</string>
     <string name="privacy_label">خصوصية</string>
+    <string name="proceed_label">يتابع</string>
     <string name="rate_us_label">قيّمونا</string>
     <string name="regenerate_level_label">مستوى التجديد</string>
     <string name="remove_ads_label">إزالة الإعلانات</string>
     <string name="restart_board_label">لوحة إعادة التشغيل</string>
     <string name="settings_label">إعدادات</string>
+    <string name="shape_label">شكل</string>
+    <string name="shape_rectangular">مستطيل</string>
     <string name="sounds_label">أصوات</string>
     <string name="speed_high">عالي</string>
     <string name="speed_low">قليل</string>
@@ -59,5 +68,6 @@
     <string name="vibrations_label">الاهتزازات</string>
     <string name="watch_ad_label">شاهد الإعلان</string>
     <string name="width_auto_label">العرض (0 للوضع التلقائي)</string>
+    <string name="width_label">عرض</string>
     <string name="write_us_label">اكتب ساعات</string>
 </resources>

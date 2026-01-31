@@ -7,6 +7,7 @@
     <string name="choose_theme_title">Выберите тему</string>
     <string name="content_description_ad">Объявление</string>
     <string name="content_description_back">Назад</string>
+    <string name="content_description_generate">Создать пользовательский уровень</string>
     <string name="content_description_guidance_lines">Руководящие принципы</string>
     <string name="content_description_levels">Уровни</string>
     <string name="content_description_life">Жизнь</string>
@@ -14,6 +15,9 @@
     <string name="content_description_restart">Перезапуск</string>
     <string name="continue_label">Продолжать</string>
     <string name="current_level_label">Текущий уровень</string>
+    <string name="custom_gen_title">Генератор</string>
+    <string name="custom_gen_warning_message">При запуске пользовательской игры ваши текущие сохранения будут удалены. Вы хотите продолжить?</string>
+    <string name="custom_gen_warning_title">Отменить прогресс?</string>
     <string name="debug_menu_title">МЕНЮ ОТЛАДКИ</string>
     <string name="email_body_template">\n\n\n---\nВерсия приложения: %1$s\nУстройство: %2$s</string>
     <string name="email_subject">Поддержка игры Arrows</string>
@@ -27,8 +31,10 @@
     <string name="forced_width_label">Принудительная ширина</string>
     <string name="game_over_message">У вас закончились жизни! Хотите перезапустить игру или посмотреть рекламу?</string>
     <string name="game_over_title">Игра закончена</string>
+    <string name="generate_start_label">Сгенерировать и запустить</string>
     <string name="generating_progress">Генерация… %1$d%%</string>
     <string name="height_auto_label">Высота (0 для автоматического режима)</string>
+    <string name="height_label">Высота</string>
     <string name="home_label">Дом</string>
     <string name="level_dialog_title">Уровень</string>
     <string name="level_label">Уровень %1$d</string>
@@ -40,11 +46,14 @@
     <string name="ok_label">ХОРОШО</string>
     <string name="play_label">Играть</string>
     <string name="privacy_label">Конфиденциальность</string>
+    <string name="proceed_label">Продолжить</string>
     <string name="rate_us_label">Оцените нас</string>
     <string name="regenerate_level_label">Восстановить уровень</string>
     <string name="remove_ads_label">Удалить рекламу</string>
     <string name="restart_board_label">Плата перезапуска</string>
     <string name="settings_label">Настройки</string>
+    <string name="shape_label">Форма</string>
+    <string name="shape_rectangular">Прямоугольный</string>
     <string name="sounds_label">Звуки</string>
     <string name="speed_high">Высокий</string>
     <string name="speed_low">Низкий</string>
@@ -59,5 +68,6 @@
     <string name="vibrations_label">Вибрации</string>
     <string name="watch_ad_label">Смотреть рекламу</string>
     <string name="width_auto_label">Ширина (0 для автоматического режима)</string>
+    <string name="width_label">Ширина</string>
     <string name="write_us_label">Напишите нам</string>
 </resources>

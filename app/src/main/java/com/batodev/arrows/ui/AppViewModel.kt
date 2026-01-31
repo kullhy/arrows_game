@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.batodev.arrows.data.UserPreferencesRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -77,6 +78,12 @@ class AppViewModel(private val userPreferencesRepository: UserPreferencesReposit
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
         initialValue = null
+    )
+
+    val hasSavedLevel: StateFlow<Boolean> = userPreferencesRepository.currentLevel.map { it != null }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+        initialValue = false
     )
 
     fun saveTheme(theme: String) {

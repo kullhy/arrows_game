@@ -7,6 +7,7 @@
     <string name="choose_theme_title">থিম বেছে নিন</string>
     <string name="content_description_ad">বিজ্ঞাপন</string>
     <string name="content_description_back">পিছনে</string>
+    <string name="content_description_generate">কাস্টম লেভেল তৈরি করুন</string>
     <string name="content_description_guidance_lines">নির্দেশিকা লাইন</string>
     <string name="content_description_levels">স্তর</string>
     <string name="content_description_life">জীবন</string>
@@ -14,6 +15,9 @@
     <string name="content_description_restart">পুনরারম্ভ করুন</string>
     <string name="continue_label">চালিয়ে যান</string>
     <string name="current_level_label">বর্তমান স্তর</string>
+    <string name="custom_gen_title">জেনারেটর</string>
+    <string name="custom_gen_warning_message">একটি কাস্টম গেম শুরু করলে আপনার বর্তমানে সংরক্ষিত গেমটি বাতিল হয়ে যাবে। আপনি কি এগিয়ে যেতে চান?</string>
+    <string name="custom_gen_warning_title">অগ্রগতি বাতিল করবেন?</string>
     <string name="debug_menu_title">ডিবাগ মেনু</string>
     <string name="email_body_template">\n\n\n---\nঅ্যাপ সংস্করণ: %1$s\nডিভাইস: %2$s</string>
     <string name="email_subject">তীর খেলা সমর্থন</string>
@@ -27,8 +31,10 @@
     <string name="forced_width_label">জোরপূর্বক প্রস্থ</string>
     <string name="game_over_message">তোমার আর জীবন নেই! তুমি কি বোর্ডটি পুনরায় চালু করতে চাও নাকি বিজ্ঞাপন দেখতে চাও?</string>
     <string name="game_over_title">খেলা শেষ</string>
+    <string name="generate_start_label">তৈরি করুন এবং শুরু করুন</string>
     <string name="generating_progress">তৈরি হচ্ছে… %1$d%%</string>
     <string name="height_auto_label">উচ্চতা (অটোর জন্য ০)</string>
+    <string name="height_label">উচ্চতা</string>
     <string name="home_label">হোম</string>
     <string name="level_dialog_title">স্তর</string>
     <string name="level_label">স্তর %1$d</string>
@@ -40,11 +46,14 @@
     <string name="ok_label">ঠিক আছে</string>
     <string name="play_label">খেলা</string>
     <string name="privacy_label">গোপনীয়তা</string>
+    <string name="proceed_label">এগিয়ে যান</string>
     <string name="rate_us_label">আমাদের রেটিং দিন</string>
     <string name="regenerate_level_label">পুনর্জন্ম স্তর</string>
     <string name="remove_ads_label">বিজ্ঞাপন সরান</string>
     <string name="restart_board_label">বোর্ড পুনরায় চালু করুন</string>
     <string name="settings_label">সেটিংস</string>
+    <string name="shape_label">আকৃতি</string>
+    <string name="shape_rectangular">আয়তক্ষেত্রাকার</string>
     <string name="sounds_label">শব্দ</string>
     <string name="speed_high">উচ্চ</string>
     <string name="speed_low">কম</string>
@@ -59,5 +68,6 @@
     <string name="vibrations_label">কম্পন</string>
     <string name="watch_ad_label">বিজ্ঞাপন দেখুন</string>
     <string name="width_auto_label">প্রস্থ (অটোর জন্য ০)</string>
+    <string name="width_label">প্রস্থ</string>
     <string name="write_us_label">আমাদের লিখুন</string>
 </resources>

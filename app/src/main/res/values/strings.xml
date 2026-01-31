@@ -7,6 +7,8 @@
     <!-- Animation Speeds -->
     <!-- Debug Menu -->
     <!-- Errors and Utils -->
+    <!-- Custom Generation -->
+    <!-- Custom Generation Warning -->
     <string name="animation_speed_label">Animation Speed</string>
     <string name="app_name" translatable="false">Arrows</string>
     <string name="auto_label">Auto</string>
@@ -15,6 +17,7 @@
     <string name="choose_theme_title">Choose Theme</string>
     <string name="content_description_ad">Ad</string>
     <string name="content_description_back">Back</string>
+    <string name="content_description_generate">Generate Custom Level</string>
     <string name="content_description_guidance_lines">Guidance Lines</string>
     <string name="content_description_levels">Levels</string>
     <string name="content_description_life">Life</string>
@@ -22,6 +25,9 @@
     <string name="content_description_restart">Restart</string>
     <string name="continue_label">Continue</string>
     <string name="current_level_label">Current Level</string>
+    <string name="custom_gen_title">Generator</string>
+    <string name="custom_gen_warning_message">Starting a custom game will discard your currently saved game. Do you want to proceed?</string>
+    <string name="custom_gen_warning_title">Discard Progress?</string>
     <string name="debug_menu_title">DEBUG MENU</string>
     <string name="email_body_template">\n\n\n---\nApp Version: %1$s\nDevice: %2$s</string>
     <string name="email_subject">Arrows Game Support</string>
@@ -35,8 +41,10 @@
     <string name="forced_width_label">Forced Width</string>
     <string name="game_over_message">You are out of lives! Would you like to restart the board or watch an ad?</string>
     <string name="game_over_title">Game Over</string>
+    <string name="generate_start_label">Generate &amp; Start</string>
     <string name="generating_progress">Generating… %1$d%%</string>
     <string name="height_auto_label">Height (0 for Auto)</string>
+    <string name="height_label">Height</string>
     <string name="home_label">Home</string>
     <string name="level_dialog_title">Level</string>
     <string name="level_label">Level %1$d</string>
@@ -49,11 +57,14 @@
     <string name="ok_label">OK</string>
     <string name="play_label">Play</string>
     <string name="privacy_label">Privacy</string>
+    <string name="proceed_label">Proceed</string>
     <string name="rate_us_label">Rate us</string>
     <string name="regenerate_level_label">Regenerate Level</string>
     <string name="remove_ads_label">Remove Ads</string>
     <string name="restart_board_label">Restart Board</string>
     <string name="settings_label">Settings</string>
+    <string name="shape_label">Shape</string>
+    <string name="shape_rectangular">Rectangular</string>
     <string name="sounds_label">Sounds</string>
     <string name="speed_high">High</string>
     <string name="speed_low">Low</string>
@@ -68,5 +79,6 @@
     <string name="vibrations_label">Vibrations</string>
     <string name="watch_ad_label">Watch Ad</string>
     <string name="width_auto_label">Width (0 for Auto)</string>
+    <string name="width_label">Width</string>
     <string name="write_us_label">Write us</string>
 </resources>

@@ -7,6 +7,7 @@
     <string name="choose_theme_title">Design auswählen</string>
     <string name="content_description_ad">Anzeige</string>
     <string name="content_description_back">Zurück</string>
+    <string name="content_description_generate">Benutzerdefiniertes Level generieren</string>
     <string name="content_description_guidance_lines">Leitlinien</string>
     <string name="content_description_levels">Level</string>
     <string name="content_description_life">Leben</string>
@@ -14,6 +15,9 @@
     <string name="content_description_restart">Neustart</string>
     <string name="continue_label">Weitermachen</string>
     <string name="current_level_label">Aktuelles Niveau</string>
+    <string name="custom_gen_title">Generator</string>
+    <string name="custom_gen_warning_message">Beim Starten eines benutzerdefinierten Spiels wird Ihr aktueller Spielstand gelöscht. Möchten Sie fortfahren?</string>
+    <string name="custom_gen_warning_title">Fortschritt verwerfen?</string>
     <string name="debug_menu_title">DEBUG-MENÜ</string>
     <string name="email_body_template">\n\n\n---\nApp-Version: %1$s\nGerät: %2$s</string>
     <string name="email_subject">Arrows-Spielunterstützung</string>
@@ -27,8 +31,10 @@
     <string name="forced_width_label">erzwungene Breite</string>
     <string name="game_over_message">Du hast keine Leben mehr! Möchtest du das Spiel neu starten oder eine Werbung ansehen?</string>
     <string name="game_over_title">Spiel vorbei</string>
+    <string name="generate_start_label">Generieren &amp; Starten</string>
     <string name="generating_progress">Generiere… %1$d%%</string>
     <string name="height_auto_label">Höhe (0 für Auto)</string>
+    <string name="height_label">Höhe</string>
     <string name="home_label">Heim</string>
     <string name="level_dialog_title">Ebene</string>
     <string name="level_label">Level %1$d</string>
@@ -40,11 +46,14 @@
     <string name="ok_label">OK</string>
     <string name="play_label">Spielen</string>
     <string name="privacy_label">Datenschutz</string>
+    <string name="proceed_label">Fortfahren</string>
     <string name="rate_us_label">Bewerten Sie uns</string>
     <string name="regenerate_level_label">Regenerieren-Level</string>
     <string name="remove_ads_label">Werbung entfernen</string>
     <string name="restart_board_label">Neustart der Platine</string>
     <string name="settings_label">Einstellungen</string>
+    <string name="shape_label">Form</string>
+    <string name="shape_rectangular">Rechteckig</string>
     <string name="sounds_label">Geräusche</string>
     <string name="speed_high">Hoch</string>
     <string name="speed_low">Niedrig</string>
@@ -59,5 +68,6 @@
     <string name="vibrations_label">Schwingungen</string>
     <string name="watch_ad_label">Werbung ansehen</string>
     <string name="width_auto_label">Breite (0 für Auto)</string>
+    <string name="width_label">Breite</string>
     <string name="write_us_label">Schreiben Sie uns</string>
 </resources>

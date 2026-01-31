@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Settings
@@ -47,6 +49,8 @@ import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.NavigationIndicator
 import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
+
+private const val GENERATOR_UNLOCK_LEVEL = 20
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,60 +104,89 @@ fun MainScreen() {
 
 @Composable
 private fun MainBottomBar(levelNumber: Int, themeColors: ThemeColors) {
-    val context = LocalContext.current
+    val isUnlocked = levelNumber >= GENERATOR_UNLOCK_LEVEL
+
     NavigationBar(
         containerColor = themeColors.bottomBar,
         contentColor = White
     ) {
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Lock,
-                    contentDescription = stringResource(R.string.content_description_levels)
-                )
-            },
-            label = { Text(stringResource(R.string.level_label, levelNumber)) },
-            selected = false,
-            onClick = { },
-            colors = NavigationBarItemDefaults.colors(
-                unselectedIconColor = InactiveIcon, unselectedTextColor = InactiveIcon
-            )
-        )
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Home,
-                    contentDescription = stringResource(R.string.home_label)
-                )
-            },
-            label = { Text(stringResource(R.string.home_label)) },
-            selected = true,
-            onClick = { },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = White,
-                indicatorColor = NavigationIndicator,
-                selectedTextColor = White
-            )
-        )
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Settings,
-                    contentDescription = stringResource(R.string.settings_label)
-                )
-            },
-            label = { Text(stringResource(R.string.settings_label)) },
-            selected = false,
-            onClick = {
-                val intent = Intent(context, SettingsActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                context.startActivity(intent)
-            },
-            colors = NavigationBarItemDefaults.colors(
-                unselectedIconColor = InactiveIcon, unselectedTextColor = InactiveIcon
-            )
-        )
+        GeneratorItem(isUnlocked)
+        HomeItem()
+        SettingsItem()
     }
+}
+
+@Composable
+private fun RowScope.GeneratorItem(isUnlocked: Boolean) {
+    val context = LocalContext.current
+    NavigationBarItem(
+        icon = {
+            Icon(
+                imageVector = if (isUnlocked) Icons.Default.AutoAwesome else Icons.Default.Lock,
+                contentDescription = stringResource(R.string.content_description_generate)
+            )
+        },
+        label = {
+            Text(
+                if (isUnlocked) stringResource(R.string.custom_gen_title)
+                else stringResource(R.string.level_label, GENERATOR_UNLOCK_LEVEL)
+            )
+        },
+        selected = false,
+        onClick = {
+            if (isUnlocked) {
+                val intent = Intent(context, GenerateActivity::class.java)
+                context.startActivity(intent)
+            }
+        },
+        colors = NavigationBarItemDefaults.colors(
+            unselectedIconColor = if (isUnlocked) White else InactiveIcon,
+            unselectedTextColor = if (isUnlocked) White else InactiveIcon
+        )
+    )
+}
+
+@Composable
+private fun RowScope.HomeItem() {
+    NavigationBarItem(
+        icon = {
+            Icon(
+                Icons.Default.Home,
+                contentDescription = stringResource(R.string.home_label)
+            )
+        },
+        label = { Text(stringResource(R.string.home_label)) },
+        selected = true,
+        onClick = { },
+        colors = NavigationBarItemDefaults.colors(
+            selectedIconColor = White,
+            indicatorColor = NavigationIndicator,
+            selectedTextColor = White
+        )
+    )
+}
+
+@Composable
+private fun RowScope.SettingsItem() {
+    val context = LocalContext.current
+    NavigationBarItem(
+        icon = {
+            Icon(
+                Icons.Default.Settings,
+                contentDescription = stringResource(R.string.settings_label)
+            )
+        },
+        label = { Text(stringResource(R.string.settings_label)) },
+        selected = false,
+        onClick = {
+            val intent = Intent(context, SettingsActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            context.startActivity(intent)
+        },
+        colors = NavigationBarItemDefaults.colors(
+            unselectedIconColor = InactiveIcon, unselectedTextColor = InactiveIcon
+        )
+    )
 }
 
 @Composable
