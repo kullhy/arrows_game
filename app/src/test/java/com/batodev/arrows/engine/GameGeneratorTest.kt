@@ -186,8 +186,9 @@ private class TestBoardShapeProvider : BoardShapeProvider {
 
             for (x in 0 until targetWidth) {
                 for (y in 0 until targetHeight) {
-                    if (x < border || x >= targetWidth - border ||
-                        y < border || y >= targetHeight - border) {
+                    val isBorderX = x < border || x >= targetWidth - border
+                    val isBorderY = y < border || y >= targetHeight - border
+                    if (isBorderX || isBorderY) {
                         walls[x][y] = true
                     }
                 }
