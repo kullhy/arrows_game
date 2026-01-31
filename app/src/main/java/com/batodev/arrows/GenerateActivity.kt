@@ -66,7 +66,7 @@ import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
 
 private const val MIN_SIZE = 20f
-private const val MAX_SIZE = 200f
+private const val MAX_SIZE = 100f
 private const val DEFAULT_SIZE = 50f
 private const val RECTANGULAR_SHAPE = "rectangular"
 private const val SHAPE_ICON_SIZE = 32
