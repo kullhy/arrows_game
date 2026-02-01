@@ -20,7 +20,7 @@ data class GameEngineConfig(
     val gameGenerator: GameGenerator = GameGenerator(),
     val autoLoad: Boolean = true,
     val isCustomGame: Boolean = false,
-    val backgroundDispatcher: kotlinx.coroutines.CoroutineDispatcher = kotlinx.coroutines.Dispatchers.Default
+    val backgroundDispatcher: kotlinx.coroutines.CoroutineDispatcher = kotlinx.coroutines.Dispatchers.Default,
 )
 
 data class GameEngineFeatures(
@@ -30,7 +30,7 @@ data class GameEngineFeatures(
     val random: kotlin.random.Random = kotlin.random.Random.Default,
     val forcedWidth: Int? = null,
     val forcedHeight: Int? = null,
-    val forcedShape: String? = null
+    val forcedShape: String? = null,
 )
 
 class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEngineFeatures()) {
@@ -87,24 +87,40 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
     private fun observePreferences() {
         coroutineScope.launch { repository.isVibrationEnabled.collect { isVibrationEnabled = it } }
         coroutineScope.launch { repository.levelNumber.collect { levelNumber = it } }
-        coroutineScope.launch { repository.isSoundsEnabled.collect { soundManager?.setSoundsEnabled(it) } }
+        coroutineScope.launch {
+            repository.isSoundsEnabled.collect {
+                soundManager?.setSoundsEnabled(
+                    it
+                )
+            }
+        }
         coroutineScope.launch { repository.animationSpeed.collect { animationSpeed = it } }
-        coroutineScope.launch { repository.debugForcedWidth.collect { if (forcedWidth == null) forcedWidth = it } }
-        coroutineScope.launch { repository.debugForcedHeight.collect { if (forcedHeight == null) forcedHeight = it } }
+        coroutineScope.launch {
+            repository.debugForcedWidth.collect {
+                if (forcedWidth == null) forcedWidth = it
+            }
+        }
+        coroutineScope.launch {
+            repository.debugForcedHeight.collect {
+                if (forcedHeight == null) forcedHeight = it
+            }
+        }
         coroutineScope.launch { repository.debugForcedLives.collect { forcedLives = it } }
-        coroutineScope.launch { repository.debugForcedShape.collect { if (forcedShape == null) forcedShape = it } }
+        coroutineScope.launch {
+            repository.debugForcedShape.collect {
+                if (forcedShape == null) forcedShape = it
+            }
+        }
     }
 
     fun loadOrRegenerateLevel() {
-        if (isCustomGame) {
-            regenerateLevel()
-            return
-        }
         coroutineScope.launch(backgroundDispatcher) {
             levelManager.loadLevel(
                 onSuccess = { initial, current, maxL, currentL ->
-                    initialLevel = initial; level = current; totalSnakesInLevel = initial.snakes.size
-                    isGameWon = level.snakes.isEmpty(); maxLives = maxL; lives = currentL; isLoading = false
+                    initialLevel = initial; level = current; totalSnakesInLevel =
+                    initial.snakes.size
+                    isGameWon = level.snakes.isEmpty(); maxLives = maxL; lives =
+                    currentL; isLoading = false
                 },
                 onFailure = { regenerateLevel() }
             )
@@ -127,15 +143,31 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
 
     fun onTransform(pan: Offset, zoom: Float) = transformationState.transform(pan, zoom)
 
-    fun addLife() { if (lives < maxLives) { lives++; saveState() } }
+    fun addLife() {
+        if (lives < maxLives) {
+            lives++; saveState()
+        }
+    }
 
     fun onTap(tapOffset: Offset, containerWidthPx: Float, containerHeightPx: Float) {
         if (isLoading || lives <= 0) return
         val gridCoords = inputHandler.transformTapToGrid(
-            TapTransformationParams(tapOffset, containerWidthPx, containerHeightPx, level, scale, offsetX, offsetY)
+            TapTransformationParams(
+                tapOffset,
+                containerWidthPx,
+                containerHeightPx,
+                level,
+                scale,
+                offsetX,
+                offsetY
+            )
         )
         val tappedSnake = inputHandler.findTappedSnake(gridCoords.x, gridCoords.y, level.snakes) {
-            SolvabilityChecker.isLineOfSightObstructed(level, it, removalAnimator.removalProgress.keys)
+            SolvabilityChecker.isLineOfSightObstructed(
+                level,
+                it,
+                removalAnimator.removalProgress.keys
+            )
         }
         if (tappedSnake != null) {
             val isObstructed = SolvabilityChecker.isLineOfSightObstructed(
@@ -147,9 +179,13 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
                     onPenalty = { lives--; saveState() },
                     onSuccess = {
                         if (!removalProgress.containsKey(tappedSnake.id)) {
-                            removalAnimator.animate(tappedSnake.id, animationSpeed, { _, _ -> }, { id ->
-                                onSnakeRemoved(id)
-                            })
+                            removalAnimator.animate(
+                                tappedSnake.id,
+                                animationSpeed,
+                                { _, _ -> },
+                                { id ->
+                                    onSnakeRemoved(id)
+                                })
                         }
                     }
                 )
@@ -175,17 +211,17 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
         isLoading = true; loadingProgress = 0f
         coroutineScope.launch(backgroundDispatcher) {
             levelManager.regenerateLevel(
-                RegenerationParams(forcedWidth, forcedHeight, forcedLives, forcedShape,
+                RegenerationParams(
+                    forcedWidth, forcedHeight, forcedLives, forcedShape,
                     onProgress = { loadingProgress = it },
                     onComplete = { newLevel, config ->
-                        initialLevel = newLevel; level = newLevel; totalSnakesInLevel = newLevel.snakes.size
+                        initialLevel = newLevel; level = newLevel; totalSnakesInLevel =
+                        newLevel.snakes.size
                         isGameWon = false; maxLives = config.maxLives; lives = config.maxLives
                         transformationState.reset(); tapHandler.clearFlash(); removalAnimator.clear()
                         isLoading = false
-                        if (!isCustomGame) {
-                            coroutineScope.launch(backgroundDispatcher) {
-                                levelManager.saveInitialState(newLevel, lives)
-                            }
+                        coroutineScope.launch(backgroundDispatcher) {
+                            levelManager.saveInitialState(newLevel, lives)
                         }
                     }
                 )
@@ -194,7 +230,6 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
     }
 
     private fun saveState() {
-        if (isCustomGame) return
         coroutineScope.launch(backgroundDispatcher) { levelManager.saveState(level, lives) }
     }
 }
