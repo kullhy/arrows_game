@@ -44,12 +44,6 @@ class AppViewModel(private val userPreferencesRepository: UserPreferencesReposit
         initialValue = true
     )
 
-    val isFillBoardEnabled: StateFlow<Boolean> = userPreferencesRepository.isFillBoardEnabled.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
-        initialValue = false
-    )
-
     val levelNumber: StateFlow<Int> = userPreferencesRepository.levelNumber.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
@@ -101,12 +95,6 @@ class AppViewModel(private val userPreferencesRepository: UserPreferencesReposit
     fun saveSounds(enabled: Boolean) {
         viewModelScope.launch {
             userPreferencesRepository.saveSoundsPreference(enabled)
-        }
-    }
-
-    fun saveFillBoard(enabled: Boolean) {
-        viewModelScope.launch {
-            userPreferencesRepository.saveFillBoardPreference(enabled)
         }
     }
 

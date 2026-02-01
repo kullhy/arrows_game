@@ -24,7 +24,6 @@
     <string name="error_could_not_launch_review">Impossible de lancer le flux de révision</string>
     <string name="error_could_not_open_browser">Impossible d\'ouvrir le navigateur</string>
     <string name="error_could_not_open_email">Impossible d\'ouvrir l\'application de messagerie</string>
-    <string name="fill_board_label">Remplir le tableau (plus lentement)</string>
     <string name="forced_height_label">Hauteur forcée</string>
     <string name="forced_lives_label">Vies forcées</string>
     <string name="forced_shape_label">Forme forcée</string>

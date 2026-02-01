@@ -24,7 +24,6 @@
     <string name="error_could_not_launch_review">No se pudo iniciar el flujo de revisión</string>
     <string name="error_could_not_open_browser">No se pudo abrir el navegador</string>
     <string name="error_could_not_open_email">No se pudo abrir la aplicación de correo electrónico</string>
-    <string name="fill_board_label">Llenar el tablero (más lento)</string>
     <string name="forced_height_label">Altura forzada</string>
     <string name="forced_lives_label">Vidas forzadas</string>
     <string name="forced_shape_label">Forma forzada</string>

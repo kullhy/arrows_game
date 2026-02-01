@@ -33,9 +33,6 @@ class FakeUserPreferencesRepository : UserPreferencesRepository(
     val soundsFlow = MutableStateFlow(true)
     override val isSoundsEnabled: Flow<Boolean> = soundsFlow
 
-    val fillBoardFlow = MutableStateFlow(false)
-    override val isFillBoardEnabled: Flow<Boolean> = fillBoardFlow
-
     val animationSpeedFlow = MutableStateFlow("Medium")
     override val animationSpeed: Flow<String> = animationSpeedFlow
 
@@ -73,10 +70,6 @@ class FakeUserPreferencesRepository : UserPreferencesRepository(
 
     override suspend fun saveSoundsPreference(enabled: Boolean) {
         soundsFlow.value = enabled
-    }
-
-    override suspend fun saveFillBoardPreference(enabled: Boolean) {
-        fillBoardFlow.value = enabled
     }
 
     override suspend fun saveAnimationSpeed(speed: String) {

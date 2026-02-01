@@ -23,7 +23,7 @@ class GameGenerator {
             ?: Array(params.width) { BooleanArray(params.height) }
 
         val config = GameGeneratorConfig(
-            params.width, params.height, params.maxSnakeLength, params.fillTheBoard, walls
+            params.width, params.height, params.maxSnakeLength, walls
         )
         val context = GenerationContext(
             config, Array(params.width) { BooleanArray(params.height) },
@@ -32,8 +32,6 @@ class GameGenerator {
 
         val totalCells = GenerationUtils.countValidCells(params.width, params.height, walls)
         generateInitialSnakes(context, totalCells, params.onProgress)
-
-        if (params.fillTheBoard) fillRemainingBoard(context)
 
         return GameLevel(params.width, params.height, context.snakes)
     }
@@ -77,15 +75,6 @@ class GameGenerator {
             if (hasLoS) {
                 context.frontierCandidates.add(Pair(p, headDir))
             }
-        }
-    }
-
-    private fun fillRemainingBoard(context: GenerationContext) {
-        var lastSnake = snakeBuilder.buildLastSnake(context)
-        while (lastSnake != null) {
-            context.snakes.add(lastSnake)
-            lastSnake.body.forEach { context.occupied[it.x][it.y] = true }
-            lastSnake = snakeBuilder.buildLastSnake(context)
         }
     }
 

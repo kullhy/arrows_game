@@ -15,7 +15,6 @@ import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Grid4x4
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Palette
@@ -120,7 +119,6 @@ data class PreferencesParams(
 fun PreferencesSection(params: PreferencesParams) {
     val isVibrationEnabled by params.viewModel.isVibrationEnabled.collectAsState()
     val isSoundsEnabled by params.viewModel.isSoundsEnabled.collectAsState()
-    val isFillBoardEnabled by params.viewModel.isFillBoardEnabled.collectAsState()
 
     SettingsGroup(params.themeColors.topBarButton) {
         SettingsSwitchItem(
@@ -131,10 +129,6 @@ fun PreferencesSection(params: PreferencesParams) {
             Icons.AutoMirrored.Filled.VolumeUp, stringResource(R.string.sounds_label),
             isSoundsEnabled, params.themeColors.accent
         ) { params.viewModel.saveSounds(it) }
-        SettingsSwitchItem(
-            Icons.Default.Grid4x4, stringResource(R.string.fill_board_label),
-            isFillBoardEnabled, params.themeColors.accent
-        ) { params.viewModel.saveFillBoard(it) }
         SettingsClickableItem(
             Icons.Default.Palette, stringResource(R.string.theme_label),
             getLocalizedThemeName(params.currentTheme), params.onThemeClick

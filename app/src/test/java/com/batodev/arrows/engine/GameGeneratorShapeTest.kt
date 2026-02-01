@@ -22,7 +22,7 @@ class GameGeneratorShapeTest {
         val shape = JvmBoardShape.fromFile(path)
 
         val generator = GameGenerator()
-        val params = GenerationParams(boardWidth, boardHeight, maxSnakeLen, true, shape)
+        val params = GenerationParams(boardWidth, boardHeight, maxSnakeLen, shape)
         val level = generator.generateSolvableLevel(params)
 
         val walls = shape.getWalls(boardWidth, boardHeight)

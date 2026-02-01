@@ -46,7 +46,6 @@ class LevelManager(
     }
 
     suspend fun regenerateLevel(params: RegenerationParams) {
-        val fillBoard = repository.isFillBoardEnabled.firstOrNull() ?: false
         val currentLevelNum = repository.levelNumber.firstOrNull() ?: 1
 
         val config = LevelProgression.calculateLevelConfiguration(
@@ -58,7 +57,7 @@ class LevelManager(
         val newLevel = gameGenerator.generateSolvableLevel(
             GenerationParams(
                 width = config.width, height = config.height, maxSnakeLength = config.maxSnakeLength,
-                onProgress = params.onProgress, fillTheBoard = fillBoard, boardShape = shape
+                onProgress = params.onProgress, boardShape = shape
             )
         )
 
