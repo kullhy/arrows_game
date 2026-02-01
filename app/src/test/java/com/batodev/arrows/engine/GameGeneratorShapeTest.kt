@@ -6,8 +6,8 @@ import java.util.Locale
 
 class GameGeneratorShapeTest {
 
-    private val boardWidth = 20
-    private val boardHeight = 20
+    private val boardWidth = 40
+    private val boardHeight = 40
     private val maxSnakeLen = 10
 
     @Test
@@ -16,9 +16,9 @@ class GameGeneratorShapeTest {
             "app/src/main/res/drawable-nodpi/favorite_256dp_000000_fill1_wght400_grad0_opsz48.png",
             "src/main/res/drawable-nodpi/favorite_256dp_000000_fill1_wght400_grad0_opsz48.png"
         )
-        val path = possiblePaths.find { java.io.File(it).exists() } 
+        val path = possiblePaths.find { java.io.File(it).exists() }
             ?: throw java.io.FileNotFoundException("Could not find heart shape image in $possiblePaths")
-            
+
         val shape = JvmBoardShape.fromFile(path)
 
         val generator = GameGenerator()
