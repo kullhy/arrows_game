@@ -33,7 +33,7 @@ class GameGenerator {
         val totalCells = GenerationUtils.countValidCells(params.width, params.height, walls)
         generateInitialSnakes(context, totalCells, params.onProgress)
 
-        if (params.fillTheBoard) fillRemainingBoard(context)
+        if (params.fillTheBoard) fillRemainingBoard(context, totalCells, params.onProgress)
 
         return GameLevel(params.width, params.height, context.snakes)
     }
@@ -52,8 +52,8 @@ class GameGenerator {
     private fun addSnakeToContext(context: GenerationContext, snake: Snake) {
         context.snakes.add(snake)
         snake.body.forEach { context.occupied[it.x][it.y] = true }
-        snake.body.forEach { p -> 
-            Direction.entries.forEach { context.frontierCandidates.remove(Pair(p, it)) } 
+        snake.body.forEach { p ->
+            Direction.entries.forEach { context.frontierCandidates.remove(Pair(p, it)) }
         }
         updateFrontierWithSnake(context, snake)
     }
@@ -80,17 +80,22 @@ class GameGenerator {
         }
     }
 
-    private fun fillRemainingBoard(context: GenerationContext) {
+    private fun fillRemainingBoard(
+        context: GenerationContext,
+        totalCells: Int,
+        onProgress: (Float) -> Unit
+    ) {
         var lastSnake = snakeBuilder.buildLastSnake(context)
         while (lastSnake != null) {
             context.snakes.add(lastSnake)
+            onProgress(calculateProgress(context.snakes, totalCells))
             lastSnake.body.forEach { context.occupied[it.x][it.y] = true }
             lastSnake = snakeBuilder.buildLastSnake(context)
         }
     }
 
     private fun isFreeAt(p: Point, occupied: Array<BooleanArray>, config: GameGeneratorConfig): Boolean {
-        return GenerationUtils.isInside(p, config.width, config.height) && 
+        return GenerationUtils.isInside(p, config.width, config.height) &&
                 !occupied[p.x][p.y] && !config.walls[p.x][p.y]
     }
 
