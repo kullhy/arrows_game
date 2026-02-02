@@ -2,7 +2,7 @@ package com.batodev.arrows.engine
 
 data class GameGeneratorConfig(
     val width: Int, val height: Int, val maxSnakeLength: Int,
-    val walls: Array<BooleanArray>
+    val fillTheBoard: Boolean, val walls: Array<BooleanArray>
 )
 
 data class GenerationContext(

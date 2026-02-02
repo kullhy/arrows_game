@@ -24,6 +24,7 @@
     <string name="error_could_not_launch_review">تعذر بدء عملية المراجعة</string>
     <string name="error_could_not_open_browser">تعذر فتح المتصفح</string>
     <string name="error_could_not_open_email">تعذر فتح تطبيق البريد الإلكتروني</string>
+    <string name="fill_board_label">املأ اللوحة (بشكل أبطأ)</string>
     <string name="forced_height_label">الطول القسري</string>
     <string name="forced_lives_label">حياة قسرية</string>
     <string name="forced_shape_label">شكل قسري</string>

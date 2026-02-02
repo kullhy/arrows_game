@@ -34,6 +34,7 @@
     <string name="hash_53aff142d75cb156cb307d047c308770dfceb3368b994e27b6c55e177b852730" translatable="false">forced_shape_label</string>
     <string name="hash_f451180cfaaeab791ccd81ba68735adbd2203e07a9cff3deacda36310603f9df" translatable="false">content_description_guidance_lines</string>
     <string name="hash_883b5a98f89cc0cb068e268f0d8139ffa86cd41fc86060144c698829166c5297" translatable="false">regenerate_level_label</string>
+    <string name="hash_c6c8fb08219ce7f75138db7a08ff4687a87dab553e4a77e99f91a7c4ffce3ce7" translatable="false">fill_board_label</string>
     <string name="hash_f0a9f807ce5132c06020ccaeca76b7e6c18d76b408c1bd3fcd71f6299c69be0c" translatable="false">email_subject</string>
     <string name="hash_3f6eb51fb61533d68fa5783c5689501f551e2bf167965eab29a09ab538ab0b53" translatable="false">game_over_message</string>
     <string name="hash_f793de205ead5ac302c4a1627829dea41f176b1068b993a32373fc869918374b" translatable="false">speed_low</string>

@@ -24,6 +24,7 @@
     <string name="error_could_not_launch_review">Alur peninjauan tidak dapat dimulai.</string>
     <string name="error_could_not_open_browser">Tidak dapat membuka browser.</string>
     <string name="error_could_not_open_email">Tidak dapat membuka aplikasi email.</string>
+    <string name="fill_board_label">Isi papan (lebih lambat)</string>
     <string name="forced_height_label">Tinggi Paksa</string>
     <string name="forced_lives_label">Kehidupan yang Dipaksa</string>
     <string name="forced_shape_label">Bentuk Paksa</string>

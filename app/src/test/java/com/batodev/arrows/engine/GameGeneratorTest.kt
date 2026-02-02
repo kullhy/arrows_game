@@ -16,12 +16,36 @@ import kotlin.random.Random
 private const val TEST_WIDTH = 20
 private const val TEST_HEIGHT = 20
 private const val TEST_SNAKE_LEN = 7
+private const val SIMULATIONS_OCCUPIED = 10
 private const val SIMULATIONS_SOLVABLE = 50
 
 class GameGeneratorTest {
 
     @get:Rule
     val timeout: Timeout = Timeout(180, TimeUnit.SECONDS)
+
+    @Test
+    fun testEverySpotOccupiedAfterGenerationParallel() = runBlocking {
+        val generator = GameGenerator()
+        val failures = AtomicInteger(0)
+        val dispatcher = Dispatchers.Default.limitedParallelism(
+            Runtime.getRuntime().availableProcessors()
+        )
+
+        (1..SIMULATIONS_OCCUPIED).map { _ ->
+            async(dispatcher) {
+                val params = GenerationParams(TEST_WIDTH, TEST_HEIGHT, TEST_SNAKE_LEN, true)
+                val level = generator.generateSolvableLevel(params)
+                val occupiedCount = level.snakes.sumOf { it.body.size }
+
+                if (occupiedCount != TEST_WIDTH * TEST_HEIGHT) {
+                    failures.incrementAndGet()
+                }
+            }
+        }.awaitAll()
+
+        assertEquals("Some simulations failed: Not all spots occupied", 0, failures.get())
+    }
 
     @Test
     fun testEveryPuzzleIsSolvable() = runBlocking {
@@ -55,7 +79,7 @@ class GameGeneratorTest {
         // Generate 10 levels one by one
         for (i in 1..numLevels) {
             val randomShape = shapeProvider.getRandomShape()
-            val params = GenerationParams(TEST_WIDTH, TEST_HEIGHT, TEST_SNAKE_LEN, randomShape)
+            val params = GenerationParams(TEST_WIDTH, TEST_HEIGHT, TEST_SNAKE_LEN, true, randomShape)
 
             val startTime = System.nanoTime()
             val level = generator.generateSolvableLevel(params)
