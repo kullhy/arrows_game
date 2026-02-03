@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Edit
@@ -37,10 +39,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.batodev.arrows.GameConstants
+import com.batodev.arrows.GenerateActivity
 import com.batodev.arrows.MainActivity
 import com.batodev.arrows.R
 import com.batodev.arrows.ui.theme.InactiveIcon
@@ -49,26 +54,12 @@ import com.batodev.arrows.ui.theme.NavigationIndicator
 import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
 
-private const val LEVEL_TWENTY = 20
-
 @Composable
-fun SettingsBottomBar(context: Context, themeColors: ThemeColors) {
+fun SettingsBottomBar(context: Context, themeColors: ThemeColors, levelNumber: Int = 1) {
+    val isGeneratorUnlocked = levelNumber >= GameConstants.GENERATOR_UNLOCK_LEVEL
+
     NavigationBar(containerColor = themeColors.bottomBar, contentColor = White) {
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Lock,
-                    contentDescription = stringResource(R.string.content_description_levels)
-                )
-            },
-            label = { Text(stringResource(R.string.level_label, LEVEL_TWENTY)) },
-            selected = false,
-            onClick = { },
-            colors = NavigationBarItemDefaults.colors(
-                unselectedIconColor = InactiveIcon,
-                unselectedTextColor = InactiveIcon
-            )
-        )
+        GeneratorNavigationItem(isGeneratorUnlocked, selected = false)
         NavigationBarItem(
             icon = {
                 Icon(
@@ -105,6 +96,39 @@ fun SettingsBottomBar(context: Context, themeColors: ThemeColors) {
             )
         )
     }
+}
+
+@Composable
+fun RowScope.GeneratorNavigationItem(isUnlocked: Boolean, selected: Boolean = false) {
+    val context = LocalContext.current
+    NavigationBarItem(
+        icon = {
+            Icon(
+                imageVector = if (isUnlocked) Icons.Default.AutoAwesome else Icons.Default.Lock,
+                contentDescription = stringResource(R.string.content_description_generate)
+            )
+        },
+        label = {
+            Text(
+                if (isUnlocked) stringResource(R.string.custom_gen_title)
+                else stringResource(R.string.level_label, GameConstants.GENERATOR_UNLOCK_LEVEL)
+            )
+        },
+        selected = selected,
+        onClick = {
+            if (isUnlocked) {
+                val intent = Intent(context, GenerateActivity::class.java)
+                context.startActivity(intent)
+            }
+        },
+        colors = NavigationBarItemDefaults.colors(
+            selectedIconColor = White,
+            unselectedIconColor = InactiveIcon,
+            selectedTextColor = White,
+            unselectedTextColor = InactiveIcon,
+            indicatorColor = NavigationIndicator
+        )
+    )
 }
 
 data class PreferencesParams(

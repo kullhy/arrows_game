@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.batodev.arrows.ArrowsApplication
 import com.batodev.arrows.data.AndroidResourceBoardShapeProvider
 import com.batodev.arrows.ui.AnimationSpeedSelectionDialog
 import com.batodev.arrows.ui.AppViewModel
@@ -59,6 +60,9 @@ class SettingsActivity : ComponentActivity() {
 @Composable
 fun SettingsScreen(viewModel: AppViewModel) {
     val context = LocalContext.current
+    val application = context.applicationContext as ArrowsApplication
+    val repository = application.userPreferencesRepository
+    val levelNumber by repository.levelNumber.collectAsState(initial = 1)
     val themeColors = LocalThemeColors.current
     var showThemeDialog by remember { mutableStateOf(false) }
     var showSpeedDialog by remember { mutableStateOf(false) }
@@ -80,7 +84,7 @@ fun SettingsScreen(viewModel: AppViewModel) {
 
     Scaffold(
         containerColor = themeColors.background,
-        bottomBar = { SettingsBottomBar(context, themeColors) }
+        bottomBar = { SettingsBottomBar(context, themeColors, levelNumber) }
     ) {
         Column(
             modifier = Modifier

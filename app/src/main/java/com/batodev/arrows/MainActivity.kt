@@ -17,9 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -43,14 +41,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.batodev.arrows.ui.AppViewModel
+import com.batodev.arrows.ui.GeneratorNavigationItem
 import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.InactiveIcon
 import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.NavigationIndicator
 import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
-
-private const val GENERATOR_UNLOCK_LEVEL = 20
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -104,46 +101,16 @@ fun MainScreen() {
 
 @Composable
 private fun MainBottomBar(levelNumber: Int, themeColors: ThemeColors) {
-    val isUnlocked = levelNumber >= GENERATOR_UNLOCK_LEVEL
+    val isUnlocked = levelNumber >= GameConstants.GENERATOR_UNLOCK_LEVEL
 
     NavigationBar(
         containerColor = themeColors.bottomBar,
         contentColor = White
     ) {
-        GeneratorItem(isUnlocked)
+        GeneratorNavigationItem(isUnlocked, selected = false)
         HomeItem()
         SettingsItem()
     }
-}
-
-@Composable
-private fun RowScope.GeneratorItem(isUnlocked: Boolean) {
-    val context = LocalContext.current
-    NavigationBarItem(
-        icon = {
-            Icon(
-                imageVector = if (isUnlocked) Icons.Default.AutoAwesome else Icons.Default.Lock,
-                contentDescription = stringResource(R.string.content_description_generate)
-            )
-        },
-        label = {
-            Text(
-                if (isUnlocked) stringResource(R.string.custom_gen_title)
-                else stringResource(R.string.level_label, GENERATOR_UNLOCK_LEVEL)
-            )
-        },
-        selected = false,
-        onClick = {
-            if (isUnlocked) {
-                val intent = Intent(context, GenerateActivity::class.java)
-                context.startActivity(intent)
-            }
-        },
-        colors = NavigationBarItemDefaults.colors(
-            unselectedIconColor = if (isUnlocked) White else InactiveIcon,
-            unselectedTextColor = if (isUnlocked) White else InactiveIcon
-        )
-    )
 }
 
 @Composable
