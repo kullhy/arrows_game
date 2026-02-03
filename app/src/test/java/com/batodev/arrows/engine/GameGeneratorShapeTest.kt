@@ -25,7 +25,7 @@ class GameGeneratorShapeTest {
         val params = GenerationParams(boardWidth, boardHeight, maxSnakeLen, true, shape)
         val level = generator.generateSolvableLevel(params)
 
-        val walls = shape.getWalls(boardWidth, boardHeight)
+        val walls = shape.getWalls(level.width, level.height)
 
         printLevelAscii(level, walls)
         validateSnakesOnNonWallCells(level, walls)

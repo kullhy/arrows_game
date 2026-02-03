@@ -5,6 +5,7 @@ import kotlin.random.Random
 
 private const val DEFAULT_STRAIGHT_PREFERENCE = 0.90f
 private const val PROGRESS_FACTOR = 1f
+private const val MAX_FILL_BOARD_SIZE = 35
 
 class GameGenerator {
     var straightPreference: Float = DEFAULT_STRAIGHT_PREFERENCE
@@ -19,23 +20,26 @@ class GameGenerator {
     private var snakeBuilder = SnakeBuilder(ids, rnd, straightPreference)
 
     fun generateSolvableLevel(params: GenerationParams): GameLevel {
-        val walls = params.boardShape?.getWalls(params.width, params.height)
-            ?: Array(params.width) { BooleanArray(params.height) }
+        val width = if (params.fillTheBoard) params.width.coerceAtMost(MAX_FILL_BOARD_SIZE) else params.width
+        val height = if (params.fillTheBoard) params.height.coerceAtMost(MAX_FILL_BOARD_SIZE) else params.height
+
+        val walls = params.boardShape?.getWalls(width, height)
+            ?: Array(width) { BooleanArray(height) }
 
         val config = GameGeneratorConfig(
-            params.width, params.height, params.maxSnakeLength, params.fillTheBoard, walls
+            width, height, params.maxSnakeLength, params.fillTheBoard, walls
         )
         val context = GenerationContext(
-            config, Array(params.width) { BooleanArray(params.height) },
+            config, Array(width) { BooleanArray(height) },
             mutableListOf(), mutableSetOf()
         )
 
-        val totalCells = GenerationUtils.countValidCells(params.width, params.height, walls)
+        val totalCells = GenerationUtils.countValidCells(width, height, walls)
         generateInitialSnakes(context, totalCells, params.onProgress)
 
         if (params.fillTheBoard) fillRemainingBoard(context, totalCells, params.onProgress)
 
-        return GameLevel(params.width, params.height, context.snakes)
+        return GameLevel(width, height, context.snakes)
     }
 
     private fun generateInitialSnakes(

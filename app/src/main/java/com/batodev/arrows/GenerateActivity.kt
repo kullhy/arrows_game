@@ -67,7 +67,8 @@ import com.batodev.arrows.ui.theme.White
 
 private const val MIN_SIZE = 20f
 private const val MAX_SIZE = 100f
-private const val DEFAULT_SIZE = 50f
+private const val MAX_SIZE_FILL_BOARD = 35f
+private const val DEFAULT_SIZE = 35f
 private const val RECTANGULAR_SHAPE = "rectangular"
 private const val SHAPE_ICON_SIZE = 32
 
@@ -98,12 +99,18 @@ fun GenerateScreen() {
         factory = AppViewModel.Factory(application.userPreferencesRepository)
     )
     val hasSavedLevel by viewModel.hasSavedLevel.collectAsState()
+    val isFillBoardEnabled by viewModel.isFillBoardEnabled.collectAsState()
     val themeColors = LocalThemeColors.current
+
+    val maxSize = if (isFillBoardEnabled) MAX_SIZE_FILL_BOARD else MAX_SIZE
 
     var width by remember { mutableFloatStateOf(DEFAULT_SIZE) }
     var height by remember { mutableFloatStateOf(DEFAULT_SIZE) }
     var selectedShape by remember { mutableStateOf(RECTANGULAR_SHAPE) }
     var showWarning by remember { mutableStateOf(false) }
+
+    if (width > maxSize) width = maxSize
+    if (height > maxSize) height = maxSize
 
     val shapeProvider = remember { AndroidResourceBoardShapeProvider(context) }
     val shapes = remember { listOf(RECTANGULAR_SHAPE) + shapeProvider.getAllShapeNames() }
@@ -149,8 +156,8 @@ fun GenerateScreen() {
         containerColor = themeColors.background
     ) { innerPadding ->
         val state = GenerateContentState(
-            innerPadding = innerPadding, width = width, height = height, shapes = shapes,
-            selectedShape = selectedShape, themeColors = themeColors,
+            innerPadding = innerPadding, width = width, height = height, maxSize = maxSize,
+            shapes = shapes, selectedShape = selectedShape, themeColors = themeColors,
             onWidthChange = { width = it }, onHeightChange = { height = it },
             onShapeSelected = { selectedShape = it },
             onStartClick = { if (hasSavedLevel) showWarning = true else startCustomGame() }
@@ -183,6 +190,7 @@ private data class GenerateContentState(
     val innerPadding: PaddingValues,
     val width: Float,
     val height: Float,
+    val maxSize: Float,
     val shapes: List<String>,
     val selectedShape: String,
     val themeColors: ThemeColors,
@@ -206,6 +214,7 @@ private fun GenerateContent(state: GenerateContentState) {
         SizeSlider(
             label = stringResource(R.string.width_label),
             value = state.width,
+            maxSize = state.maxSize,
             onValueChange = state.onWidthChange,
             themeColors = state.themeColors
         )
@@ -215,6 +224,7 @@ private fun GenerateContent(state: GenerateContentState) {
         SizeSlider(
             label = stringResource(R.string.height_label),
             value = state.height,
+            maxSize = state.maxSize,
             onValueChange = state.onHeightChange,
             themeColors = state.themeColors
         )
@@ -278,7 +288,13 @@ private fun ShapeSelectionSection(
 }
 
 @Composable
-private fun SizeSlider(label: String, value: Float, onValueChange: (Float) -> Unit, themeColors: ThemeColors) {
+private fun SizeSlider(
+    label: String,
+    value: Float,
+    maxSize: Float,
+    onValueChange: (Float) -> Unit,
+    themeColors: ThemeColors
+) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(text = label, color = White, fontSize = 16.sp)
@@ -293,7 +309,7 @@ private fun SizeSlider(label: String, value: Float, onValueChange: (Float) -> Un
         Slider(
             value = value,
             onValueChange = onValueChange,
-            valueRange = MIN_SIZE..MAX_SIZE,
+            valueRange = MIN_SIZE..maxSize,
             colors = SliderDefaults.colors(
                 thumbColor = themeColors.accent,
                 activeTrackColor = themeColors.accent,
