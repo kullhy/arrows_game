@@ -1,11 +1,11 @@
 package com.batodev.arrows.engine
 
 import androidx.compose.ui.geometry.Offset
+import com.batodev.arrows.GameConstants
 import kotlin.math.min
 
 const val TAP_AREA_OFFSET_FACTOR = 0.3f
 internal const val DEFAULT_TOLERANCE = 1.3f
-private const val CELL_CENTER = 0.5f
 
 class InputHandler {
     
@@ -34,8 +34,10 @@ class InputHandler {
         return snakes
             .map { snake ->
                 val head = snake.body.first()
-                val tapAreaCenterX = head.x + CELL_CENTER + snake.headDirection.dx * TAP_AREA_OFFSET_FACTOR
-                val tapAreaCenterY = head.y + CELL_CENTER + snake.headDirection.dy * TAP_AREA_OFFSET_FACTOR
+                val cellOffset = GameConstants.CELL_CENTER + snake.headDirection.dx * TAP_AREA_OFFSET_FACTOR
+                val tapAreaCenterX = head.x + cellOffset
+                val cellOffsetY = GameConstants.CELL_CENTER + snake.headDirection.dy * TAP_AREA_OFFSET_FACTOR
+                val tapAreaCenterY = head.y + cellOffsetY
 
                 val dx = tapAreaCenterX - cellX
                 val dy = tapAreaCenterY - cellY

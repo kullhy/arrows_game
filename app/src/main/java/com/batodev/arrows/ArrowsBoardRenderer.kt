@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
+import com.batodev.arrows.GameConstants
 import com.batodev.arrows.engine.DEFAULT_TOLERANCE
 import com.batodev.arrows.engine.Direction
 import com.batodev.arrows.engine.GameLevel
@@ -55,31 +56,10 @@ const val ARROW_HEAD_SIZE_FACTOR = 0.2f
  */
 const val TAP_AREA_OFFSET_FACTOR = 0.3f
 
-private const val BOARD_BORDER_WIDTH = 2f
-private const val GUIDANCE_LINE_ALPHA_FACTOR = 0.4f
-private const val GUIDANCE_DASH_ON = 10f
-private const val GUIDANCE_DASH_OFF = 10f
-private const val TAP_AREA_ALPHA = 0.3f
-private const val BOARD_STROKE_WIDTH_FACTOR = 0.15f
-private const val BOARD_CORNER_RADIUS_FACTOR = 0.3f
-private const val SNAKE_MOVE_DIST_FACTOR = 1.2f
-private const val ARROW_HEAD_STROKE_WIDTH_FACTOR = 0.3f
-
-private const val FLASH_PULSE_DURATION = 250
-private const val FLASH_MIN_ALPHA = 0.2f
-
-private const val ANGLE_UP = 270.0
-private const val ANGLE_DOWN = 90.0
-private const val ANGLE_LEFT = 180.0
-private const val ANGLE_RIGHT = 0.0
-private const val ANGLE_TRIANGLE_OFFSET = 2.094 // 120 degrees in radians
-private const val DEG_TO_RAD = PI / 180.0
-
 /**
  * Renderer responsible for drawing the arrows game board including snakes, arrow heads,
  * tap areas, and animations.
  */
-private const val ARROW_HEAD_CENTER_FACTOR = 0.5f
 
 object ArrowsBoardRenderer {
     /**
@@ -109,9 +89,9 @@ object ArrowsBoardRenderer {
         val infiniteTransition = rememberInfiniteTransition(label = "flash")
         val flashPulseAlpha by infiniteTransition.animateFloat(
             initialValue = 1f,
-            targetValue = FLASH_MIN_ALPHA,
+            targetValue = GameConstants.FLASH_MIN_ALPHA,
             animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis = FLASH_PULSE_DURATION, easing = LinearEasing),
+                animation = tween(durationMillis = GameConstants.FLASH_PULSE_DURATION, easing = LinearEasing),
                 repeatMode = RepeatMode.Reverse
             ),
             label = "flashAlpha"
@@ -166,10 +146,10 @@ object ArrowsBoardRenderer {
         return BoardMetrics(
             cellWidth = cellSize,
             cellHeight = cellSize,
-            strokeWidth = cellSize * BOARD_STROKE_WIDTH_FACTOR,
-            cornerRadius = cellSize * BOARD_CORNER_RADIUS_FACTOR,
+            strokeWidth = cellSize * GameConstants.BOARD_STROKE_WIDTH_FACTOR,
+            cornerRadius = cellSize * GameConstants.BOARD_CORNER_RADIUS_FACTOR,
             arrowHeadSize = cellSize * ARROW_HEAD_SIZE_FACTOR,
-            moveDist = max(canvasSize.width, canvasSize.height) * SNAKE_MOVE_DIST_FACTOR,
+            moveDist = max(canvasSize.width, canvasSize.height) * GameConstants.SNAKE_MOVE_DIST_FACTOR,
             boardWidth = boardWidth,
             boardHeight = boardHeight
         )
@@ -184,7 +164,7 @@ object ArrowsBoardRenderer {
             color = Color.Gray,
             topLeft = Offset(leftOffset, topOffset),
             size = Size(metrics.boardWidth, metrics.boardHeight),
-            style = Stroke(width = BOARD_BORDER_WIDTH)
+            style = Stroke(width = GameConstants.BOARD_BORDER_WIDTH)
         )
     }
 
@@ -219,14 +199,15 @@ object ArrowsBoardRenderer {
                 y = headCy + (fullEndPoint.y - headCy) * config.guidanceAlpha
             )
 
+            val alphaFactor = GameConstants.GUIDANCE_LINE_ALPHA_FACTOR * config.guidanceAlpha
             drawLine(
-                color = config.accentColor.copy(alpha = GUIDANCE_LINE_ALPHA_FACTOR * config.guidanceAlpha),
+                color = config.accentColor.copy(alpha = alphaFactor),
                 start = Offset(headCx, headCy),
                 end = endPoint,
                 strokeWidth = 2.dp.toPx(),
                 cap = StrokeCap.Round,
                 pathEffect = PathEffect.dashPathEffect(
-                    floatArrayOf(GUIDANCE_DASH_ON, GUIDANCE_DASH_OFF), 0f
+                    floatArrayOf(GameConstants.GUIDANCE_DASH_ON, GameConstants.GUIDANCE_DASH_OFF), 0f
                 )
             )
         }
@@ -246,7 +227,7 @@ object ArrowsBoardRenderer {
             val tapOffsetY = headCy + snake.headDirection.dy * metrics.cellHeight * TAP_AREA_OFFSET_FACTOR
 
             drawCircle(
-                color = LightGray.copy(alpha = TAP_AREA_ALPHA),
+                color = LightGray.copy(alpha = GameConstants.TAP_AREA_ALPHA),
                 radius = tapRadius,
                 center = Offset(tapOffsetX, tapOffsetY)
             )
@@ -295,9 +276,9 @@ object ArrowsBoardRenderer {
 
             // Draw arrow head
             val triangleCenterX = lineEndX + snake.headDirection.dx *
-                    (params.metrics.arrowHeadSize * ARROW_HEAD_CENTER_FACTOR)
+                    (params.metrics.arrowHeadSize * GameConstants.ARROW_HEAD_CENTER_FACTOR)
             val triangleCenterY = lineEndY + snake.headDirection.dy *
-                    (params.metrics.arrowHeadSize * ARROW_HEAD_CENTER_FACTOR)
+                    (params.metrics.arrowHeadSize * GameConstants.ARROW_HEAD_CENTER_FACTOR)
 
             drawArrowHead(
                 centerX = triangleCenterX,
@@ -447,11 +428,11 @@ object ArrowsBoardRenderer {
     ) {
         // Convert direction to angle in radians (0° = RIGHT, 90° = DOWN, etc.)
         val angle = when (direction) {
-            Direction.UP -> ANGLE_UP
-            Direction.DOWN -> ANGLE_DOWN
-            Direction.LEFT -> ANGLE_LEFT
-            Direction.RIGHT -> ANGLE_RIGHT
-        } * DEG_TO_RAD
+            Direction.UP -> GameConstants.ANGLE_UP
+            Direction.DOWN -> GameConstants.ANGLE_DOWN
+            Direction.LEFT -> GameConstants.ANGLE_LEFT
+            Direction.RIGHT -> GameConstants.ANGLE_RIGHT
+        } * GameConstants.DEG_TO_RAD
 
         // Create triangular path with three vertices equally spaced around the center
         val path = Path().apply {
@@ -462,13 +443,13 @@ object ArrowsBoardRenderer {
             )
             // Second vertex (120 degrees clockwise)
             lineTo(
-                centerX + (arrowHeadSize * cos(angle + ANGLE_TRIANGLE_OFFSET)).toFloat(),
-                centerY + (arrowHeadSize * sin(angle + ANGLE_TRIANGLE_OFFSET)).toFloat()
+                centerX + (arrowHeadSize * cos(angle + GameConstants.ANGLE_TRIANGLE_OFFSET)).toFloat(),
+                centerY + (arrowHeadSize * sin(angle + GameConstants.ANGLE_TRIANGLE_OFFSET)).toFloat()
             )
             // Third vertex (120 degrees counter-clockwise)
             lineTo(
-                centerX + (arrowHeadSize * cos(angle - ANGLE_TRIANGLE_OFFSET)).toFloat(),
-                centerY + (arrowHeadSize * sin(angle - ANGLE_TRIANGLE_OFFSET)).toFloat()
+                centerX + (arrowHeadSize * cos(angle - GameConstants.ANGLE_TRIANGLE_OFFSET)).toFloat(),
+                centerY + (arrowHeadSize * sin(angle - GameConstants.ANGLE_TRIANGLE_OFFSET)).toFloat()
             )
             close()
         }
@@ -481,7 +462,7 @@ object ArrowsBoardRenderer {
             path = path,
             color = color,
             style = Stroke(
-                width = arrowHeadSize * ARROW_HEAD_STROKE_WIDTH_FACTOR,
+                width = arrowHeadSize * GameConstants.ARROW_HEAD_STROKE_WIDTH_FACTOR,
                 cap = StrokeCap.Round,
                 join = StrokeJoin.Round
             )

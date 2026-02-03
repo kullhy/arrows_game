@@ -1,9 +1,8 @@
 package com.batodev.arrows.engine
 
+import com.batodev.arrows.GameConstants
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.random.Random
-
-private const val FIRST_SNAKE_MAX_ATTEMPTS = 100
 
 class SnakeBuilder(
     private val ids: AtomicInteger,
@@ -15,7 +14,7 @@ class SnakeBuilder(
         var attempts = 0
         do {
             head = Point(rnd.nextInt(config.width), rnd.nextInt(config.height))
-            if (attempts++ > FIRST_SNAKE_MAX_ATTEMPTS) return null
+            if (attempts++ > GameConstants.FIRST_SNAKE_MAX_ATTEMPTS) return null
         } while (config.walls[head.x][head.y])
 
         val direction = Direction.entries.random(rnd)

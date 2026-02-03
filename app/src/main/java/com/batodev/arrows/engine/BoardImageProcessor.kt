@@ -1,10 +1,6 @@
 package com.batodev.arrows.engine
 
-private const val COLOR_THRESHOLD = 128
-private const val ALPHA_SHIFT = 24
-private const val RED_SHIFT = 16
-private const val GREEN_SHIFT = 8
-private const val COLOR_MASK = 0xFF
+import com.batodev.arrows.GameConstants
 
 class BoardImageProcessor {
 
@@ -47,14 +43,14 @@ class BoardImageProcessor {
     }
 
     private fun isBlackPixel(pixel: Int): Boolean {
-        val alpha = (pixel shr ALPHA_SHIFT) and COLOR_MASK
-        val red = (pixel shr RED_SHIFT) and COLOR_MASK
-        val green = (pixel shr GREEN_SHIFT) and COLOR_MASK
-        val blue = pixel and COLOR_MASK
+        val alpha = (pixel shr GameConstants.ALPHA_SHIFT) and GameConstants.COLOR_MASK
+        val red = (pixel shr GameConstants.RED_SHIFT) and GameConstants.COLOR_MASK
+        val green = (pixel shr GameConstants.GREEN_SHIFT) and GameConstants.COLOR_MASK
+        val blue = pixel and GameConstants.COLOR_MASK
         
-        return alpha > COLOR_THRESHOLD &&
-                red < COLOR_THRESHOLD &&
-                green < COLOR_THRESHOLD &&
-                blue < COLOR_THRESHOLD
+        return alpha > GameConstants.COLOR_THRESHOLD &&
+                red < GameConstants.COLOR_THRESHOLD &&
+                green < GameConstants.COLOR_THRESHOLD &&
+                blue < GameConstants.COLOR_THRESHOLD
     }
 }

@@ -76,26 +76,12 @@ import nl.dionsegijn.konfetti.core.Position
 import nl.dionsegijn.konfetti.core.emitter.Emitter
 import java.util.concurrent.TimeUnit
 
-private const val GAME_WON_EXIT_DELAY = 3000L
-private const val GUIDANCE_ANIM_DURATION = 500
-private const val PROGRESS_BAR_WIDTH = 200
-private const val DEBUG_CIRCLE_RADIUS = 20f
-private const val PERCENT_MULTIPLIER = 100
-
-private const val CONFETTI_MAX_SPEED = 30f
-private const val CONFETTI_DAMPING = 0.9f
-private const val CONFETTI_SPREAD = 360
-private const val CONFETTI_DURATION_MS = 100L
-private const val CONFETTI_EMITTER_MAX = 100
-private const val CONFETTI_REL_X = 0.5
-private const val CONFETTI_REL_Y = 0.3
-
-private const val CONFETTI_COLOR_1 = 0xfce18a
-private const val CONFETTI_COLOR_2 = 0xff726d
-private const val CONFETTI_COLOR_3 = 0xf4306d
-private const val CONFETTI_COLOR_4 = 0xb48def
-
-private val CONFETTI_COLORS = listOf(CONFETTI_COLOR_1, CONFETTI_COLOR_2, CONFETTI_COLOR_3, CONFETTI_COLOR_4)
+private val CONFETTI_COLORS = listOf(
+    GameConstants.CONFETTI_COLOR_1,
+    GameConstants.CONFETTI_COLOR_2,
+    GameConstants.CONFETTI_COLOR_3,
+    GameConstants.CONFETTI_COLOR_4
+)
 
 class GameActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -157,7 +143,7 @@ fun ArrowsGameView(
     var showGuidanceLines by remember { mutableStateOf(false) }
     val guidanceAlpha by animateFloatAsState(
         targetValue = if (showGuidanceLines) 1f else 0f,
-        animationSpec = tween(durationMillis = GUIDANCE_ANIM_DURATION),
+        animationSpec = tween(durationMillis = GameConstants.GUIDANCE_ANIM_DURATION),
         label = stringResource(R.string.content_description_guidance_lines)
     )
     val tapAnimations = remember { androidx.compose.runtime.mutableStateListOf<TapAnimationState>() }
@@ -190,7 +176,7 @@ fun ArrowsGameView(
 private fun HandleGameWonState(engine: GameEngine, context: android.content.Context) {
     LaunchedEffect(engine.isGameWon) {
         if (engine.isGameWon) {
-            delay(GAME_WON_EXIT_DELAY)
+            delay(GameConstants.GAME_WON_EXIT_DELAY)
             (context as? Activity)?.finish()
         }
     }
@@ -201,13 +187,13 @@ private fun updateConfettiState(engine: GameEngine, currentState: List<Party>): 
     return if (engine.isGameWon && currentState.isEmpty()) {
         listOf(
             Party(
-                speed = 0f, maxSpeed = CONFETTI_MAX_SPEED, damping = CONFETTI_DAMPING,
-                spread = CONFETTI_SPREAD,
+                speed = 0f, maxSpeed = GameConstants.CONFETTI_MAX_SPEED, damping = GameConstants.CONFETTI_DAMPING,
+                spread = GameConstants.CONFETTI_SPREAD,
                 colors = CONFETTI_COLORS,
-                position = Position.Relative(CONFETTI_REL_X, CONFETTI_REL_Y),
+                position = Position.Relative(GameConstants.CONFETTI_REL_X, GameConstants.CONFETTI_REL_Y),
                 emitter = Emitter(
-                    duration = CONFETTI_DURATION_MS, TimeUnit.MILLISECONDS
-                ).max(CONFETTI_EMITTER_MAX)
+                    duration = GameConstants.CONFETTI_DURATION_MS, TimeUnit.MILLISECONDS
+                ).max(GameConstants.CONFETTI_EMITTER_MAX)
             )
         )
     } else if (!engine.isGameWon && currentState.isNotEmpty()) {
@@ -300,7 +286,7 @@ private fun DebugOverlay(tapAnimations: SnapshotStateList<TapAnimationState>) {
     if (tapAnimations.isNotEmpty()) {
         val lastTap = tapAnimations.last().offset
         Canvas(modifier = Modifier.fillMaxSize()) {
-            drawCircle(color = Color.Green, radius = DEBUG_CIRCLE_RADIUS, center = lastTap)
+            drawCircle(color = Color.Green, radius = GameConstants.DEBUG_CIRCLE_RADIUS, center = lastTap)
         }
     }
 }
@@ -320,11 +306,12 @@ private fun BoxScope.LoadingOverlay(progress: Float, themeColors: ThemeColors) {
         modifier = Modifier.align(Alignment.Center),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(stringResource(R.string.generating_progress, (progress * PERCENT_MULTIPLIER).toInt()), color = White)
+        val progressPercent = (progress * GameConstants.PERCENT_MULTIPLIER).toInt()
+        Text(stringResource(R.string.generating_progress, progressPercent), color = White)
         Spacer(modifier = Modifier.height(8.dp))
         LinearProgressIndicator(
             progress = { progress },
-            modifier = Modifier.width(PROGRESS_BAR_WIDTH.dp),
+            modifier = Modifier.width(GameConstants.PROGRESS_BAR_WIDTH.dp),
             color = ProgressBarGreen,
             trackColor = themeColors.topBarButton
         )

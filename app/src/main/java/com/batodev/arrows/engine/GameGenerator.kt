@@ -1,14 +1,11 @@
 package com.batodev.arrows.engine
 
+import com.batodev.arrows.GameConstants
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.random.Random
 
-private const val DEFAULT_STRAIGHT_PREFERENCE = 0.90f
-private const val PROGRESS_FACTOR = 1f
-private const val MAX_FILL_BOARD_SIZE = 35
-
 class GameGenerator {
-    var straightPreference: Float = DEFAULT_STRAIGHT_PREFERENCE
+    var straightPreference: Float = GameConstants.DEFAULT_STRAIGHT_PREFERENCE
         set(value) {
             require(value in 0f..1f) { "straightPreference must be in [0, 1]" }
             field = value
@@ -20,8 +17,16 @@ class GameGenerator {
     private var snakeBuilder = SnakeBuilder(ids, rnd, straightPreference)
 
     fun generateSolvableLevel(params: GenerationParams): GameLevel {
-        val width = if (params.fillTheBoard) params.width.coerceAtMost(MAX_FILL_BOARD_SIZE) else params.width
-        val height = if (params.fillTheBoard) params.height.coerceAtMost(MAX_FILL_BOARD_SIZE) else params.height
+        val width = if (params.fillTheBoard) {
+            params.width.coerceAtMost(GameConstants.MAX_FILL_BOARD_SIZE)
+        } else {
+            params.width
+        }
+        val height = if (params.fillTheBoard) {
+            params.height.coerceAtMost(GameConstants.MAX_FILL_BOARD_SIZE)
+        } else {
+            params.height
+        }
 
         val walls = params.boardShape?.getWalls(width, height)
             ?: Array(width) { BooleanArray(height) }
@@ -104,5 +109,5 @@ class GameGenerator {
     }
 
     private fun calculateProgress(snakes: List<Snake>, totalCells: Int): Float =
-        (snakes.sumOf { it.body.size }.toFloat() / totalCells).coerceIn(0f, PROGRESS_FACTOR)
+        (snakes.sumOf { it.body.size }.toFloat() / totalCells).coerceIn(0f, GameConstants.PROGRESS_FACTOR)
 }

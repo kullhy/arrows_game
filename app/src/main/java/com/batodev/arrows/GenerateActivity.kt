@@ -59,18 +59,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.batodev.arrows.data.AndroidResourceBoardShapeProvider
+import com.batodev.arrows.data.ShapeRegistry
 import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
-
-private const val MIN_SIZE = 20f
-private const val MAX_SIZE = 100f
-private const val MAX_SIZE_FILL_BOARD = 35f
-private const val DEFAULT_SIZE = 35f
-private const val RECTANGULAR_SHAPE = "rectangular"
-private const val SHAPE_ICON_SIZE = 32
 
 class GenerateActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,18 +96,22 @@ fun GenerateScreen() {
     val isFillBoardEnabled by viewModel.isFillBoardEnabled.collectAsState()
     val themeColors = LocalThemeColors.current
 
-    val maxSize = if (isFillBoardEnabled) MAX_SIZE_FILL_BOARD else MAX_SIZE
+    val maxSize = if (isFillBoardEnabled) {
+        GameConstants.GENERATOR_MAX_SIZE_FILL_BOARD
+    } else {
+        GameConstants.GENERATOR_MAX_SIZE
+    }
 
-    var width by remember { mutableFloatStateOf(DEFAULT_SIZE) }
-    var height by remember { mutableFloatStateOf(DEFAULT_SIZE) }
-    var selectedShape by remember { mutableStateOf(RECTANGULAR_SHAPE) }
+    var width by remember { mutableFloatStateOf(GameConstants.GENERATOR_DEFAULT_SIZE) }
+    var height by remember { mutableFloatStateOf(GameConstants.GENERATOR_DEFAULT_SIZE) }
+    var selectedShape by remember { mutableStateOf(GameConstants.SHAPE_TYPE_RECTANGULAR) }
     var showWarning by remember { mutableStateOf(false) }
 
     if (width > maxSize) width = maxSize
     if (height > maxSize) height = maxSize
 
     val shapeProvider = remember { AndroidResourceBoardShapeProvider(context) }
-    val shapes = remember { listOf(RECTANGULAR_SHAPE) + shapeProvider.getAllShapeNames() }
+    val shapes = remember { listOf(GameConstants.SHAPE_TYPE_RECTANGULAR) + shapeProvider.getAllShapeNames() }
 
     fun startCustomGame() {
         viewModel.regenerateCurrentLevel()
@@ -121,7 +119,7 @@ fun GenerateScreen() {
             putExtra("IS_CUSTOM", true)
             putExtra("CUSTOM_WIDTH", width.toInt())
             putExtra("CUSTOM_HEIGHT", height.toInt())
-            val shapeName = if (selectedShape == RECTANGULAR_SHAPE) null else selectedShape
+            val shapeName = if (selectedShape == GameConstants.SHAPE_TYPE_RECTANGULAR) null else selectedShape
             putExtra("CUSTOM_SHAPE", shapeName)
         }
         context.startActivity(intent)
@@ -309,7 +307,7 @@ private fun SizeSlider(
         Slider(
             value = value,
             onValueChange = onValueChange,
-            valueRange = MIN_SIZE..maxSize,
+            valueRange = GameConstants.GENERATOR_MIN_SIZE..maxSize,
             colors = SliderDefaults.colors(
                 thumbColor = themeColors.accent,
                 activeTrackColor = themeColors.accent,
@@ -346,11 +344,11 @@ private fun ShapeItem(
 
 @Composable
 private fun ShapeIcon(name: String) {
-    if (name == RECTANGULAR_SHAPE) {
+    if (name == GameConstants.SHAPE_TYPE_RECTANGULAR) {
         Icon(
             imageVector = Icons.Default.CropSquare,
             contentDescription = stringResource(R.string.shape_rectangular),
-            modifier = Modifier.size(SHAPE_ICON_SIZE.dp)
+            modifier = Modifier.size(GameConstants.SHAPE_ICON_SIZE.dp)
         )
     } else {
         val resId = getShapeResourceId(name)
@@ -358,7 +356,7 @@ private fun ShapeIcon(name: String) {
             Icon(
                 painter = painterResource(id = resId),
                 contentDescription = name,
-                modifier = Modifier.size(SHAPE_ICON_SIZE.dp)
+                modifier = Modifier.size(GameConstants.SHAPE_ICON_SIZE.dp)
             )
         } else {
             Text(text = name.take(1).uppercase())
@@ -366,28 +364,7 @@ private fun ShapeIcon(name: String) {
     }
 }
 
-private val shapeResourceMap = mapOf(
-    "bolt" to R.drawable.bolt_256dp_000000_fill1_wght400_grad0_opsz48,
-    "brick" to R.drawable.brick_256dp_000000_fill1_wght400_grad0_opsz48,
-    "build" to R.drawable.build_256dp_000000_fill1_wght400_grad0_opsz48,
-    "cannabis" to R.drawable.cannabis_256dp_000000_fill1_wght400_grad0_opsz48,
-    "chess_queen" to R.drawable.chess_queen_256dp_000000_fill1_wght400_grad0_opsz48,
-    "chess_rook" to R.drawable.chess_rook_256dp_000000_fill1_wght400_grad0_opsz48,
-    "delete" to R.drawable.delete_256dp_000000_fill1_wght400_grad0_opsz48,
-    "disabled" to R.drawable.disabled_by_default_256dp_000000_fill1_wght400_grad0_opsz48,
-    "favorite" to R.drawable.favorite_256dp_000000_fill1_wght400_grad0_opsz48,
-    "home" to R.drawable.home_256dp_000000_fill1_wght400_grad0_opsz48,
-    "humerus" to R.drawable.humerus_256dp_000000_fill1_wght400_grad0_opsz48,
-    "key" to R.drawable.key_vertical_256dp_000000_fill1_wght400_grad0_opsz48,
-    "mood_bad" to R.drawable.mood_bad_256dp_000000_fill1_wght400_grad0_opsz48,
-    "satisfied" to R.drawable.sentiment_satisfied_256dp_000000_fill1_wght400_grad0_opsz48,
-    "settings" to R.drawable.settings_256dp_000000_fill1_wght400_grad0_opsz48,
-    "star" to R.drawable.star_256dp_000000_fill1_wght400_grad0_opsz48,
-    "star_kid" to R.drawable.kid_star_256dp_000000_fill1_wght400_grad0_opsz48,
-    "tibia" to R.drawable.tibia_256dp_000000_fill1_wght400_grad0_opsz48,
-    "water_bottle" to R.drawable.water_bottle_large_256dp_000000_fill1_wght400_grad0_opsz48
-)
 
 private fun getShapeResourceId(name: String): Int? {
-    return shapeResourceMap[name]
+    return ShapeRegistry.shapes[name]
 }
