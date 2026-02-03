@@ -105,7 +105,11 @@ class LevelManager(
     }
 
     suspend fun advanceLevel(currentLevelNum: Int) {
-         repository.saveLevelNumber(currentLevelNum + 1)
-         repository.clearSavedLevel()
+        repository.saveLevelNumber(currentLevelNum + 1)
+        repository.clearSavedLevel()
+    }
+
+    suspend fun clearSavedGame() {
+        repository.clearSavedLevel()
     }
 }

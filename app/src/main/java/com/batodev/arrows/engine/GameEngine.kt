@@ -198,8 +198,15 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
         if (level.snakes.isEmpty()) {
             isGameWon = true
             soundManager?.playGameWon()
-            if (!isCustomGame) {
-                coroutineScope.launch(backgroundDispatcher) { levelManager.advanceLevel(levelNumber) }
+            // Clear saved game for both custom and regular games
+            coroutineScope.launch(backgroundDispatcher) {
+                if (isCustomGame) {
+                    // For custom games, only clear the save without advancing level
+                    levelManager.clearSavedGame()
+                } else {
+                    // For regular games, advance to next level and clear the save
+                    levelManager.advanceLevel(levelNumber)
+                }
             }
         } else {
             soundManager?.playSnakeRemoved()
