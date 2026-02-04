@@ -23,17 +23,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.batodev.arrows.ArrowsApplication
 import com.batodev.arrows.data.AndroidResourceBoardShapeProvider
 import com.batodev.arrows.ui.AnimationSpeedSelectionDialog
+import com.batodev.arrows.ui.AppNavigationBar
 import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.DebugMenu
 import com.batodev.arrows.ui.FeedbackSection
 import com.batodev.arrows.ui.LegalSection
+import com.batodev.arrows.ui.NavigationDestination
 import com.batodev.arrows.ui.PreferencesParams
 import com.batodev.arrows.ui.PreferencesSection
 import com.batodev.arrows.ui.PurchasesSection
-import com.batodev.arrows.ui.SettingsBottomBar
 import com.batodev.arrows.ui.ThemeSelectionDialog
 import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.LocalThemeColors
@@ -84,7 +84,13 @@ fun SettingsScreen(viewModel: AppViewModel) {
 
     Scaffold(
         containerColor = themeColors.background,
-        bottomBar = { SettingsBottomBar(context, themeColors, levelNumber) }
+        bottomBar = {
+            AppNavigationBar(
+                selectedDestination = NavigationDestination.SETTINGS,
+                levelNumber = levelNumber,
+                themeColors = themeColors
+            )
+        }
     ) {
         Column(
             modifier = Modifier

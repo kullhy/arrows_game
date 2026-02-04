@@ -8,7 +8,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,15 +15,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,12 +32,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.batodev.arrows.ui.AppNavigationBar
 import com.batodev.arrows.ui.AppViewModel
-import com.batodev.arrows.ui.GeneratorNavigationItem
+import com.batodev.arrows.ui.NavigationDestination
 import com.batodev.arrows.ui.theme.ArrowsTheme
-import com.batodev.arrows.ui.theme.InactiveIcon
 import com.batodev.arrows.ui.theme.LocalThemeColors
-import com.batodev.arrows.ui.theme.NavigationIndicator
 import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
 
@@ -79,7 +70,11 @@ fun MainScreen() {
     Scaffold(
         containerColor = themeColors.background,
         bottomBar = {
-            MainBottomBar(levelNumber, themeColors)
+            AppNavigationBar(
+                selectedDestination = NavigationDestination.HOME,
+                levelNumber = levelNumber,
+                themeColors = themeColors
+            )
         }
     ) { innerPadding ->
         Column(
@@ -99,62 +94,6 @@ fun MainScreen() {
     }
 }
 
-@Composable
-private fun MainBottomBar(levelNumber: Int, themeColors: ThemeColors) {
-    val isUnlocked = levelNumber >= GameConstants.GENERATOR_UNLOCK_LEVEL
-
-    NavigationBar(
-        containerColor = themeColors.bottomBar,
-        contentColor = White
-    ) {
-        GeneratorNavigationItem(isUnlocked, selected = false)
-        HomeItem()
-        SettingsItem()
-    }
-}
-
-@Composable
-private fun RowScope.HomeItem() {
-    NavigationBarItem(
-        icon = {
-            Icon(
-                Icons.Default.Home,
-                contentDescription = stringResource(R.string.home_label)
-            )
-        },
-        label = { Text(stringResource(R.string.home_label)) },
-        selected = true,
-        onClick = { },
-        colors = NavigationBarItemDefaults.colors(
-            selectedIconColor = White,
-            indicatorColor = NavigationIndicator,
-            selectedTextColor = White
-        )
-    )
-}
-
-@Composable
-private fun RowScope.SettingsItem() {
-    val context = LocalContext.current
-    NavigationBarItem(
-        icon = {
-            Icon(
-                Icons.Default.Settings,
-                contentDescription = stringResource(R.string.settings_label)
-            )
-        },
-        label = { Text(stringResource(R.string.settings_label)) },
-        selected = false,
-        onClick = {
-            val intent = Intent(context, SettingsActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            context.startActivity(intent)
-        },
-        colors = NavigationBarItemDefaults.colors(
-            unselectedIconColor = InactiveIcon, unselectedTextColor = InactiveIcon
-        )
-    )
-}
 
 @Composable
 private fun LogoSection(levelNumber: Int, themeColors: ThemeColors) {

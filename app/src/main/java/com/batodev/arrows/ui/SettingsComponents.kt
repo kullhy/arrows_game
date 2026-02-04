@@ -1,11 +1,9 @@
 package com.batodev.arrows.ui
 
 import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,23 +11,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Grid4x4
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
@@ -39,106 +29,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.batodev.arrows.GameConstants
-import com.batodev.arrows.GenerateActivity
-import com.batodev.arrows.MainActivity
 import com.batodev.arrows.R
 import com.batodev.arrows.ui.theme.InactiveIcon
 import com.batodev.arrows.ui.theme.LocalThemeColors
-import com.batodev.arrows.ui.theme.NavigationIndicator
 import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
-
-@Composable
-fun SettingsBottomBar(context: Context, themeColors: ThemeColors, levelNumber: Int = 1) {
-    val isGeneratorUnlocked = levelNumber >= GameConstants.GENERATOR_UNLOCK_LEVEL
-
-    NavigationBar(containerColor = themeColors.bottomBar, contentColor = White) {
-        GeneratorNavigationItem(isGeneratorUnlocked, selected = false)
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Home,
-                    contentDescription = stringResource(R.string.home_label)
-                )
-            },
-            label = { Text(stringResource(R.string.home_label)) },
-            selected = false,
-            onClick = {
-                val intent = Intent(context, MainActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                context.startActivity(intent)
-            },
-            colors = NavigationBarItemDefaults.colors(
-                unselectedIconColor = InactiveIcon,
-                unselectedTextColor = InactiveIcon
-            )
-        )
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Settings,
-                    contentDescription = stringResource(R.string.settings_label)
-                )
-            },
-            label = { Text(stringResource(R.string.settings_label)) },
-            selected = true,
-            onClick = { },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = White,
-                indicatorColor = NavigationIndicator,
-                selectedTextColor = White
-            )
-        )
-    }
-}
-
-@Composable
-fun RowScope.GeneratorNavigationItem(isUnlocked: Boolean, selected: Boolean = false) {
-    val context = LocalContext.current
-    NavigationBarItem(
-        icon = {
-            Icon(
-                imageVector = if (isUnlocked) Icons.Default.AutoAwesome else Icons.Default.Lock,
-                contentDescription = stringResource(R.string.content_description_generate)
-            )
-        },
-        label = {
-            Text(
-                if (isUnlocked) stringResource(R.string.custom_gen_title)
-                else stringResource(R.string.level_label, GameConstants.GENERATOR_UNLOCK_LEVEL)
-            )
-        },
-        selected = selected,
-        onClick = {
-            if (isUnlocked) {
-                val intent = Intent(context, GenerateActivity::class.java)
-                context.startActivity(intent)
-            }
-        },
-        colors = NavigationBarItemDefaults.colors(
-            selectedIconColor = White,
-            unselectedIconColor = InactiveIcon,
-            selectedTextColor = White,
-            unselectedTextColor = InactiveIcon,
-            indicatorColor = NavigationIndicator
-        )
-    )
-}
-
-data class PreferencesParams(
-    val viewModel: AppViewModel,
-    val themeColors: ThemeColors,
-    val currentTheme: String,
-    val currentSpeed: String,
-    val onThemeClick: () -> Unit,
-    val onSpeedClick: () -> Unit
-)
 
 @Composable
 fun PreferencesSection(params: PreferencesParams) {
@@ -315,3 +214,12 @@ fun AnimationSpeedSelectionDialog(currentSpeed: String, onDismiss: () -> Unit, o
         }
     )
 }
+
+data class PreferencesParams(
+    val viewModel: AppViewModel,
+    val themeColors: ThemeColors,
+    val currentTheme: String,
+    val currentSpeed: String,
+    val onThemeClick: () -> Unit,
+    val onSpeedClick: () -> Unit
+)

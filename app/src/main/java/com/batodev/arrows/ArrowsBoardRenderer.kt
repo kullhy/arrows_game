@@ -21,7 +21,6 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
-import com.batodev.arrows.GameConstants
 import com.batodev.arrows.engine.DEFAULT_TOLERANCE
 import com.batodev.arrows.engine.Direction
 import com.batodev.arrows.engine.GameLevel
@@ -30,7 +29,6 @@ import com.batodev.arrows.ui.theme.FlashingRed
 import com.batodev.arrows.ui.theme.LightGray
 import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.ThemeColors
-import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min

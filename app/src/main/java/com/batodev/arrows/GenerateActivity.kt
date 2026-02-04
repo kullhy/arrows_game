@@ -60,7 +60,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.batodev.arrows.data.AndroidResourceBoardShapeProvider
 import com.batodev.arrows.data.ShapeRegistry
+import com.batodev.arrows.ui.AppNavigationBar
 import com.batodev.arrows.ui.AppViewModel
+import com.batodev.arrows.ui.NavigationDestination
 import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.ThemeColors
@@ -89,57 +91,66 @@ class GenerateActivity : ComponentActivity() {
 fun GenerateScreen() {
     val context = LocalContext.current
     val application = context.applicationContext as ArrowsApplication
-    val viewModel: AppViewModel = viewModel(
-        factory = AppViewModel.Factory(application.userPreferencesRepository)
-    )
+    val repository = application.userPreferencesRepository
+    val viewModel: AppViewModel = viewModel(factory = AppViewModel.Factory(repository))
     val hasSavedLevel by viewModel.hasSavedLevel.collectAsState()
     val isFillBoardEnabled by viewModel.isFillBoardEnabled.collectAsState()
+    val levelNumber by repository.levelNumber.collectAsState(initial = 1)
     val themeColors = LocalThemeColors.current
-
-    val maxSize = if (isFillBoardEnabled) {
-        GameConstants.GENERATOR_MAX_SIZE_FILL_BOARD
-    } else {
-        GameConstants.GENERATOR_MAX_SIZE
-    }
-
+    val maxSize = if (isFillBoardEnabled) GameConstants.GENERATOR_MAX_SIZE_FILL_BOARD
+                  else GameConstants.GENERATOR_MAX_SIZE
     var width by remember { mutableFloatStateOf(GameConstants.GENERATOR_DEFAULT_SIZE) }
     var height by remember { mutableFloatStateOf(GameConstants.GENERATOR_DEFAULT_SIZE) }
     var selectedShape by remember { mutableStateOf(GameConstants.SHAPE_TYPE_RECTANGULAR) }
     var showWarning by remember { mutableStateOf(false) }
-
     if (width > maxSize) width = maxSize
     if (height > maxSize) height = maxSize
-
     val shapeProvider = remember { AndroidResourceBoardShapeProvider(context) }
-    val shapes = remember { listOf(GameConstants.SHAPE_TYPE_RECTANGULAR) + shapeProvider.getAllShapeNames() }
-
-    fun startCustomGame() {
-        viewModel.regenerateCurrentLevel()
-        val intent = Intent(context, GameActivity::class.java).apply {
-            putExtra("IS_CUSTOM", true)
-            putExtra("CUSTOM_WIDTH", width.toInt())
-            putExtra("CUSTOM_HEIGHT", height.toInt())
-            val shapeName = if (selectedShape == GameConstants.SHAPE_TYPE_RECTANGULAR) null else selectedShape
-            putExtra("CUSTOM_SHAPE", shapeName)
-        }
-        context.startActivity(intent)
+    val shapes = remember {
+        listOf(GameConstants.SHAPE_TYPE_RECTANGULAR) + shapeProvider.getAllShapeNames()
     }
-
     if (showWarning) {
         WarningDialog(
             themeColors = themeColors,
-            onConfirm = { startCustomGame() },
+            onConfirm = { startCustomGame(context, viewModel, width, selectedShape, height) },
             onDismiss = { showWarning = false }
         )
     }
+    val scaffoldState = GenerateScaffoldState(
+        context, themeColors, levelNumber, width, height, maxSize, shapes, selectedShape,
+        { width = it }, { height = it }, { selectedShape = it }
+    ) {
+        if (hasSavedLevel) showWarning = true
+        else startCustomGame(context, viewModel, width, selectedShape, height)
+    }
+    GenerateScaffoldContent(scaffoldState)
+}
 
+private data class GenerateScaffoldState(
+    val context: android.content.Context,
+    val themeColors: ThemeColors,
+    val levelNumber: Int,
+    val width: Float,
+    val height: Float,
+    val maxSize: Float,
+    val shapes: List<String>,
+    val selectedShape: String,
+    val onWidthChange: (Float) -> Unit,
+    val onHeightChange: (Float) -> Unit,
+    val onShapeSelected: (String) -> Unit,
+    val onStartClick: () -> Unit
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun GenerateScaffoldContent(state: GenerateScaffoldState) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.custom_gen_title), color = White) },
                 navigationIcon = {
                     IconButton(
-                        onClick = { (context as? Activity)?.finish() },
+                        onClick = { (state.context as? Activity)?.finish() },
                         colors = IconButtonDefaults.iconButtonColors(contentColor = White)
                     ) {
                         Icon(
@@ -148,20 +159,46 @@ fun GenerateScreen() {
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = themeColors.background)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = state.themeColors.background)
             )
         },
-        containerColor = themeColors.background
+        bottomBar = {
+            AppNavigationBar(
+                selectedDestination = NavigationDestination.GENERATOR,
+                levelNumber = state.levelNumber,
+                themeColors = state.themeColors
+            )
+        },
+        containerColor = state.themeColors.background
     ) { innerPadding ->
-        val state = GenerateContentState(
-            innerPadding = innerPadding, width = width, height = height, maxSize = maxSize,
-            shapes = shapes, selectedShape = selectedShape, themeColors = themeColors,
-            onWidthChange = { width = it }, onHeightChange = { height = it },
-            onShapeSelected = { selectedShape = it },
-            onStartClick = { if (hasSavedLevel) showWarning = true else startCustomGame() }
+        val contentState = GenerateContentState(
+            innerPadding = innerPadding, width = state.width, height = state.height,
+            maxSize = state.maxSize, shapes = state.shapes, selectedShape = state.selectedShape,
+            themeColors = state.themeColors,
+            onWidthChange = state.onWidthChange, onHeightChange = state.onHeightChange,
+            onShapeSelected = state.onShapeSelected,
+            onStartClick = state.onStartClick
         )
-        GenerateContent(state)
+        GenerateContent(contentState)
     }
+}
+
+private fun startCustomGame(
+    context: android.content.Context,
+    viewModel: AppViewModel,
+    width: Float,
+    selectedShape: String,
+    height: Float
+) {
+    viewModel.regenerateCurrentLevel()
+    val intent = Intent(context, GameActivity::class.java).apply {
+        putExtra("IS_CUSTOM", true)
+        putExtra("CUSTOM_WIDTH", width.toInt())
+        putExtra("CUSTOM_HEIGHT", height.toInt())
+        val shapeName = if (selectedShape == GameConstants.SHAPE_TYPE_RECTANGULAR) null else selectedShape
+        putExtra("CUSTOM_SHAPE", shapeName)
+    }
+    context.startActivity(intent)
 }
 
 @Composable
