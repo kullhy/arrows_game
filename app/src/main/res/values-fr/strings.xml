@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="ad_not_ready">Annonce non prête</string>
+    <string name="add_life_label">Ajouter de la vie</string>
+    <string name="ads_removed">Publicité supprimée !</string>
     <string name="animation_speed_label">Vitesse d\'animation</string>
+    <string name="app_name">Flèches</string>
     <string name="auto_label">Auto</string>
     <string name="cancel_label">Annuler</string>
     <string name="choose_forced_shape_title">Choisir la forme forcée</string>
@@ -39,6 +43,7 @@
     <string name="level_dialog_title">Niveau</string>
     <string name="level_label">Niveau %1$d</string>
     <string name="lives_auto_label">Vies (0 pour Auto)</string>
+    <string name="loading_ad">Chargement de l\'annonce…</string>
     <string name="loading_label">Chargement..</string>
     <string name="more_games_label">Plus de jeux</string>
     <string name="none_auto_label">Aucun (Auto)</string>
@@ -67,6 +72,7 @@
     <string name="theme_yellow">Jaune</string>
     <string name="vibrations_label">Vibrations</string>
     <string name="watch_ad_label">Regardez la publicité</string>
+    <string name="watch_ad_to_remove_ads">Regardez l\'annonce (%1$d restant)</string>
     <string name="width_auto_label">Largeur (0 pour Auto)</string>
     <string name="width_label">Largeur</string>
     <string name="write_us_label">Écrivez-nous</string>

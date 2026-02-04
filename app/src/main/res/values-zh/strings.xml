@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="ad_not_ready">广告尚未准备就绪</string>
+    <string name="add_life_label">增添生活</string>
+    <string name="ads_removed">广告已移除！</string>
     <string name="animation_speed_label">动画速度</string>
+    <string name="app_name">箭头</string>
     <string name="auto_label">汽车</string>
     <string name="cancel_label">取消</string>
     <string name="choose_forced_shape_title">选择强制形状</string>
@@ -39,6 +43,7 @@
     <string name="level_dialog_title">等级</string>
     <string name="level_label">级别 %1$d</string>
     <string name="lives_auto_label">生命值（0 代表自动）</string>
+    <string name="loading_ad">广告加载中…</string>
     <string name="loading_label">加载中..</string>
     <string name="more_games_label">更多游戏</string>
     <string name="none_auto_label">无（自动）</string>
@@ -67,6 +72,7 @@
     <string name="theme_yellow">黄色的</string>
     <string name="vibrations_label">振动</string>
     <string name="watch_ad_label">观看广告</string>
+    <string name="watch_ad_to_remove_ads">观看广告（剩余 %1$d）</string>
     <string name="width_auto_label">宽度（0 表示自动）</string>
     <string name="width_label">宽度</string>
     <string name="write_us_label">请联系我们</string>

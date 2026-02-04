@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="ad_not_ready">الإعلان غير جاهز</string>
+    <string name="add_life_label">أضف الحياة</string>
+    <string name="ads_removed">تمت إزالة الإعلانات!</string>
     <string name="animation_speed_label">سرعة الرسوم المتحركة</string>
+    <string name="app_name">الأسهم</string>
     <string name="auto_label">آلي</string>
     <string name="cancel_label">يلغي</string>
     <string name="choose_forced_shape_title">اختر الشكل القسري</string>
@@ -39,6 +43,7 @@
     <string name="level_dialog_title">مستوى</string>
     <string name="level_label">المستوى %1$d</string>
     <string name="lives_auto_label">الأرواح (0 للسيارة)</string>
+    <string name="loading_ad">تحميل الإعلان…</string>
     <string name="loading_label">تحميل..</string>
     <string name="more_games_label">المزيد من الألعاب</string>
     <string name="none_auto_label">لا شيء (تلقائي)</string>
@@ -67,6 +72,7 @@
     <string name="theme_yellow">أصفر</string>
     <string name="vibrations_label">الاهتزازات</string>
     <string name="watch_ad_label">شاهد الإعلان</string>
+    <string name="watch_ad_to_remove_ads">شاهد الإعلان (تبقى 1%)</string>
     <string name="width_auto_label">العرض (0 للوضع التلقائي)</string>
     <string name="width_label">عرض</string>
     <string name="write_us_label">اكتب ساعات</string>

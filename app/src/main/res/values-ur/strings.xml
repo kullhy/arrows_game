@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="ad_not_ready">اشتہار تیار نہیں ہے۔</string>
+    <string name="add_life_label">زندگی شامل کریں۔</string>
+    <string name="ads_removed">اشتہارات کو ہٹا دیا گیا!</string>
     <string name="animation_speed_label">حرکت پذیری کی رفتار</string>
+    <string name="app_name">تیر</string>
     <string name="auto_label">آٹو</string>
     <string name="cancel_label">منسوخ کریں۔</string>
     <string name="choose_forced_shape_title">جبری شکل کا انتخاب کریں۔</string>
@@ -39,6 +43,7 @@
     <string name="level_dialog_title">سطح</string>
     <string name="level_label">لیول %1$d</string>
     <string name="lives_auto_label">زندگیاں (0 آٹو کے لیے)</string>
+    <string name="loading_ad">اشتہار لوڈ ہو رہا ہے…</string>
     <string name="loading_label">لوڈ ہو رہا ہے..</string>
     <string name="more_games_label">مزید گیمز</string>
     <string name="none_auto_label">کوئی نہیں (خودکار)</string>
@@ -67,6 +72,7 @@
     <string name="theme_yellow">پیلا</string>
     <string name="vibrations_label">وائبریشنز</string>
     <string name="watch_ad_label">اشتہار دیکھیں</string>
+    <string name="watch_ad_to_remove_ads">اشتہار دیکھیں (%1$d باقی)</string>
     <string name="width_auto_label">چوڑائی (0 آٹو کے لیے)</string>
     <string name="width_label">چوڑائی</string>
     <string name="write_us_label">ہمیں لکھیں۔</string>

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="ad_not_ready">Reklama nie jest gotowa</string>
+    <string name="add_life_label">Dodaj życie</string>
+    <string name="ads_removed">Reklamy usunięte!</string>
     <string name="animation_speed_label">Prędkość animacji</string>
+    <string name="app_name">Strzałki</string>
     <string name="auto_label">Automatyczny</string>
     <string name="cancel_label">Anulować</string>
     <string name="choose_forced_shape_title">Wybierz wymuszony kształt</string>
@@ -39,6 +43,7 @@
     <string name="level_dialog_title">Poziom</string>
     <string name="level_label">Poziom %1$d</string>
     <string name="lives_auto_label">Życia (0 dla Auto)</string>
+    <string name="loading_ad">Ładowanie reklamy…</string>
     <string name="loading_label">Załadunek..</string>
     <string name="more_games_label">Więcej gier</string>
     <string name="none_auto_label">Brak (automatyczne)</string>
@@ -67,6 +72,7 @@
     <string name="theme_yellow">Żółty</string>
     <string name="vibrations_label">Wibracje</string>
     <string name="watch_ad_label">Obejrzyj reklamę</string>
+    <string name="watch_ad_to_remove_ads">Obejrzyj reklamę (pozostało %1$d)</string>
     <string name="width_auto_label">Szerokość (0 dla Auto)</string>
     <string name="width_label">Szerokość</string>
     <string name="write_us_label">Napisz do nas</string>

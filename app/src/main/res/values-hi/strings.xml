@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="ad_not_ready">विज्ञापन तैयार नहीं है</string>
+    <string name="add_life_label">जीवन जोड़ें</string>
+    <string name="ads_removed">विज्ञापन हटा दिए गए!</string>
     <string name="animation_speed_label">एनीमेशन गति</string>
+    <string name="app_name">तीर</string>
     <string name="auto_label">ऑटो</string>
     <string name="cancel_label">रद्द करना</string>
     <string name="choose_forced_shape_title">बाध्य आकार चुनें</string>
@@ -39,6 +43,7 @@
     <string name="level_dialog_title">स्तर</string>
     <string name="level_label">स्तर %1$d</string>
     <string name="lives_auto_label">जीवन (स्वचालित के लिए 0)</string>
+    <string name="loading_ad">विज्ञापन लोड हो रहा है…</string>
     <string name="loading_label">लोड हो रहा है…</string>
     <string name="more_games_label">अधिक खेल</string>
     <string name="none_auto_label">कोई नहीं (स्वचालित)</string>
@@ -67,6 +72,7 @@
     <string name="theme_yellow">पीला</string>
     <string name="vibrations_label">कंपन</string>
     <string name="watch_ad_label">विज्ञापन देखें</string>
+    <string name="watch_ad_to_remove_ads">विज्ञापन देखें (%1$d शेष)</string>
     <string name="width_auto_label">चौड़ाई (स्वचालित के लिए 0)</string>
     <string name="width_label">चौड़ाई</string>
     <string name="write_us_label">हमें लिखना</string>

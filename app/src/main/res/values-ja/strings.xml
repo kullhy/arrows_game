@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="ad_not_ready">広告の準備ができていません</string>
+    <string name="add_life_label">命を吹き込む</string>
+    <string name="ads_removed">広告が削除されました!</string>
     <string name="animation_speed_label">アニメーション速度</string>
+    <string name="app_name">矢印</string>
     <string name="auto_label">オート</string>
     <string name="cancel_label">キャンセル</string>
     <string name="choose_forced_shape_title">強制形状を選択</string>
@@ -39,6 +43,7 @@
     <string name="level_dialog_title">レベル</string>
     <string name="level_label">レベル %1$d</string>
     <string name="lives_auto_label">ライフ（自動の場合は0）</string>
+    <string name="loading_ad">広告を読み込んでいます…</string>
     <string name="loading_label">読み込み中…</string>
     <string name="more_games_label">その他のゲーム</string>
     <string name="none_auto_label">なし（自動）</string>
@@ -67,6 +72,7 @@
     <string name="theme_yellow">黄色</string>
     <string name="vibrations_label">振動</string>
     <string name="watch_ad_label">広告を見る</string>
+    <string name="watch_ad_to_remove_ads">広告を見る（残り%1$d）</string>
     <string name="width_auto_label">幅（自動の場合は0）</string>
     <string name="width_label">幅</string>
     <string name="write_us_label">メールでお問い合わせください</string>

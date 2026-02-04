@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="ad_not_ready">বিজ্ঞাপন প্রস্তুত নয়</string>
+    <string name="add_life_label">জীবন যোগ করুন</string>
+    <string name="ads_removed">বিজ্ঞাপন সরানো হয়েছে!</string>
     <string name="animation_speed_label">অ্যানিমেশনের গতি</string>
+    <string name="app_name">তীর</string>
     <string name="auto_label">স্বয়ংক্রিয়</string>
     <string name="cancel_label">বাতিল করুন</string>
     <string name="choose_forced_shape_title">জোরপূর্বক আকৃতি নির্বাচন করুন</string>
@@ -39,6 +43,7 @@
     <string name="level_dialog_title">স্তর</string>
     <string name="level_label">স্তর %1$d</string>
     <string name="lives_auto_label">জীবন (অটোর জন্য ০)</string>
+    <string name="loading_ad">বিজ্ঞাপন লোড হচ্ছে...</string>
     <string name="loading_label">লোড হচ্ছে..</string>
     <string name="more_games_label">আরও গেম</string>
     <string name="none_auto_label">কিছুই না (অটো)</string>
@@ -67,6 +72,7 @@
     <string name="theme_yellow">হলুদ</string>
     <string name="vibrations_label">কম্পন</string>
     <string name="watch_ad_label">বিজ্ঞাপন দেখুন</string>
+    <string name="watch_ad_to_remove_ads">বিজ্ঞাপন দেখুন (%1$d বাকি)</string>
     <string name="width_auto_label">প্রস্থ (অটোর জন্য ০)</string>
     <string name="width_label">প্রস্থ</string>
     <string name="write_us_label">আমাদের লিখুন</string>
