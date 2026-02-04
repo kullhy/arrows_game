@@ -71,17 +71,17 @@ fun MainScreen() {
 
     Scaffold(
         containerColor = themeColors.background,
-        topBar = {
-            if (!isAdFree) {
-                BannerAdView()
-            }
-        },
         bottomBar = {
-            AppNavigationBar(
-                selectedDestination = NavigationDestination.HOME,
-                levelNumber = levelNumber,
-                themeColors = themeColors
-            )
+            Column(modifier = Modifier.fillMaxWidth()) {
+                AppNavigationBar(
+                    selectedDestination = NavigationDestination.HOME,
+                    levelNumber = levelNumber,
+                    themeColors = themeColors
+                )
+                if (!isAdFree) {
+                    BannerAdView()
+                }
+            }
         }
     ) { innerPadding ->
         Column(

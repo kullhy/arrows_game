@@ -149,33 +149,33 @@ private data class GenerateScaffoldState(
 private fun GenerateScaffoldContent(state: GenerateScaffoldState) {
     Scaffold(
         topBar = {
-            Column {
+            TopAppBar(
+                title = { Text(stringResource(R.string.custom_gen_title), color = White) },
+                navigationIcon = {
+                    IconButton(
+                        onClick = { (state.context as? Activity)?.finish() },
+                        colors = IconButtonDefaults.iconButtonColors(contentColor = White)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.content_description_back)
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = state.themeColors.background)
+            )
+        },
+        bottomBar = {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                AppNavigationBar(
+                    selectedDestination = NavigationDestination.GENERATOR,
+                    levelNumber = state.levelNumber,
+                    themeColors = state.themeColors
+                )
                 if (!state.isAdFree) {
                     BannerAdView()
                 }
-                TopAppBar(
-                    title = { Text(stringResource(R.string.custom_gen_title), color = White) },
-                    navigationIcon = {
-                        IconButton(
-                            onClick = { (state.context as? Activity)?.finish() },
-                            colors = IconButtonDefaults.iconButtonColors(contentColor = White)
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.content_description_back)
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = state.themeColors.background)
-                )
             }
-        },
-        bottomBar = {
-            AppNavigationBar(
-                selectedDestination = NavigationDestination.GENERATOR,
-                levelNumber = state.levelNumber,
-                themeColors = state.themeColors
-            )
         },
         containerColor = state.themeColors.background
     ) { innerPadding ->

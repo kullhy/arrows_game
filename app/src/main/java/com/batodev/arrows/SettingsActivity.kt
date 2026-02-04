@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -84,17 +85,17 @@ fun SettingsScreen(viewModel: AppViewModel, rewardAdManager: RewardAdManager) {
 
     Scaffold(
         containerColor = themeColors.background,
-        topBar = {
-            if (!isAdFree) {
-                BannerAdView()
-            }
-        },
         bottomBar = {
-            AppNavigationBar(
-                selectedDestination = NavigationDestination.SETTINGS,
-                levelNumber = levelNumber,
-                themeColors = themeColors
-            )
+            Column(modifier = Modifier.fillMaxWidth()) {
+                AppNavigationBar(
+                    selectedDestination = NavigationDestination.SETTINGS,
+                    levelNumber = levelNumber,
+                    themeColors = themeColors
+                )
+                if (!isAdFree) {
+                    BannerAdView()
+                }
+            }
         }
     ) {
         Column(

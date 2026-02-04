@@ -217,7 +217,7 @@ object GameConstants {
     const val BANNER_AD_UNIT_ID = "ca-app-pub-3940256099942544/6300978111"
 
     /** Rewarded interstitial ad unit ID for "Remove Ads" feature (test ID - replace with real ID before production) */
-    const val REWARDED_INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-3940256099942544/5354046379"
+    const val REWARDED_AD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917"
 
     /** Interstitial ad unit ID shown every 5 games (test ID - replace with real ID before production) */
     const val INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-3940256099942544/1033173712"

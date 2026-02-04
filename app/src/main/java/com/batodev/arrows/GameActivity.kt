@@ -159,9 +159,6 @@ fun ArrowsGameView(
     confettiState = updateConfettiState(engine, confettiState)
 
     Column(modifier = Modifier.fillMaxSize()) {
-        if (!isAdFree) {
-            BannerAdView()
-        }
         GameTopBar(
             lives = engine.lives,
             maxLives = engine.maxLives,
@@ -178,6 +175,10 @@ fun ArrowsGameView(
         GameArea(GameAreaParams(engine, tapAnimations, guidanceAlpha, showGuidanceLines, themeColors) {
             showGuidanceLines = !showGuidanceLines
         })
+
+        if (!isAdFree) {
+            BannerAdView()
+        }
     }
 }
 

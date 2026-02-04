@@ -6,14 +6,14 @@ import com.batodev.arrows.GameConstants
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class RewardAdManager(private val context: Context) {
-    private var rewardedInterstitialAd: RewardedInterstitialAd? = null
+    private var rewardedAd: RewardedAd? = null
     private val _isAdLoaded = MutableStateFlow(false)
     val isAdLoaded: StateFlow<Boolean> = _isAdLoaded.asStateFlow()
 
@@ -27,19 +27,19 @@ class RewardAdManager(private val context: Context) {
         val adRequest = AdRequest.Builder().build()
 
         // Load rewarded interstitial ad
-        RewardedInterstitialAd.load(
+        RewardedAd.load(
             context,
-            GameConstants.REWARDED_INTERSTITIAL_AD_UNIT_ID,
+            GameConstants.REWARDED_AD_UNIT_ID,
             adRequest,
-            object : RewardedInterstitialAdLoadCallback() {
-                override fun onAdLoaded(ad: RewardedInterstitialAd) {
-                    rewardedInterstitialAd = ad
+            object : RewardedAdLoadCallback() {
+                override fun onAdLoaded(ad: RewardedAd) {
+                    rewardedAd = ad
                     _isAdLoaded.value = true
                     _isAdLoading.value = false
                 }
 
                 override fun onAdFailedToLoad(loadAdError: LoadAdError) {
-                    rewardedInterstitialAd = null
+                    rewardedAd = null
                     _isAdLoaded.value = false
                     _isAdLoading.value = false
                 }
@@ -52,12 +52,12 @@ class RewardAdManager(private val context: Context) {
         onRewarded: () -> Unit,
         onAdDismissed: () -> Unit
     ) {
-        rewardedInterstitialAd?.let { ad ->
+        rewardedAd?.let { ad ->
             ad.show(activity) { _ ->
                 // User earned the reward
                 onRewarded()
                 _isAdLoaded.value = false
-                rewardedInterstitialAd = null
+                rewardedAd = null
                 // Load next ad
                 loadRewardAd()
             }
@@ -65,7 +65,7 @@ class RewardAdManager(private val context: Context) {
                 override fun onAdDismissedFullScreenContent() {
                     onAdDismissed()
                     _isAdLoaded.value = false
-                    rewardedInterstitialAd = null
+                    rewardedAd = null
                     // Load next ad
                     loadRewardAd()
                 }
@@ -73,7 +73,7 @@ class RewardAdManager(private val context: Context) {
                 override fun onAdFailedToShowFullScreenContent(adError: com.google.android.gms.ads.AdError) {
                     onAdDismissed()
                     _isAdLoaded.value = false
-                    rewardedInterstitialAd = null
+                    rewardedAd = null
                 }
             }
         } ?: run {
