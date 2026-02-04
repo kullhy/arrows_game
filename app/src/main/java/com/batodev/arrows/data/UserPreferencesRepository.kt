@@ -37,7 +37,7 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
         val GAMES_COMPLETED = intPreferencesKey("games_completed")
     }
 
-    open val theme: Flow<String> get() = getStringFlow(PreferencesKeys.THEME, "Dark")
+    open val theme: Flow<String> get() = getStringFlow(PreferencesKeys.THEME, "Green")
     open val animationSpeed: Flow<String> get() = getStringFlow(PreferencesKeys.ANIMATION_SPEED, "Medium")
     open val isVibrationEnabled: Flow<Boolean> get() = getBooleanFlow(PreferencesKeys.VIBRATION_ENABLED, true)
     open val isSoundsEnabled: Flow<Boolean> get() = getBooleanFlow(PreferencesKeys.SOUNDS_ENABLED, true)
