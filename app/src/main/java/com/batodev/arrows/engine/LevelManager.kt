@@ -53,7 +53,7 @@ class LevelManager(
             currentLevelNum, params.forcedWidth, params.forcedHeight, params.forcedLives
         )
 
-        val shape = determineShape(config, params.forcedShape)
+        val shape = determineShape(config, params.forcedShape, params.isCustomGame)
 
         val newLevel = gameGenerator.generateSolvableLevel(
             GenerationParams(
@@ -67,9 +67,11 @@ class LevelManager(
         }
     }
 
-    private fun determineShape(config: LevelConfiguration, forcedShape: String?): BoardShape? {
+    private fun determineShape(config: LevelConfiguration, forcedShape: String?, isCustomGame: Boolean): BoardShape? {
         return if (forcedShape != null) {
             shapeProvider?.getShapeByName(forcedShape)
+        } else if (isCustomGame) {
+            null
         } else if (shouldApplyShape(config)) {
             shapeProvider?.getRandomShape()
         } else {

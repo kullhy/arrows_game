@@ -17,6 +17,7 @@ data class RegenerationParams(
     val forcedHeight: Int?,
     val forcedLives: Int?,
     val forcedShape: String?,
+    val isCustomGame: Boolean = false,
     val onProgress: (Float) -> Unit,
     val onComplete: (GameLevel, LevelConfiguration) -> Unit
 )

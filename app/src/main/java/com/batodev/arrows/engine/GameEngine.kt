@@ -219,7 +219,7 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
         coroutineScope.launch(backgroundDispatcher) {
             levelManager.regenerateLevel(
                 RegenerationParams(
-                    forcedWidth, forcedHeight, forcedLives, forcedShape,
+                    forcedWidth, forcedHeight, forcedLives, forcedShape, isCustomGame,
                     onProgress = { loadingProgress = it },
                     onComplete = { newLevel, config ->
                         initialLevel = newLevel; level = newLevel; totalSnakesInLevel =
