@@ -63,6 +63,15 @@ class FakeUserPreferencesRepository : UserPreferencesRepository(
     val debugForcedShapeFlow = MutableStateFlow<String?>(null)
     override val debugForcedShape: Flow<String?> = debugForcedShapeFlow
 
+    val isAdFreeFlow = MutableStateFlow(false)
+    override val isAdFree: Flow<Boolean> = isAdFreeFlow
+
+    val rewardAdCountFlow = MutableStateFlow(0)
+    override val rewardAdCount: Flow<Int> = rewardAdCountFlow
+
+    val gamesCompletedFlow = MutableStateFlow(0)
+    override val gamesCompleted: Flow<Int> = gamesCompletedFlow
+
     override suspend fun saveThemePreference(theme: String) {
         themeFlow.value = theme
     }
@@ -118,5 +127,21 @@ class FakeUserPreferencesRepository : UserPreferencesRepository(
     override suspend fun clearSavedLevel() {
         initialLevelFlow.value = null
         currentLevelFlow.value = null
+    }
+
+    override suspend fun saveIsAdFree(isAdFree: Boolean) {
+        isAdFreeFlow.value = isAdFree
+    }
+
+    override suspend fun incrementRewardAdCount() {
+        rewardAdCountFlow.value += 1
+    }
+
+    override suspend fun resetRewardAdCount() {
+        rewardAdCountFlow.value = 0
+    }
+
+    override suspend fun incrementGamesCompleted() {
+        gamesCompletedFlow.value += 1
     }
 }

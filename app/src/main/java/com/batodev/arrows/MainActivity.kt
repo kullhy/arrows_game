@@ -35,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.batodev.arrows.ui.AppNavigationBar
 import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.NavigationDestination
+import com.batodev.arrows.ui.ads.BannerAdView
 import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.ThemeColors
@@ -65,10 +66,16 @@ fun MainScreen() {
     val repository = application.userPreferencesRepository
     val currentLevel by repository.currentLevel.collectAsState(initial = null)
     val levelNumber by repository.levelNumber.collectAsState(initial = 1)
+    val isAdFree by repository.isAdFree.collectAsState(initial = false)
     val themeColors = LocalThemeColors.current
 
     Scaffold(
         containerColor = themeColors.background,
+        topBar = {
+            if (!isAdFree) {
+                BannerAdView()
+            }
+        },
         bottomBar = {
             AppNavigationBar(
                 selectedDestination = NavigationDestination.HOME,

@@ -32,6 +32,9 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
         val DEBUG_FORCED_HEIGHT = intPreferencesKey("debug_forced_height")
         val DEBUG_FORCED_LIVES = intPreferencesKey("debug_forced_lives")
         val DEBUG_FORCED_SHAPE = stringPreferencesKey("debug_forced_shape")
+        val IS_AD_FREE = booleanPreferencesKey("is_ad_free")
+        val REWARD_AD_COUNT = intPreferencesKey("reward_ad_count")
+        val GAMES_COMPLETED = intPreferencesKey("games_completed")
     }
 
     open val theme: Flow<String> get() = getStringFlow(PreferencesKeys.THEME, "Dark")
@@ -47,6 +50,9 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
     open val debugForcedShape: Flow<String?> get() = getNullableStringFlow(PreferencesKeys.DEBUG_FORCED_SHAPE)
     open val initialLevel: Flow<String?> get() = getNullableStringFlow(PreferencesKeys.INITIAL_LEVEL)
     open val currentLevel: Flow<String?> get() = getNullableStringFlow(PreferencesKeys.CURRENT_LEVEL)
+    open val isAdFree: Flow<Boolean> get() = getBooleanFlow(PreferencesKeys.IS_AD_FREE, false)
+    open val rewardAdCount: Flow<Int> get() = getIntFlow(PreferencesKeys.REWARD_AD_COUNT, 0)
+    open val gamesCompleted: Flow<Int> get() = getIntFlow(PreferencesKeys.GAMES_COMPLETED, 0)
 
     open suspend fun saveThemePreference(theme: String) = save(PreferencesKeys.THEME, theme)
     open suspend fun saveAnimationSpeed(speed: String) = save(PreferencesKeys.ANIMATION_SPEED, speed)
@@ -66,6 +72,24 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
         dataStore.edit { preferences ->
             preferences.remove(PreferencesKeys.INITIAL_LEVEL)
             preferences.remove(PreferencesKeys.CURRENT_LEVEL)
+        }
+    }
+
+    open suspend fun saveIsAdFree(isAdFree: Boolean) = save(PreferencesKeys.IS_AD_FREE, isAdFree)
+
+    open suspend fun incrementRewardAdCount() {
+        dataStore.edit { preferences ->
+            val currentCount = preferences[PreferencesKeys.REWARD_AD_COUNT] ?: 0
+            preferences[PreferencesKeys.REWARD_AD_COUNT] = currentCount + 1
+        }
+    }
+
+    open suspend fun resetRewardAdCount() = save(PreferencesKeys.REWARD_AD_COUNT, 0)
+
+    open suspend fun incrementGamesCompleted() {
+        dataStore.edit { preferences ->
+            val currentCount = preferences[PreferencesKeys.GAMES_COMPLETED] ?: 0
+            preferences[PreferencesKeys.GAMES_COMPLETED] = currentCount + 1
         }
     }
 

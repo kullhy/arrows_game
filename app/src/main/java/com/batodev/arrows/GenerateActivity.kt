@@ -63,6 +63,7 @@ import com.batodev.arrows.data.ShapeRegistry
 import com.batodev.arrows.ui.AppNavigationBar
 import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.NavigationDestination
+import com.batodev.arrows.ui.ads.BannerAdView
 import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.ThemeColors
@@ -96,6 +97,7 @@ fun GenerateScreen() {
     val hasSavedLevel by viewModel.hasSavedLevel.collectAsState()
     val isFillBoardEnabled by viewModel.isFillBoardEnabled.collectAsState()
     val levelNumber by repository.levelNumber.collectAsState(initial = 1)
+    val isAdFree by repository.isAdFree.collectAsState(initial = false)
     val themeColors = LocalThemeColors.current
     val maxSize = if (isFillBoardEnabled) GameConstants.GENERATOR_MAX_SIZE_FILL_BOARD
                   else GameConstants.GENERATOR_MAX_SIZE
@@ -117,7 +119,7 @@ fun GenerateScreen() {
         )
     }
     val scaffoldState = GenerateScaffoldState(
-        context, themeColors, levelNumber, width, height, maxSize, shapes, selectedShape,
+        context, themeColors, levelNumber, width, height, maxSize, shapes, selectedShape, isAdFree,
         { width = it }, { height = it }, { selectedShape = it }
     ) {
         if (hasSavedLevel) showWarning = true
@@ -135,6 +137,7 @@ private data class GenerateScaffoldState(
     val maxSize: Float,
     val shapes: List<String>,
     val selectedShape: String,
+    val isAdFree: Boolean,
     val onWidthChange: (Float) -> Unit,
     val onHeightChange: (Float) -> Unit,
     val onShapeSelected: (String) -> Unit,
@@ -146,21 +149,26 @@ private data class GenerateScaffoldState(
 private fun GenerateScaffoldContent(state: GenerateScaffoldState) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.custom_gen_title), color = White) },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { (state.context as? Activity)?.finish() },
-                        colors = IconButtonDefaults.iconButtonColors(contentColor = White)
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.content_description_back)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = state.themeColors.background)
-            )
+            Column {
+                if (!state.isAdFree) {
+                    BannerAdView()
+                }
+                TopAppBar(
+                    title = { Text(stringResource(R.string.custom_gen_title), color = White) },
+                    navigationIcon = {
+                        IconButton(
+                            onClick = { (state.context as? Activity)?.finish() },
+                            colors = IconButtonDefaults.iconButtonColors(contentColor = White)
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.content_description_back)
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = state.themeColors.background)
+                )
+            }
         },
         bottomBar = {
             AppNavigationBar(

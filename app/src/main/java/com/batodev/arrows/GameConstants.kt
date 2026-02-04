@@ -208,6 +208,21 @@ object GameConstants {
     const val DEG_TO_RAD = PI / 180.0
 
     // ====================
+    // ADMOB AD UNIT IDS
+    // ====================
+    /** AdMob App ID (test ID - replace with real ID before production) */
+    const val ADMOB_APP_ID = "ca-app-pub-3940256099942544~3347511713"
+
+    /** Banner ad unit ID (test ID - replace with real ID before production) */
+    const val BANNER_AD_UNIT_ID = "ca-app-pub-3940256099942544/6300978111"
+
+    /** Rewarded interstitial ad unit ID for "Remove Ads" feature (test ID - replace with real ID before production) */
+    const val REWARDED_INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-3940256099942544/5354046379"
+
+    /** Interstitial ad unit ID shown every 5 games (test ID - replace with real ID before production) */
+    const val INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-3940256099942544/1033173712"
+
+    // ====================
     // INPUT HANDLING
     // ====================
     /** Cell center position (0.5 = 50% of cell) used for tap area calculations */

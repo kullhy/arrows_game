@@ -61,6 +61,7 @@ import com.batodev.arrows.engine.GameEngine
 import com.batodev.arrows.engine.GameEngineConfig
 import com.batodev.arrows.engine.GameEngineFeatures
 import com.batodev.arrows.ui.AppViewModel
+import com.batodev.arrows.ui.ads.BannerAdView
 import com.batodev.arrows.ui.game.GameProgressBar
 import com.batodev.arrows.ui.game.GameTopBar
 import com.batodev.arrows.ui.theme.ArrowsTheme
@@ -70,6 +71,7 @@ import com.batodev.arrows.ui.theme.ProgressBarGreen
 import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.core.Party
 import nl.dionsegijn.konfetti.core.Position
@@ -82,6 +84,7 @@ private val CONFETTI_COLORS = listOf(
     GameConstants.CONFETTI_COLOR_3,
     GameConstants.CONFETTI_COLOR_4
 )
+private const val GAMES_BETWEEN_INTERSTITIALS = 5
 
 class GameActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,13 +98,15 @@ class GameActivity : ComponentActivity() {
             val currentTheme by viewModel.theme.collectAsState()
 
             ArrowsTheme(themeName = currentTheme) {
+                val repository = application.userPreferencesRepository
+                val isAdFree by repository.isAdFree.collectAsState(initial = false)
                 val themeColors = LocalThemeColors.current
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = themeColors.background
                 ) { innerPadding ->
                     Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-                        ArrowsGameView(application.userPreferencesRepository)
+                        ArrowsGameView(repository, isAdFree)
                     }
                 }
             }
@@ -112,29 +117,28 @@ class GameActivity : ComponentActivity() {
 @Composable
 fun ArrowsGameView(
     repository: com.batodev.arrows.data.UserPreferencesRepository,
+    isAdFree: Boolean
 ) {
     val coroutineScope = rememberCoroutineScope()
     val view = LocalView.current
     val context = LocalContext.current
-    val intent = (context as? Activity)?.intent
-    val isCustom = intent?.getBooleanExtra("IS_CUSTOM", false) ?: false
-    val customWidth = intent?.getIntExtra("CUSTOM_WIDTH", 0)?.takeIf { it > 0 }
-    val customHeight = intent?.getIntExtra("CUSTOM_HEIGHT", 0)?.takeIf { it > 0 }
-    val customShape = intent?.getStringExtra("CUSTOM_SHAPE")
+    val activity = context as? Activity
+    val application = context.applicationContext as ArrowsApplication
+    val customParams = extractCustomGameParams(activity?.intent)
 
     val engine = remember {
         GameEngine(
             config = GameEngineConfig(
                 coroutineScope = coroutineScope, repository = repository,
-                isCustomGame = isCustom
+                isCustomGame = customParams.isCustom
             ),
             features = GameEngineFeatures(
                 onVibrate = { view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK) },
                 soundManager = SoundManager(context),
                 shapeProvider = AndroidResourceBoardShapeProvider(context),
-                forcedWidth = customWidth,
-                forcedHeight = customHeight,
-                forcedShape = customShape
+                forcedWidth = customParams.customWidth,
+                forcedHeight = customParams.customHeight,
+                forcedShape = customParams.customShape
             )
         )
     }
@@ -149,10 +153,15 @@ fun ArrowsGameView(
     val tapAnimations = remember { androidx.compose.runtime.mutableStateListOf<TapAnimationState>() }
     val themeColors = LocalThemeColors.current
 
-    HandleGameWonState(engine, context)
+    HandleGameWonState(
+        GameWonStateParams(engine, repository, activity, application, isAdFree)
+    )
     confettiState = updateConfettiState(engine, confettiState)
 
     Column(modifier = Modifier.fillMaxSize()) {
+        if (!isAdFree) {
+            BannerAdView()
+        }
         GameTopBar(
             lives = engine.lives,
             maxLives = engine.maxLives,
@@ -173,11 +182,27 @@ fun ArrowsGameView(
 }
 
 @Composable
-private fun HandleGameWonState(engine: GameEngine, context: android.content.Context) {
-    LaunchedEffect(engine.isGameWon) {
-        if (engine.isGameWon) {
-            delay(GameConstants.GAME_WON_EXIT_DELAY)
-            (context as? Activity)?.finish()
+private fun HandleGameWonState(params: GameWonStateParams) {
+    LaunchedEffect(params.engine.isGameWon) {
+        if (params.engine.isGameWon) {
+            // Increment games completed
+            params.repository.incrementGamesCompleted()
+
+            // Show interstitial ad every 5 games (if not ad-free)
+            val gamesCompleted = params.repository.gamesCompleted.first()
+            if (!params.isAdFree && gamesCompleted % GAMES_BETWEEN_INTERSTITIALS == 0) {
+                params.activity?.let { act ->
+                    params.application.interstitialAdManager.showInterstitialAd(act) {
+                        params.activity.finish()
+                    }
+                } ?: run {
+                    delay(GameConstants.GAME_WON_EXIT_DELAY)
+                    params.activity?.finish()
+                }
+            } else {
+                delay(GameConstants.GAME_WON_EXIT_DELAY)
+                params.activity?.finish()
+            }
         }
     }
 }

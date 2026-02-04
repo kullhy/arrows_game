@@ -1,6 +1,5 @@
 package com.batodev.arrows
 
-import android.util.Log
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -33,7 +32,6 @@ import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sin
-import kotlin.system.measureTimeMillis
 
 /**
  * Factor to determine the tail length for single-block snakes.
@@ -89,50 +87,54 @@ object ArrowsBoardRenderer {
             initialValue = 1f,
             targetValue = GameConstants.FLASH_MIN_ALPHA,
             animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis = GameConstants.FLASH_PULSE_DURATION, easing = LinearEasing),
+                animation = tween(
+                    durationMillis = GameConstants.FLASH_PULSE_DURATION,
+                    easing = LinearEasing
+                ),
                 repeatMode = RepeatMode.Reverse
             ),
             label = "flashAlpha"
         )
 
         Canvas(modifier = modifier) {
-            val totalDrawTime = measureTimeMillis {
-                val metrics = calculateBoardMetrics(level, size)
-                val leftOffset = (size.width - metrics.boardWidth) / 2
-                val topOffset = (size.height - metrics.boardHeight) / 2
+            val metrics = calculateBoardMetrics(level, size)
+            val leftOffset = (size.width - metrics.boardWidth) / 2
+            val topOffset = (size.height - metrics.boardHeight) / 2
 
-                if (BuildConfig.DRAW_DEBUG_STUFF) {
-                    drawDebugBorder(leftOffset, topOffset, metrics)
-                }
-
-                drawContext.canvas.save()
-                drawContext.canvas.translate(leftOffset, topOffset)
-
-                if (guidanceAlpha > 0f) {
-                    val guidanceConfig = GuidanceLineConfig(
-                        guidanceAlpha = guidanceAlpha,
-                        accentColor = themeColors.accent,
-                        totalWidth = size.width,
-                        totalHeight = size.height,
-                        leftOffset = leftOffset,
-                        topOffset = topOffset
-                    )
-                    drawGuidanceLines(level, metrics, removalProgress, guidanceConfig)
-                }
-
-                if (BuildConfig.DRAW_DEBUG_STUFF) {
-                    drawDebugTapAreas(level, metrics)
-                }
-
-                val drawingParams = SnakeDrawingParams(
-                    level = level, metrics = metrics, removalProgress = removalProgress,
-                    flashingSnakeId = flashingSnakeId, flashPulseAlpha = flashPulseAlpha, themeColors = themeColors
-                )
-                drawSnakes(drawingParams)
-
-                drawContext.canvas.restore()
+            if (BuildConfig.DRAW_DEBUG_STUFF) {
+                drawDebugBorder(leftOffset, topOffset, metrics)
             }
-            Log.v(ArrowsBoardRenderer.javaClass.simpleName, "Total board draw time: $totalDrawTime ms")
+
+            drawContext.canvas.save()
+            drawContext.canvas.translate(leftOffset, topOffset)
+
+            if (guidanceAlpha > 0f) {
+                val guidanceConfig = GuidanceLineConfig(
+                    guidanceAlpha = guidanceAlpha,
+                    accentColor = themeColors.accent,
+                    totalWidth = size.width,
+                    totalHeight = size.height,
+                    leftOffset = leftOffset,
+                    topOffset = topOffset
+                )
+                drawGuidanceLines(level, metrics, removalProgress, guidanceConfig)
+            }
+
+            if (BuildConfig.DRAW_DEBUG_STUFF) {
+                drawDebugTapAreas(level, metrics)
+            }
+
+            val drawingParams = SnakeDrawingParams(
+                level = level,
+                metrics = metrics,
+                removalProgress = removalProgress,
+                flashingSnakeId = flashingSnakeId,
+                flashPulseAlpha = flashPulseAlpha,
+                themeColors = themeColors
+            )
+            drawSnakes(drawingParams)
+
+            drawContext.canvas.restore()
         }
     }
 
@@ -147,7 +149,10 @@ object ArrowsBoardRenderer {
             strokeWidth = cellSize * GameConstants.BOARD_STROKE_WIDTH_FACTOR,
             cornerRadius = cellSize * GameConstants.BOARD_CORNER_RADIUS_FACTOR,
             arrowHeadSize = cellSize * ARROW_HEAD_SIZE_FACTOR,
-            moveDist = max(canvasSize.width, canvasSize.height) * GameConstants.SNAKE_MOVE_DIST_FACTOR,
+            moveDist = max(
+                canvasSize.width,
+                canvasSize.height
+            ) * GameConstants.SNAKE_MOVE_DIST_FACTOR,
             boardWidth = boardWidth,
             boardHeight = boardHeight
         )
@@ -156,7 +161,7 @@ object ArrowsBoardRenderer {
     private fun DrawScope.drawDebugBorder(
         leftOffset: Float,
         topOffset: Float,
-        metrics: BoardMetrics
+        metrics: BoardMetrics,
     ) {
         drawRect(
             color = Color.Gray,
@@ -170,7 +175,7 @@ object ArrowsBoardRenderer {
         level: GameLevel,
         metrics: BoardMetrics,
         removalProgress: Map<Int, Float>,
-        config: GuidanceLineConfig
+        config: GuidanceLineConfig,
     ) {
         level.snakes.forEach { snake ->
             if (removalProgress.containsKey(snake.id)) return@forEach
@@ -185,6 +190,7 @@ object ArrowsBoardRenderer {
                     headCx,
                     metrics.boardHeight + (config.totalHeight - metrics.boardHeight - config.topOffset)
                 )
+
                 Direction.LEFT -> Offset(-config.leftOffset, headCy)
                 Direction.RIGHT -> Offset(
                     metrics.boardWidth + (config.totalWidth - metrics.boardWidth - config.leftOffset),
@@ -205,7 +211,8 @@ object ArrowsBoardRenderer {
                 strokeWidth = 2.dp.toPx(),
                 cap = StrokeCap.Round,
                 pathEffect = PathEffect.dashPathEffect(
-                    floatArrayOf(GameConstants.GUIDANCE_DASH_ON, GameConstants.GUIDANCE_DASH_OFF), 0f
+                    floatArrayOf(GameConstants.GUIDANCE_DASH_ON, GameConstants.GUIDANCE_DASH_OFF),
+                    0f
                 )
             )
         }
@@ -213,7 +220,7 @@ object ArrowsBoardRenderer {
 
     private fun DrawScope.drawDebugTapAreas(
         level: GameLevel,
-        metrics: BoardMetrics
+        metrics: BoardMetrics,
     ) {
         level.snakes.forEach { snake ->
             val head = snake.body.first()
@@ -221,8 +228,10 @@ object ArrowsBoardRenderer {
             val headCy = head.y * metrics.cellHeight + metrics.cellHeight / 2
             val tapRadius = DEFAULT_TOLERANCE * metrics.cellWidth
 
-            val tapOffsetX = headCx + snake.headDirection.dx * metrics.cellWidth * TAP_AREA_OFFSET_FACTOR
-            val tapOffsetY = headCy + snake.headDirection.dy * metrics.cellHeight * TAP_AREA_OFFSET_FACTOR
+            val tapOffsetX =
+                headCx + snake.headDirection.dx * metrics.cellWidth * TAP_AREA_OFFSET_FACTOR
+            val tapOffsetY =
+                headCy + snake.headDirection.dy * metrics.cellHeight * TAP_AREA_OFFSET_FACTOR
 
             drawCircle(
                 color = LightGray.copy(alpha = GameConstants.TAP_AREA_ALPHA),
@@ -293,7 +302,7 @@ object ArrowsBoardRenderer {
         p: Float,
         metrics: BoardMetrics,
         headCoords: SnakeHeadCoordinates,
-        snakeColor: Color
+        snakeColor: Color,
     ) {
         val path = Path()
         val body = snake.body
@@ -326,11 +335,18 @@ object ArrowsBoardRenderer {
 
         val head = body[0]
         val prev = body[1]
-        val headEntryX = headCoords.headCx0 + (prev.x - head.x).coerceIn(-1, 1) * metrics.cornerRadius
-        val headEntryY = headCoords.headCy0 + (prev.y - head.y).coerceIn(-1, 1) * metrics.cornerRadius
+        val headEntryX =
+            headCoords.headCx0 + (prev.x - head.x).coerceIn(-1, 1) * metrics.cornerRadius
+        val headEntryY =
+            headCoords.headCy0 + (prev.y - head.y).coerceIn(-1, 1) * metrics.cornerRadius
 
         path.lineTo(headEntryX, headEntryY)
-        path.quadraticTo(headCoords.headCx0, headCoords.headCy0, headCoords.baseLineEndX0, headCoords.baseLineEndY0)
+        path.quadraticTo(
+            headCoords.headCx0,
+            headCoords.headCy0,
+            headCoords.baseLineEndX0,
+            headCoords.baseLineEndY0
+        )
 
         if (p > 0f) {
             path.lineTo(headCoords.lineEndX, headCoords.lineEndY)
@@ -352,7 +368,7 @@ object ArrowsBoardRenderer {
         metrics: BoardMetrics,
         lineEndX: Float,
         lineEndY: Float,
-        snakeColor: Color
+        snakeColor: Color,
     ) {
         val tailLength = metrics.cellWidth * SINGLE_BLOCK_TAIL_FACTOR
         val tailStartX = lineEndX - snake.headDirection.dx * (tailLength + metrics.cornerRadius)
@@ -375,7 +391,7 @@ object ArrowsBoardRenderer {
         val arrowHeadSize: Float,
         val moveDist: Float,
         val boardWidth: Float,
-        val boardHeight: Float
+        val boardHeight: Float,
     )
 
     private data class SnakeDrawingParams(
@@ -384,7 +400,7 @@ object ArrowsBoardRenderer {
         val removalProgress: Map<Int, Float>,
         val flashingSnakeId: Int?,
         val flashPulseAlpha: Float,
-        val themeColors: ThemeColors
+        val themeColors: ThemeColors,
     )
 
     private data class GuidanceLineConfig(
@@ -393,7 +409,7 @@ object ArrowsBoardRenderer {
         val totalWidth: Float,
         val totalHeight: Float,
         val leftOffset: Float,
-        val topOffset: Float
+        val topOffset: Float,
     )
 
     private data class SnakeHeadCoordinates(
@@ -402,7 +418,7 @@ object ArrowsBoardRenderer {
         val baseLineEndX0: Float,
         val baseLineEndY0: Float,
         val lineEndX: Float,
-        val lineEndY: Float
+        val lineEndY: Float,
     )
 
     /**

@@ -1,5 +1,6 @@
 package com.batodev.arrows.ui
 
+import android.app.Activity
 import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -27,13 +28,17 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.batodev.arrows.R
+import com.batodev.arrows.ads.RewardAdManager
+import com.batodev.arrows.data.UserPreferencesRepository
 import com.batodev.arrows.ui.theme.InactiveIcon
 import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.ThemeColors
@@ -111,14 +116,34 @@ fun FeedbackSection(context: Context, themeColors: ThemeColors) {
 }
 
 @Composable
-fun PurchasesSection(themeColors: ThemeColors) {
+fun PurchasesSection(
+    repository: UserPreferencesRepository,
+    rewardAdManager: RewardAdManager,
+    themeColors: ThemeColors
+) {
+    val context = LocalContext.current
+    val activity = context as? Activity
+    val coroutineScope = rememberCoroutineScope()
+
+    val isAdFree by repository.isAdFree.collectAsState(initial = false)
+    val rewardAdCount by repository.rewardAdCount.collectAsState(initial = 0)
+    val isAdLoaded by rewardAdManager.isAdLoaded.collectAsState()
+    val isAdLoading by rewardAdManager.isAdLoading.collectAsState()
+
     SettingsGroup(themeColors.topBarButton) {
-        SettingsSwitchItem(
-            Icons.Default.Block, stringResource(R.string.remove_ads_label),
-            false, themeColors.accent
-        )
+        if (isAdFree) {
+            AdFreeSection(themeColors)
+        } else {
+            AdNotFreeSection(
+                AdNotFreeSectionState(
+                    repository, rewardAdManager, themeColors, activity, coroutineScope,
+                    rewardAdCount, isAdLoaded, isAdLoading
+                )
+            )
+        }
     }
 }
+
 
 @Composable
 fun LegalSection(context: Context, themeColors: ThemeColors) {
