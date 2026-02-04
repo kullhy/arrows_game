@@ -56,6 +56,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.batodev.arrows.ads.RewardAdManager
 import com.batodev.arrows.data.AndroidResourceBoardShapeProvider
 import com.batodev.arrows.engine.GameEngine
 import com.batodev.arrows.engine.GameEngineConfig
@@ -106,7 +107,7 @@ class GameActivity : ComponentActivity() {
                     containerColor = themeColors.background
                 ) { innerPadding ->
                     Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-                        ArrowsGameView(repository, isAdFree)
+                        ArrowsGameView(repository, isAdFree, application.rewardAdManager)
                     }
                 }
             }
@@ -117,7 +118,8 @@ class GameActivity : ComponentActivity() {
 @Composable
 fun ArrowsGameView(
     repository: com.batodev.arrows.data.UserPreferencesRepository,
-    isAdFree: Boolean
+    isAdFree: Boolean,
+    rewardAdManager: RewardAdManager
 ) {
     val coroutineScope = rememberCoroutineScope()
     val view = LocalView.current
@@ -125,24 +127,11 @@ fun ArrowsGameView(
     val activity = context as? Activity
     val application = context.applicationContext as ArrowsApplication
     val customParams = extractCustomGameParams(activity?.intent)
-
+    val isAdLoaded by rewardAdManager.isAdLoaded.collectAsState()
+    val isAdLoading by rewardAdManager.isAdLoading.collectAsState()
     val engine = remember {
-        GameEngine(
-            config = GameEngineConfig(
-                coroutineScope = coroutineScope, repository = repository,
-                isCustomGame = customParams.isCustom
-            ),
-            features = GameEngineFeatures(
-                onVibrate = { view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK) },
-                soundManager = SoundManager(context),
-                shapeProvider = AndroidResourceBoardShapeProvider(context),
-                forcedWidth = customParams.customWidth,
-                forcedHeight = customParams.customHeight,
-                forcedShape = customParams.customShape
-            )
-        )
+        createGameEngine(coroutineScope, view, context, repository, customParams)
     }
-
     var confettiState by remember { mutableStateOf<List<Party>>(emptyList()) }
     var showGuidanceLines by remember { mutableStateOf(false) }
     val guidanceAlpha by animateFloatAsState(
@@ -152,34 +141,29 @@ fun ArrowsGameView(
     )
     val tapAnimations = remember { androidx.compose.runtime.mutableStateListOf<TapAnimationState>() }
     val themeColors = LocalThemeColors.current
-
     HandleGameWonState(
         GameWonStateParams(engine, repository, activity, application, isAdFree)
     )
     confettiState = updateConfettiState(engine, confettiState)
-
-    Column(modifier = Modifier.fillMaxSize()) {
-        GameTopBar(
-            lives = engine.lives,
-            maxLives = engine.maxLives,
-            onRestart = { engine.restartLevel() },
-            onHint = { engine.showHint() },
-            onBack = { (context as? Activity)?.finish() }
-        )
-
-        GameProgressBar(
-            totalSnakes = engine.totalSnakesInLevel,
-            currentSnakes = engine.level.snakes.size
-        )
-
-        GameArea(GameAreaParams(engine, tapAnimations, guidanceAlpha, showGuidanceLines, themeColors) {
-            showGuidanceLines = !showGuidanceLines
-        })
-
-        if (!isAdFree) {
-            BannerAdView()
+    val handleHint: () -> Unit = {
+        if (isAdFree || !isAdLoaded || isAdLoading) {
+            engine.showHint()
+        } else {
+            activity?.let { act ->
+                rewardAdManager.showRewardAd(
+                    activity = act,
+                    onRewarded = { engine.showHint() },
+                    onAdDismissed = { /* No action needed */ }
+                )
+            }
         }
     }
+    GameScreenContent(
+        GameScreenContentParams(
+            engine, activity, context, tapAnimations, guidanceAlpha, showGuidanceLines, themeColors,
+            rewardAdManager, isAdFree, handleHint, { showGuidanceLines = !showGuidanceLines }
+        )
+    )
 }
 
 @Composable
@@ -260,9 +244,39 @@ private fun ColumnScope.GameArea(params: GameAreaParams) {
         }
         if (params.engine.lives <= 0) {
             GameOverDialog(
+                rewardAdManager = params.rewardAdManager,
+                activity = params.activity,
+                isAdFree = params.isAdFree,
                 onRestart = { params.engine.restartLevel() },
                 onWatchAd = { params.engine.addLife() }
             )
+        }
+    }
+}
+
+@Composable
+private fun GameScreenContent(params: GameScreenContentParams) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        GameTopBar(
+            lives = params.engine.lives,
+            maxLives = params.engine.maxLives,
+            onRestart = { params.engine.restartLevel() },
+            onHint = params.handleHint,
+            onBack = { (params.context as? Activity)?.finish() }
+        )
+        GameProgressBar(
+            totalSnakes = params.engine.totalSnakesInLevel,
+            currentSnakes = params.engine.level.snakes.size
+        )
+        GameArea(
+            GameAreaParams(
+                params.engine, params.tapAnimations, params.guidanceAlpha, params.showGuidanceLines,
+                params.themeColors, params.rewardAdManager, params.activity, params.isAdFree,
+                params.onToggleGuidance
+            )
+        )
+        if (!params.isAdFree) {
+            BannerAdView()
         }
     }
 }
@@ -281,28 +295,6 @@ private fun BoardLayer(engine: GameEngine, guidanceAlpha: Float) {
             removalProgress = engine.removalProgress,
             guidanceAlpha = guidanceAlpha,
             modifier = Modifier.fillMaxSize()
-        )
-    }
-}
-
-@Composable
-private fun BoxScope.GuidanceToggleButton(
-    showGuidanceLines: Boolean,
-    themeColors: ThemeColors,
-    onToggleGuidance: () -> Unit
-) {
-    IconButton(
-        onClick = onToggleGuidance,
-        modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp).size(48.dp),
-        colors = IconButtonDefaults.iconButtonColors(
-            containerColor = if (showGuidanceLines) themeColors.accent else themeColors.topBarButton,
-            contentColor = White
-        )
-    ) {
-        Icon(
-            imageVector = Icons.Default.Grid4x4,
-            contentDescription = stringResource(R.string.content_description_guidance_lines),
-            tint = White
         )
     }
 }
@@ -346,10 +338,16 @@ private fun BoxScope.LoadingOverlay(progress: Float, themeColors: ThemeColors) {
 
 @Composable
 fun GameOverDialog(
+    rewardAdManager: RewardAdManager,
+    activity: Activity?,
+    isAdFree: Boolean,
     onRestart: () -> Unit,
     onWatchAd: () -> Unit,
 ) {
     val themeColors = LocalThemeColors.current
+    val isAdLoaded by rewardAdManager.isAdLoaded.collectAsState()
+    val isAdLoading by rewardAdManager.isAdLoading.collectAsState()
+
     AlertDialog(
         onDismissRequest = { },
         containerColor = themeColors.bottomBar,
@@ -362,7 +360,20 @@ fun GameOverDialog(
         },
         confirmButton = {
             Button(
-                onClick = onWatchAd,
+                onClick = {
+                    if (isAdFree) {
+                        onWatchAd()
+                    } else {
+                        activity?.let { act ->
+                            rewardAdManager.showRewardAd(
+                                activity = act,
+                                onRewarded = onWatchAd,
+                                onAdDismissed = { /* No action needed */ }
+                            )
+                        }
+                    }
+                },
+                enabled = isAdFree || (isAdLoaded && !isAdLoading),
                 colors = ButtonDefaults.buttonColors(containerColor = ProgressBarGreen)
             ) {
                 Icon(
@@ -371,7 +382,18 @@ fun GameOverDialog(
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(stringResource(R.string.watch_ad_label), color = White)
+                Text(
+                    text = if (isAdFree) {
+                        stringResource(R.string.add_life_label)
+                    } else if (isAdLoading) {
+                        stringResource(R.string.loading_ad)
+                    } else if (!isAdLoaded) {
+                        stringResource(R.string.ad_not_ready)
+                    } else {
+                        stringResource(R.string.watch_ad_label)
+                    },
+                    color = White
+                )
             }
         },
         dismissButton = {

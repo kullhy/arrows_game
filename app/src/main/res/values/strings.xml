@@ -10,7 +10,7 @@
     <!-- Custom Generation -->
     <!-- Custom Generation Warning -->
     <string name="animation_speed_label">Animation Speed</string>
-    <string name="app_name" translatable="false">Arrows</string>
+    <string name="app_name">Arrows</string>
     <string name="auto_label">Auto</string>
     <string name="cancel_label">Cancel</string>
     <string name="choose_forced_shape_title">Choose Forced Shape</string>
@@ -81,8 +81,9 @@
     <string name="width_auto_label">Width (0 for Auto)</string>
     <string name="width_label">Width</string>
     <string name="write_us_label">Write us</string>
-    <string name="ads_removed" translatable="false">Ads Removed!</string>
-    <string name="watch_ad_to_remove_ads" translatable="false">Watch Ad (%1$d left)</string>
-    <string name="loading_ad" translatable="false">Loading Ad…</string>
-    <string name="ad_not_ready" translatable="false">Ad Not Ready</string>
+    <string name="ads_removed">Ads Removed!</string>
+    <string name="watch_ad_to_remove_ads">Watch Ad (%1$d left)</string>
+    <string name="loading_ad">Loading Ad…</string>
+    <string name="ad_not_ready">Ad Not Ready</string>
+    <string name="add_life_label">Add Life</string>
 </resources>
