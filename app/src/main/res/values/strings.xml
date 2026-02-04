@@ -86,4 +86,15 @@
     <string name="width_auto_label">Width (0 for Auto)</string>
     <string name="width_label">Width</string>
     <string name="write_us_label">Write us</string>
+    <!-- Congratulatory Messages -->
+    <string name="congratulations_super" translatable="false">Super!</string>
+    <string name="congratulations_fantastic" translatable="false">Fantastic!</string>
+    <string name="congratulations_great" translatable="false">Great!</string>
+    <string name="congratulations_good_job" translatable="false">Good Job!</string>
+    <string name="congratulations_well_done" translatable="false">Well Done!</string>
+    <string name="congratulations_awesome" translatable="false">Awesome!</string>
+    <string name="congratulations_excellent" translatable="false">Excellent!</string>
+    <string name="congratulations_amazing" translatable="false">Amazing!</string>
+    <string name="congratulations_brilliant" translatable="false">Brilliant!</string>
+    <string name="congratulations_outstanding" translatable="false">Outstanding!</string>
 </resources>

@@ -33,7 +33,9 @@ data class GameWonStateParams(
     val repository: UserPreferencesRepository,
     val activity: Activity?,
     val application: ArrowsApplication,
-    val isAdFree: Boolean
+    val isAdFree: Boolean,
+    val celebrationFinished: Boolean,
+    val onShowCelebration: () -> Unit
 )
 
 data class CustomGameParams(
@@ -66,7 +68,9 @@ data class GameScreenContentParams(
     val rewardAdManager: RewardAdManager,
     val isAdFree: Boolean,
     val handleHint: () -> Unit,
-    val onToggleGuidance: () -> Unit
+    val onToggleGuidance: () -> Unit,
+    val showCelebrationVideo: Boolean,
+    val onCelebrationComplete: () -> Unit
 )
 
 fun extractCustomGameParams(intent: android.content.Intent?): CustomGameParams {

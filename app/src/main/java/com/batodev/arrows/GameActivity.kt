@@ -65,6 +65,7 @@ import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.ads.BannerAdView
 import com.batodev.arrows.ui.game.GameProgressBar
 import com.batodev.arrows.ui.game.GameTopBar
+import com.batodev.arrows.ui.game.WinCelebrationScreen
 import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.HeartRed
 import com.batodev.arrows.ui.theme.LocalThemeColors
@@ -76,8 +77,19 @@ import kotlinx.coroutines.flow.first
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.core.Party
 import nl.dionsegijn.konfetti.core.Position
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import nl.dionsegijn.konfetti.core.emitter.Emitter
 import java.util.concurrent.TimeUnit
+
+data class CelebrationParams(
+    val showCelebration: Boolean,
+    val onCelebrationComplete: () -> Unit
+)
+
+private val LocalCelebrationParams = compositionLocalOf<CelebrationParams> {
+    error("CelebrationParams not provided")
+}
 
 private val CONFETTI_COLORS = listOf(
     GameConstants.CONFETTI_COLOR_1,
@@ -134,6 +146,8 @@ fun ArrowsGameView(
     }
     var confettiState by remember { mutableStateOf<List<Party>>(emptyList()) }
     var showGuidanceLines by remember { mutableStateOf(false) }
+    var showCelebrationVideo by remember { mutableStateOf(false) }
+    var celebrationFinished by remember { mutableStateOf(false) }
     val guidanceAlpha by animateFloatAsState(
         targetValue = if (showGuidanceLines) 1f else 0f,
         animationSpec = tween(durationMillis = GameConstants.GUIDANCE_ANIM_DURATION),
@@ -142,7 +156,10 @@ fun ArrowsGameView(
     val tapAnimations = remember { androidx.compose.runtime.mutableStateListOf<TapAnimationState>() }
     val themeColors = LocalThemeColors.current
     HandleGameWonState(
-        GameWonStateParams(engine, repository, activity, application, isAdFree)
+        GameWonStateParams(
+            engine, repository, activity, application, isAdFree, celebrationFinished,
+            { showCelebrationVideo = true }
+        )
     )
     confettiState = updateConfettiState(engine, confettiState)
     val handleHint: () -> Unit = {
@@ -158,18 +175,33 @@ fun ArrowsGameView(
             }
         }
     }
-    GameScreenContent(
-        GameScreenContentParams(
-            engine, activity, context, tapAnimations, guidanceAlpha, showGuidanceLines, themeColors,
-            rewardAdManager, isAdFree, handleHint, { showGuidanceLines = !showGuidanceLines }
-        )
+    val celebrationParams = CelebrationParams(
+        showCelebration = showCelebrationVideo && engine.isGameWon,
+        onCelebrationComplete = { celebrationFinished = true }
     )
+    CompositionLocalProvider(LocalCelebrationParams provides celebrationParams) {
+        GameScreenContent(
+            GameScreenContentParams(
+                engine, activity, context, tapAnimations, guidanceAlpha, showGuidanceLines, themeColors,
+                rewardAdManager, isAdFree, handleHint, { showGuidanceLines = !showGuidanceLines },
+                showCelebrationVideo, { celebrationFinished = true }
+            )
+        )
+    }
 }
 
 @Composable
 private fun HandleGameWonState(params: GameWonStateParams) {
     LaunchedEffect(params.engine.isGameWon) {
         if (params.engine.isGameWon) {
+            // Show celebration video first
+            params.onShowCelebration()
+
+            // Wait for celebration to complete
+            while (!params.celebrationFinished) {
+                delay(GameConstants.CELEBRATION_POLL_DELAY)
+            }
+
             // Increment games completed
             params.repository.incrementGamesCompleted()
 
@@ -236,6 +268,10 @@ private fun ColumnScope.GameArea(params: GameAreaParams) {
         if (BuildConfig.DRAW_DEBUG_STUFF) DebugOverlay(params.tapAnimations)
         TapAnimationsLayer(params.tapAnimations)
         if (params.engine.isLoading) LoadingOverlay(params.engine.loadingProgress, params.themeColors)
+        val celebrationParams = LocalCelebrationParams.current
+        if (celebrationParams.showCelebration) {
+            WinCelebrationScreen(onCelebrationComplete = celebrationParams.onCelebrationComplete)
+        }
         if (params.engine.isGameWon) {
             KonfettiView(
                 modifier = Modifier.fillMaxSize(),

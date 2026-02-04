@@ -227,4 +227,25 @@ object GameConstants {
     // ====================
     /** Cell center position (0.5 = 50% of cell) used for tap area calculations */
     const val CELL_CENTER = 0.5f
+
+    // ====================
+    // WIN CELEBRATION VIDEO
+    // ====================
+    /** Video fade in duration in milliseconds (1 second) */
+    const val VIDEO_FADE_IN_DURATION = 1000
+
+    /** Video display duration at full opacity in milliseconds (3 seconds) */
+    const val VIDEO_DISPLAY_DURATION = 3000
+
+    /** Video fade out duration in milliseconds (1 second) */
+    const val VIDEO_FADE_OUT_DURATION = 1000
+
+    /** Total video celebration duration in milliseconds (5 seconds) */
+    const val VIDEO_TOTAL_DURATION = 5000
+
+    /** Number of available win celebration videos */
+    const val WIN_VIDEOS_COUNT = 2
+
+    /** Polling delay for celebration completion check in milliseconds (0.1 seconds) */
+    const val CELEBRATION_POLL_DELAY = 100L
 }
