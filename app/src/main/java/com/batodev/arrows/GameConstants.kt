@@ -244,8 +244,50 @@ object GameConstants {
     const val VIDEO_TOTAL_DURATION = 5000
 
     /** Number of available win celebration videos */
-    const val WIN_VIDEOS_COUNT = 2
+    const val WIN_VIDEOS_COUNT = 22
 
-    /** Polling delay for celebration completion check in milliseconds (0.1 seconds) */
-    const val CELEBRATION_POLL_DELAY = 100L
+    /** Small delay before starting video to ensure it's prepared */
+    const val VIDEO_PREPARATION_DELAY = 50L
+
+    /** Font size for congratulatory text overlay */
+    const val CONGRATULATIONS_FONT_SIZE = 64
+
+    /** List of congratulatory message string resource IDs */
+    val CONGRATULATION_LABELS = listOf(
+        R.string.congratulations_super,
+        R.string.congratulations_fantastic,
+        R.string.congratulations_great,
+        R.string.congratulations_good_job,
+        R.string.congratulations_well_done,
+        R.string.congratulations_awesome,
+        R.string.congratulations_excellent,
+        R.string.congratulations_amazing,
+        R.string.congratulations_brilliant,
+        R.string.congratulations_outstanding
+    )
+
+    /** List of win celebration video raw resource IDs */
+    val WIN_VIDEOS = listOf(
+        R.raw.win1,
+        R.raw.win2,
+        R.raw.win3,
+        R.raw.win4,
+        R.raw.win5,
+        R.raw.win6,
+        R.raw.win7,
+        R.raw.win8,
+        R.raw.win9,
+        R.raw.win10,
+        R.raw.win12,
+        R.raw.win13,
+        R.raw.win14,
+        R.raw.win15,
+        R.raw.win16,
+        R.raw.win17,
+        R.raw.win18,
+        R.raw.win19,
+        R.raw.win20,
+        R.raw.win21,
+        R.raw.win22
+    )
 }

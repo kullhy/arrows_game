@@ -74,6 +74,7 @@ import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.core.Party
 import nl.dionsegijn.konfetti.core.Position
@@ -97,7 +98,6 @@ private val CONFETTI_COLORS = listOf(
     GameConstants.CONFETTI_COLOR_3,
     GameConstants.CONFETTI_COLOR_4
 )
-private const val GAMES_BETWEEN_INTERSTITIALS = 5
 
 class GameActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -147,7 +147,6 @@ fun ArrowsGameView(
     var confettiState by remember { mutableStateOf<List<Party>>(emptyList()) }
     var showGuidanceLines by remember { mutableStateOf(false) }
     var showCelebrationVideo by remember { mutableStateOf(false) }
-    var celebrationFinished by remember { mutableStateOf(false) }
     val guidanceAlpha by animateFloatAsState(
         targetValue = if (showGuidanceLines) 1f else 0f,
         animationSpec = tween(durationMillis = GameConstants.GUIDANCE_ANIM_DURATION),
@@ -155,12 +154,10 @@ fun ArrowsGameView(
     )
     val tapAnimations = remember { androidx.compose.runtime.mutableStateListOf<TapAnimationState>() }
     val themeColors = LocalThemeColors.current
-    HandleGameWonState(
-        GameWonStateParams(
-            engine, repository, activity, application, isAdFree, celebrationFinished,
-            { showCelebrationVideo = true }
-        )
-    )
+    val gameWonParams = remember(activity, application, isAdFree) {
+        GameWonStateParams(engine, repository, activity, application, isAdFree)
+    }
+    HandleGameWonState(gameWonParams) { showCelebrationVideo = true }
     confettiState = updateConfettiState(engine, confettiState)
     val handleHint: () -> Unit = {
         if (isAdFree || !isAdLoaded || isAdLoading) {
@@ -175,54 +172,38 @@ fun ArrowsGameView(
             }
         }
     }
+    val onCelebrationComplete: () -> Unit = {
+        coroutineScope.launch {
+            finishGameAfterCelebration(gameWonParams)
+        }
+    }
     val celebrationParams = CelebrationParams(
         showCelebration = showCelebrationVideo && engine.isGameWon,
-        onCelebrationComplete = { celebrationFinished = true }
+        onCelebrationComplete = onCelebrationComplete
     )
     CompositionLocalProvider(LocalCelebrationParams provides celebrationParams) {
         GameScreenContent(
             GameScreenContentParams(
                 engine, activity, context, tapAnimations, guidanceAlpha, showGuidanceLines, themeColors,
                 rewardAdManager, isAdFree, handleHint, { showGuidanceLines = !showGuidanceLines },
-                showCelebrationVideo, { celebrationFinished = true }
+                showCelebrationVideo, onCelebrationComplete
             )
         )
     }
 }
 
 @Composable
-private fun HandleGameWonState(params: GameWonStateParams) {
+private fun HandleGameWonState(
+    params: GameWonStateParams,
+    onShowCelebration: () -> Unit
+) {
     LaunchedEffect(params.engine.isGameWon) {
         if (params.engine.isGameWon) {
-            // Show celebration video first
-            params.onShowCelebration()
-
-            // Wait for celebration to complete
-            while (!params.celebrationFinished) {
-                delay(GameConstants.CELEBRATION_POLL_DELAY)
-            }
-
-            // Increment games completed
-            params.repository.incrementGamesCompleted()
-
-            // Show interstitial ad every 5 games (if not ad-free)
-            val gamesCompleted = params.repository.gamesCompleted.first()
-            if (!params.isAdFree && gamesCompleted % GAMES_BETWEEN_INTERSTITIALS == 0) {
-                params.activity?.let { act ->
-                    params.application.interstitialAdManager.showInterstitialAd(act) {
-                        params.activity.finish()
-                    }
-                } ?: run {
-                    delay(GameConstants.GAME_WON_EXIT_DELAY)
-                    params.activity?.finish()
-                }
-            } else {
-                delay(GameConstants.GAME_WON_EXIT_DELAY)
-                params.activity?.finish()
-            }
+            onShowCelebration()
         }
     }
 }
+
 
 @Composable
 private fun updateConfettiState(engine: GameEngine, currentState: List<Party>): List<Party> {

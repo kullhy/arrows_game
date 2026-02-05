@@ -27,15 +27,17 @@ import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
 import androidx.compose.ui.geometry.Offset
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
+
+private const val GAMES_BETWEEN_INTERSTITIALS = 5
 
 data class GameWonStateParams(
     val engine: GameEngine,
     val repository: UserPreferencesRepository,
     val activity: Activity?,
     val application: ArrowsApplication,
-    val isAdFree: Boolean,
-    val celebrationFinished: Boolean,
-    val onShowCelebration: () -> Unit
+    val isAdFree: Boolean
 )
 
 data class CustomGameParams(
@@ -123,6 +125,24 @@ fun BoxScope.GuidanceToggleButton(
             contentDescription = stringResource(R.string.content_description_guidance_lines),
             tint = White
         )
+    }
+}
+
+suspend fun finishGameAfterCelebration(params: GameWonStateParams) {
+    params.repository.incrementGamesCompleted()
+    val gamesCompleted = params.repository.gamesCompleted.first()
+    if (!params.isAdFree && gamesCompleted % GAMES_BETWEEN_INTERSTITIALS == 0) {
+        params.activity?.let { act ->
+            params.application.interstitialAdManager.showInterstitialAd(act) {
+                params.activity.finish()
+            }
+        } ?: run {
+            delay(GameConstants.GAME_WON_EXIT_DELAY)
+            params.activity?.finish()
+        }
+    } else {
+        delay(GameConstants.GAME_WON_EXIT_DELAY)
+        params.activity?.finish()
     }
 }
 

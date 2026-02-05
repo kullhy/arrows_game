@@ -28,22 +28,6 @@ import com.batodev.arrows.GameConstants
 import com.batodev.arrows.R
 import kotlinx.coroutines.delay
 
-private const val VIDEO_PREPARATION_DELAY = 50L
-private const val CONGRATULATIONS_FONT_SIZE = 64
-
-private val CONGRATULATION_LABELS = listOf(
-    R.string.congratulations_super,
-    R.string.congratulations_fantastic,
-    R.string.congratulations_great,
-    R.string.congratulations_good_job,
-    R.string.congratulations_well_done,
-    R.string.congratulations_awesome,
-    R.string.congratulations_excellent,
-    R.string.congratulations_amazing,
-    R.string.congratulations_brilliant,
-    R.string.congratulations_outstanding
-)
-
 @Composable
 fun WinCelebrationScreen(onCelebrationComplete: () -> Unit) {
     var videoAlpha by remember { mutableStateOf(0f) }
@@ -81,9 +65,8 @@ private fun SelectRandomCelebrationContent(
     onContentSelected: (Int, Int) -> Unit
 ) {
     LaunchedEffect(Unit) {
-        val label = CONGRATULATION_LABELS.random()
-        val videoNumber = (1..GameConstants.WIN_VIDEOS_COUNT).random()
-        val videoId = if (videoNumber == 1) R.raw.win1 else R.raw.win2
+        val label = GameConstants.CONGRATULATION_LABELS.random()
+        val videoId = GameConstants.WIN_VIDEOS.random()
         onContentSelected(label, videoId)
     }
 }
@@ -95,7 +78,7 @@ private fun PlayCelebrationTimeline(
     onComplete: () -> Unit
 ) {
     LaunchedEffect(Unit) {
-        delay(VIDEO_PREPARATION_DELAY)
+        delay(GameConstants.VIDEO_PREPARATION_DELAY)
         onFadeInStart()
         delay(GameConstants.VIDEO_FADE_IN_DURATION.toLong())
         delay(GameConstants.VIDEO_DISPLAY_DURATION.toLong())
@@ -117,15 +100,22 @@ private fun CelebrationContent(
             .background(Color.Black),
         contentAlignment = Alignment.Center
     ) {
+        // Video plays underneath
         VideoPlayerView(
             videoResId = videoResId,
+            modifier = Modifier.fillMaxSize()
+        )
+        // Black overlay fades out (1-alpha) for fade-in, fades in for fade-out
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .alpha(alpha)
+                .alpha(1f - alpha)
+                .background(Color.Black)
         )
+        // Text fades with the content
         Text(
             text = stringResource(labelResId),
-            fontSize = CONGRATULATIONS_FONT_SIZE.sp,
+            fontSize = GameConstants.CONGRATULATIONS_FONT_SIZE.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
             modifier = Modifier.alpha(alpha)
