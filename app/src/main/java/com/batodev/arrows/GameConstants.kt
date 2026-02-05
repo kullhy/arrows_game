@@ -210,17 +210,17 @@ object GameConstants {
     // ====================
     // ADMOB AD UNIT IDS
     // ====================
-    /** AdMob App ID (test ID - replace with real ID before production) */
-    const val ADMOB_APP_ID = "ca-app-pub-3940256099942544~3347511713"
+    /** AdMob App ID - uses test ID in debug, production ID in release */
+    val ADMOB_APP_ID: String get() = BuildConfig.ADMOB_APP_ID
 
-    /** Banner ad unit ID (test ID - replace with real ID before production) */
-    const val BANNER_AD_UNIT_ID = "ca-app-pub-3940256099942544/6300978111"
+    /** Banner ad unit ID - uses test ID in debug, production ID in release */
+    val BANNER_AD_UNIT_ID: String get() = BuildConfig.BANNER_AD_UNIT_ID
 
-    /** Rewarded interstitial ad unit ID for "Remove Ads" feature (test ID - replace with real ID before production) */
-    const val REWARDED_AD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917"
+    /** Rewarded ad unit ID - uses test ID in debug, production ID in release */
+    val REWARDED_AD_UNIT_ID: String get() = BuildConfig.REWARDED_AD_UNIT_ID
 
-    /** Interstitial ad unit ID shown every 5 games (test ID - replace with real ID before production) */
-    const val INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-3940256099942544/1033173712"
+    /** Interstitial ad unit ID - uses test ID in debug, production ID in release */
+    val INTERSTITIAL_AD_UNIT_ID: String get() = BuildConfig.INTERSTITIAL_AD_UNIT_ID
 
     // ====================
     // INPUT HANDLING

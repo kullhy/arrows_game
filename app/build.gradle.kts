@@ -31,11 +31,21 @@ android {
                 "proguard-rules.pro"
             )
             buildConfigField("Boolean", "DRAW_DEBUG_STUFF", "false")
+            // Production Ad IDs - replace with real IDs before release
+            buildConfigField("String", "ADMOB_APP_ID", "\"N/A\"")
+            buildConfigField("String", "BANNER_AD_UNIT_ID", "\"N/A\"")
+            buildConfigField("String", "REWARDED_AD_UNIT_ID", "\"N/A\"")
+            buildConfigField("String", "INTERSTITIAL_AD_UNIT_ID", "\"N/A\"")
         }
         debug {
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
             buildConfigField("Boolean", "DRAW_DEBUG_STUFF", "false")
+            // Test Ad IDs for development
+            buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-3940256099942544~3347511713\"")
+            buildConfigField("String", "BANNER_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/6300978111\"")
+            buildConfigField("String", "REWARDED_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/5224354917\"")
+            buildConfigField("String", "INTERSTITIAL_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/1033173712\"")
         }
     }
     compileOptions {
