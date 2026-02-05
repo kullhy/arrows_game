@@ -9,6 +9,16 @@
     <string name="cancel_label">منسوخ کریں۔</string>
     <string name="choose_forced_shape_title">جبری شکل کا انتخاب کریں۔</string>
     <string name="choose_theme_title">تھیم کا انتخاب کریں۔</string>
+    <string name="congratulations_amazing">حیرت انگیز!</string>
+    <string name="congratulations_awesome">بہت اچھے!</string>
+    <string name="congratulations_brilliant">شاندار!</string>
+    <string name="congratulations_excellent">بہترین!</string>
+    <string name="congratulations_fantastic">لاجواب!</string>
+    <string name="congratulations_good_job">اچھا کام!</string>
+    <string name="congratulations_great">بہت اچھا!</string>
+    <string name="congratulations_outstanding">بقایا!</string>
+    <string name="congratulations_super">سپر!</string>
+    <string name="congratulations_well_done">شاباش!</string>
     <string name="content_description_ad">اشتہار</string>
     <string name="content_description_back">پیچھے</string>
     <string name="content_description_generate">کسٹم لیول تیار کریں۔</string>

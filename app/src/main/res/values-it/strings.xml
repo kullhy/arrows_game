@@ -9,6 +9,16 @@
     <string name="cancel_label">Cancellare</string>
     <string name="choose_forced_shape_title">Scegli la forma forzata</string>
     <string name="choose_theme_title">Scegli il tema</string>
+    <string name="congratulations_amazing">Sorprendente!</string>
+    <string name="congratulations_awesome">Eccezionale!</string>
+    <string name="congratulations_brilliant">Brillante!</string>
+    <string name="congratulations_excellent">Eccellente!</string>
+    <string name="congratulations_fantastic">Fantastico!</string>
+    <string name="congratulations_good_job">Buon lavoro!</string>
+    <string name="congratulations_great">Grande!</string>
+    <string name="congratulations_outstanding">Eccezionale!</string>
+    <string name="congratulations_super">Super!</string>
+    <string name="congratulations_well_done">Ben fatto!</string>
     <string name="content_description_ad">A.D</string>
     <string name="content_description_back">Indietro</string>
     <string name="content_description_generate">Genera livello personalizzato</string>

@@ -9,6 +9,16 @@
     <string name="cancel_label">বাতিল করুন</string>
     <string name="choose_forced_shape_title">জোরপূর্বক আকৃতি নির্বাচন করুন</string>
     <string name="choose_theme_title">থিম বেছে নিন</string>
+    <string name="congratulations_amazing">অসাধারণ!</string>
+    <string name="congratulations_awesome">অসাধারণ!</string>
+    <string name="congratulations_brilliant">দারুন!</string>
+    <string name="congratulations_excellent">চমৎকার!</string>
+    <string name="congratulations_fantastic">অসাধারণ!</string>
+    <string name="congratulations_good_job">ভালো করেছো!</string>
+    <string name="congratulations_great">দারুন!</string>
+    <string name="congratulations_outstanding">অসাধারণ!</string>
+    <string name="congratulations_super">অসাধারণ!</string>
+    <string name="congratulations_well_done">সাবাশ!</string>
     <string name="content_description_ad">বিজ্ঞাপন</string>
     <string name="content_description_back">পিছনে</string>
     <string name="content_description_generate">কাস্টম লেভেল তৈরি করুন</string>

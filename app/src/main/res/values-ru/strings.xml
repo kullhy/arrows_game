@@ -9,6 +9,16 @@
     <string name="cancel_label">Отмена</string>
     <string name="choose_forced_shape_title">Выберите принудительную форму</string>
     <string name="choose_theme_title">Выберите тему</string>
+    <string name="congratulations_amazing">Удивительный!</string>
+    <string name="congratulations_awesome">Потрясающий!</string>
+    <string name="congratulations_brilliant">Блестяще!</string>
+    <string name="congratulations_excellent">Отличный!</string>
+    <string name="congratulations_fantastic">Фантастика!</string>
+    <string name="congratulations_good_job">Хорошая работа!</string>
+    <string name="congratulations_great">Большой!</string>
+    <string name="congratulations_outstanding">Выдающийся!</string>
+    <string name="congratulations_super">Супер!</string>
+    <string name="congratulations_well_done">Отличная работа!</string>
     <string name="content_description_ad">Объявление</string>
     <string name="content_description_back">Назад</string>
     <string name="content_description_generate">Создать пользовательский уровень</string>

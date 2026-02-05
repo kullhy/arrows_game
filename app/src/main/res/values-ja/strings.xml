@@ -9,6 +9,16 @@
     <string name="cancel_label">キャンセル</string>
     <string name="choose_forced_shape_title">強制形状を選択</string>
     <string name="choose_theme_title">テーマを選択</string>
+    <string name="congratulations_amazing">すばらしい！</string>
+    <string name="congratulations_awesome">素晴らしい！</string>
+    <string name="congratulations_brilliant">素晴らしい！</string>
+    <string name="congratulations_excellent">素晴らしい！</string>
+    <string name="congratulations_fantastic">素晴らしい！</string>
+    <string name="congratulations_good_job">よくやった！</string>
+    <string name="congratulations_great">素晴らしい！</string>
+    <string name="congratulations_outstanding">並外れた！</string>
+    <string name="congratulations_super">素晴らしい！</string>
+    <string name="congratulations_well_done">よくやった！</string>
     <string name="content_description_ad">広告</string>
     <string name="content_description_back">戻る</string>
     <string name="content_description_generate">カスタムレベルの生成</string>

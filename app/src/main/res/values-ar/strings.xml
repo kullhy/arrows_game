@@ -9,6 +9,16 @@
     <string name="cancel_label">يلغي</string>
     <string name="choose_forced_shape_title">اختر الشكل القسري</string>
     <string name="choose_theme_title">اختر المظهر</string>
+    <string name="congratulations_amazing">مدهش!</string>
+    <string name="congratulations_awesome">مذهل!</string>
+    <string name="congratulations_brilliant">باهِر!</string>
+    <string name="congratulations_excellent">ممتاز!</string>
+    <string name="congratulations_fantastic">رائع!</string>
+    <string name="congratulations_good_job">أحسنت!</string>
+    <string name="congratulations_great">عظيم!</string>
+    <string name="congratulations_outstanding">متميز!</string>
+    <string name="congratulations_super">ممتاز!</string>
+    <string name="congratulations_well_done">أحسنت!</string>
     <string name="content_description_ad">إعلان</string>
     <string name="content_description_back">خلف</string>
     <string name="content_description_generate">إنشاء مستوى مخصص</string>

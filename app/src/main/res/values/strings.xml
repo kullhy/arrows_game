@@ -9,6 +9,7 @@
     <!-- Errors and Utils -->
     <!-- Custom Generation -->
     <!-- Custom Generation Warning -->
+    <!-- Congratulatory Messages -->
     <string name="ad_not_ready">Ad Not Ready</string>
     <string name="add_life_label">Add Life</string>
     <string name="ads_removed">Ads Removed!</string>
@@ -18,6 +19,16 @@
     <string name="cancel_label">Cancel</string>
     <string name="choose_forced_shape_title">Choose Forced Shape</string>
     <string name="choose_theme_title">Choose Theme</string>
+    <string name="congratulations_amazing">Amazing!</string>
+    <string name="congratulations_awesome">Awesome!</string>
+    <string name="congratulations_brilliant">Brilliant!</string>
+    <string name="congratulations_excellent">Excellent!</string>
+    <string name="congratulations_fantastic">Fantastic!</string>
+    <string name="congratulations_good_job">Good Job!</string>
+    <string name="congratulations_great">Great!</string>
+    <string name="congratulations_outstanding">Outstanding!</string>
+    <string name="congratulations_super">Super!</string>
+    <string name="congratulations_well_done">Well Done!</string>
     <string name="content_description_ad">Ad</string>
     <string name="content_description_back">Back</string>
     <string name="content_description_generate">Generate Custom Level</string>
@@ -86,15 +97,4 @@
     <string name="width_auto_label">Width (0 for Auto)</string>
     <string name="width_label">Width</string>
     <string name="write_us_label">Write us</string>
-    <!-- Congratulatory Messages -->
-    <string name="congratulations_super" translatable="false">Super!</string>
-    <string name="congratulations_fantastic" translatable="false">Fantastic!</string>
-    <string name="congratulations_great" translatable="false">Great!</string>
-    <string name="congratulations_good_job" translatable="false">Good Job!</string>
-    <string name="congratulations_well_done" translatable="false">Well Done!</string>
-    <string name="congratulations_awesome" translatable="false">Awesome!</string>
-    <string name="congratulations_excellent" translatable="false">Excellent!</string>
-    <string name="congratulations_amazing" translatable="false">Amazing!</string>
-    <string name="congratulations_brilliant" translatable="false">Brilliant!</string>
-    <string name="congratulations_outstanding" translatable="false">Outstanding!</string>
 </resources>

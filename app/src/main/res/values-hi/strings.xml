@@ -9,6 +9,16 @@
     <string name="cancel_label">रद्द करना</string>
     <string name="choose_forced_shape_title">बाध्य आकार चुनें</string>
     <string name="choose_theme_title">थीम चुनें</string>
+    <string name="congratulations_amazing">अद्भुत!</string>
+    <string name="congratulations_awesome">बहुत बढ़िया!</string>
+    <string name="congratulations_brilliant">शानदार!</string>
+    <string name="congratulations_excellent">उत्कृष्ट!</string>
+    <string name="congratulations_fantastic">ज़बरदस्त!</string>
+    <string name="congratulations_good_job">अच्छा काम!</string>
+    <string name="congratulations_great">महान!</string>
+    <string name="congratulations_outstanding">असाधारण!</string>
+    <string name="congratulations_super">बहुत अच्छा!</string>
+    <string name="congratulations_well_done">बहुत अच्छा!</string>
     <string name="content_description_ad">विज्ञापन</string>
     <string name="content_description_back">पीछे</string>
     <string name="content_description_generate">कस्टम स्तर उत्पन्न करें</string>
