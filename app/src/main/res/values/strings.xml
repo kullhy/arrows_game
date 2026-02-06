@@ -1,15 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-    <!-- MainActivity -->
-    <!-- GameActivity -->
-    <!-- Settings -->
-    <!-- Themes -->
-    <!-- Animation Speeds -->
-    <!-- Debug Menu -->
-    <!-- Errors and Utils -->
-    <!-- Custom Generation -->
-    <!-- Custom Generation Warning -->
-    <!-- Congratulatory Messages -->
     <string name="ad_not_ready">Ad Not Ready</string>
     <string name="add_life_label">Add Life</string>
     <string name="ads_removed">Ads Removed!</string>

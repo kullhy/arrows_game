@@ -27,6 +27,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.batodev.arrows.GameConstants
 import com.batodev.arrows.R
 import kotlinx.coroutines.delay
+import androidx.core.net.toUri
 
 @Composable
 fun WinCelebrationScreen(onCelebrationComplete: () -> Unit) {
@@ -62,7 +63,7 @@ fun WinCelebrationScreen(onCelebrationComplete: () -> Unit) {
 
 @Composable
 private fun SelectRandomCelebrationContent(
-    onContentSelected: (Int, Int) -> Unit
+    onContentSelected: (Int, Int) -> Unit,
 ) {
     LaunchedEffect(Unit) {
         val label = GameConstants.CONGRATULATION_LABELS.random()
@@ -75,7 +76,7 @@ private fun SelectRandomCelebrationContent(
 private fun PlayCelebrationTimeline(
     onFadeInStart: () -> Unit,
     onFadeOutStart: () -> Unit,
-    onComplete: () -> Unit
+    onComplete: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
         delay(GameConstants.VIDEO_PREPARATION_DELAY)
@@ -92,7 +93,7 @@ private fun PlayCelebrationTimeline(
 private fun CelebrationContent(
     videoResId: Int,
     labelResId: Int,
-    alpha: Float
+    alpha: Float,
 ) {
     Box(
         modifier = Modifier
@@ -129,7 +130,7 @@ private fun VideoPlayerView(videoResId: Int, modifier: Modifier = Modifier) {
     val videoView = remember { VideoView(context) }
 
     DisposableEffect(videoResId) {
-        val videoUri = Uri.parse("android.resource://${context.packageName}/$videoResId")
+        val videoUri = "android.resource://${context.packageName}/$videoResId".toUri()
         videoView.setVideoURI(videoUri)
         videoView.start()
 
