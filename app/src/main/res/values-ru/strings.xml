@@ -62,6 +62,8 @@
     <string name="ok_label">ХОРОШО</string>
     <string name="play_label">Играть</string>
     <string name="privacy_label">Конфиденциальность</string>
+    <string name="third_party_licenses_label">Лицензии сторонних библиотек</string>
+    <string name="licenses_title">Лицензии сторонних библиотек</string>
     <string name="proceed_label">Продолжить</string>
     <string name="rate_us_label">Оцените нас</string>
     <string name="regenerate_level_label">Восстановить уровень</string>

@@ -63,6 +63,8 @@
     <string name="ok_label">OK</string>
     <string name="play_label">Play</string>
     <string name="privacy_label">Privacy</string>
+    <string name="third_party_licenses_label">Third Party Licenses</string>
+    <string name="licenses_title">Third Party Licenses</string>
     <string name="proceed_label">Proceed</string>
     <string name="rate_us_label">Rate us</string>
     <string name="regenerate_level_label">Regenerate Level</string>

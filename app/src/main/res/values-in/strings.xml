@@ -62,6 +62,8 @@
     <string name="ok_label">OKE</string>
     <string name="play_label">Bermain</string>
     <string name="privacy_label">Pribadi</string>
+    <string name="third_party_licenses_label">Lisensi Pihak Ketiga</string>
+    <string name="licenses_title">Lisensi Pihak Ketiga</string>
     <string name="proceed_label">Melanjutkan</string>
     <string name="rate_us_label">Beri kami nilai</string>
     <string name="regenerate_level_label">Regenerasi Level</string>

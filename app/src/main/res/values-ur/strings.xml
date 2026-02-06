@@ -62,6 +62,8 @@
     <string name="ok_label">ٹھیک ہے</string>
     <string name="play_label">کھیلیں</string>
     <string name="privacy_label">رازداری</string>
+    <string name="third_party_licenses_label">فریق ثالث لائسنس</string>
+    <string name="licenses_title">فریق ثالث لائسنس</string>
     <string name="proceed_label">آگے بڑھیں۔</string>
     <string name="rate_us_label">ہمیں درجہ دیں۔</string>
     <string name="regenerate_level_label">سطح کو دوبارہ تخلیق کریں۔</string>

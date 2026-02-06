@@ -62,6 +62,8 @@
     <string name="ok_label">نعم</string>
     <string name="play_label">يلعب</string>
     <string name="privacy_label">خصوصية</string>
+    <string name="third_party_licenses_label">تراخيص الطرف الثالث</string>
+    <string name="licenses_title">تراخيص الطرف الثالث</string>
     <string name="proceed_label">يتابع</string>
     <string name="rate_us_label">قيّمونا</string>
     <string name="regenerate_level_label">مستوى التجديد</string>

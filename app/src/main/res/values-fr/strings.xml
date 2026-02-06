@@ -62,6 +62,8 @@
     <string name="ok_label">D\'ACCORD</string>
     <string name="play_label">Jouer</string>
     <string name="privacy_label">Confidentialité</string>
+    <string name="third_party_licenses_label">Licences tierces</string>
+    <string name="licenses_title">Licences tierces</string>
     <string name="proceed_label">Procéder</string>
     <string name="rate_us_label">Évaluez-nous</string>
     <string name="regenerate_level_label">Niveau de régénération</string>

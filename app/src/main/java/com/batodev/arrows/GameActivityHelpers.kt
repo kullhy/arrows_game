@@ -25,7 +25,6 @@ import com.batodev.arrows.engine.GameEngineConfig
 import com.batodev.arrows.engine.GameEngineFeatures
 import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
-import androidx.compose.ui.geometry.Offset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
@@ -62,7 +61,7 @@ data class GameAreaParams(
 data class GameScreenContentParams(
     val engine: GameEngine,
     val activity: Activity?,
-    val context: android.content.Context,
+    val context: Context,
     val tapAnimations: SnapshotStateList<TapAnimationState>,
     val guidanceAlpha: Float,
     val showGuidanceLines: Boolean,
@@ -76,6 +75,33 @@ data class GameScreenContentParams(
     val showCelebrationVideo: Boolean,
     val onCelebrationComplete: () -> Unit
 )
+
+data class HintHandlerParams(
+    val isAdFree: Boolean,
+    val isAdLoading: Boolean,
+    val isAdLoaded: Boolean,
+    val engine: GameEngine,
+    val activity: Activity?,
+    val rewardAdManager: RewardAdManager
+)
+
+fun buildHintHandler(params: HintHandlerParams): () -> Unit = {
+    when {
+        params.isAdFree -> params.engine.showHint()
+        params.isAdLoading -> { /* Do nothing while ad is loading */ }
+        !params.isAdLoaded -> params.engine.showHint() // Ad failed to load
+        else -> { // Ad is loaded
+            var wasRewarded = false
+            params.activity?.let { act ->
+                params.rewardAdManager.showRewardAd(
+                    activity = act,
+                    onRewarded = { wasRewarded = true },
+                    onAdDismissed = { if (wasRewarded) params.engine.showHint() }
+                )
+            }
+        }
+    }
+}
 
 fun extractCustomGameParams(intent: android.content.Intent?): CustomGameParams {
     val isCustom = intent?.getBooleanExtra("IS_CUSTOM", false) ?: false
@@ -147,5 +173,3 @@ suspend fun finishGameAfterCelebration(params: GameWonStateParams) {
         params.activity?.finish()
     }
 }
-
-

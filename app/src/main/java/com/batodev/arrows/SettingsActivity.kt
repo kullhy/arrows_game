@@ -37,6 +37,7 @@ import com.batodev.arrows.ui.PreferencesParams
 import com.batodev.arrows.ui.PreferencesSection
 import com.batodev.arrows.ui.PurchasesSection
 import com.batodev.arrows.ui.ThemeSelectionDialog
+import com.batodev.arrows.ui.ThirdPartyLicensesDialog
 import com.batodev.arrows.ui.ads.BannerAdView
 import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.LocalThemeColors
@@ -73,6 +74,7 @@ fun SettingsScreen(viewModel: AppViewModel, rewardAdManager: RewardAdManager) {
     val themeColors = LocalThemeColors.current
     var showThemeDialog by remember { mutableStateOf(false) }
     var showSpeedDialog by remember { mutableStateOf(false) }
+    var showLicensesDialog by remember { mutableStateOf(false) }
     val currentTheme by viewModel.theme.collectAsState()
     val currentSpeed by viewModel.animationSpeed.collectAsState()
 
@@ -82,17 +84,46 @@ fun SettingsScreen(viewModel: AppViewModel, rewardAdManager: RewardAdManager) {
             showSpeedDialog, { showSpeedDialog = it }, currentSpeed, { viewModel.saveAnimationSpeed(it) }
         )
     )
+    if (showLicensesDialog) {
+        ThirdPartyLicensesDialog(onDismiss = { showLicensesDialog = false })
+    }
 
+    SettingsScaffold(
+        SettingsScaffoldParams(
+            viewModel, rewardAdManager, repository, context, themeColors,
+            levelNumber, isAdFree, currentTheme, currentSpeed,
+            { showThemeDialog = true }, { showSpeedDialog = true }, { showLicensesDialog = true }
+        )
+    )
+}
+
+private data class SettingsScaffoldParams(
+    val viewModel: AppViewModel,
+    val rewardAdManager: RewardAdManager,
+    val repository: com.batodev.arrows.data.UserPreferencesRepository,
+    val context: android.content.Context,
+    val themeColors: com.batodev.arrows.ui.theme.ThemeColors,
+    val levelNumber: Int,
+    val isAdFree: Boolean,
+    val currentTheme: String,
+    val currentSpeed: String,
+    val onThemeClick: () -> Unit,
+    val onSpeedClick: () -> Unit,
+    val onLicensesClick: () -> Unit
+)
+
+@Composable
+private fun SettingsScaffold(params: SettingsScaffoldParams) {
     Scaffold(
-        containerColor = themeColors.background,
+        containerColor = params.themeColors.background,
         bottomBar = {
             Column(modifier = Modifier.fillMaxWidth()) {
                 AppNavigationBar(
                     selectedDestination = NavigationDestination.SETTINGS,
-                    levelNumber = levelNumber,
-                    themeColors = themeColors
+                    levelNumber = params.levelNumber,
+                    themeColors = params.themeColors
                 )
-                if (!isAdFree) {
+                if (!params.isAdFree) {
                     BannerAdView()
                 }
             }
@@ -109,18 +140,18 @@ fun SettingsScreen(viewModel: AppViewModel, rewardAdManager: RewardAdManager) {
             Spacer(modifier = Modifier.height(16.dp))
             PreferencesSection(
                 PreferencesParams(
-                    viewModel, themeColors, currentTheme, currentSpeed,
-                    { showThemeDialog = true }, { showSpeedDialog = true }
+                    params.viewModel, params.themeColors, params.currentTheme, params.currentSpeed,
+                    params.onThemeClick, params.onSpeedClick
                 )
             )
-            FeedbackSection(context, themeColors)
+            FeedbackSection(params.context, params.themeColors)
             PurchasesSection(
-                repository = repository,
-                rewardAdManager = rewardAdManager,
-                themeColors = themeColors
+                repository = params.repository,
+                rewardAdManager = params.rewardAdManager,
+                themeColors = params.themeColors
             )
-            LegalSection(context, themeColors)
-            if (BuildConfig.DRAW_DEBUG_STUFF) DebugMenu(viewModel)
+            LegalSection(params.context, params.themeColors, params.onLicensesClick)
+            if (BuildConfig.DRAW_DEBUG_STUFF) DebugMenu(params.viewModel)
         }
     }
 }

@@ -2,8 +2,6 @@ package com.batodev.arrows
 
 import android.app.Activity
 import android.os.Bundle
-import android.util.Log
-import android.view.HapticFeedbackConstants
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -23,21 +21,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Grid4x4
 import androidx.compose.material.icons.filled.VideoLabel
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -58,10 +55,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.batodev.arrows.ads.RewardAdManager
-import com.batodev.arrows.data.AndroidResourceBoardShapeProvider
 import com.batodev.arrows.engine.GameEngine
-import com.batodev.arrows.engine.GameEngineConfig
-import com.batodev.arrows.engine.GameEngineFeatures
 import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.ads.BannerAdView
 import com.batodev.arrows.ui.game.GameProgressBar
@@ -76,14 +70,10 @@ import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.ProgressBarGreen
 import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.core.Party
 import nl.dionsegijn.konfetti.core.Position
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.compositionLocalOf
 import nl.dionsegijn.konfetti.core.emitter.Emitter
 import java.util.concurrent.TimeUnit
 
@@ -163,29 +153,9 @@ fun ArrowsGameView(
     }
     HandleGameWonState(gameWonParams) { showCelebrationVideo = true }
     confettiState = updateConfettiState(engine, confettiState)
-    val handleHint: () -> Unit = {
-        when {
-            isAdFree -> engine.showHint()
-            isAdLoading -> { /* Do nothing while ad is loading */ }
-            !isAdLoaded -> engine.showHint() // Ad failed to load
-            else -> { // Ad is loaded
-                var wasRewarded = false
-                activity?.let { act ->
-                    rewardAdManager.showRewardAd(
-                        activity = act,
-                        onRewarded = {
-                            wasRewarded = true
-                        },
-                        onAdDismissed = {
-                            if (wasRewarded) {
-                                engine.showHint()
-                            }
-                        }
-                    )
-                }
-            }
-        }
-    }
+    val handleHint = buildHintHandler(
+        HintHandlerParams(isAdFree, isAdLoading, isAdLoaded, engine, activity, rewardAdManager)
+    )
     val onCelebrationComplete: () -> Unit = {
         coroutineScope.launch {
             finishGameAfterCelebration(gameWonParams)

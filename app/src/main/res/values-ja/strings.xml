@@ -62,6 +62,8 @@
     <string name="ok_label">わかりました</string>
     <string name="play_label">遊ぶ</string>
     <string name="privacy_label">プライバシー</string>
+    <string name="third_party_licenses_label">サードパーティライセンス</string>
+    <string name="licenses_title">サードパーティライセンス</string>
     <string name="proceed_label">進む</string>
     <string name="rate_us_label">評価してください</string>
     <string name="regenerate_level_label">レベル再生</string>

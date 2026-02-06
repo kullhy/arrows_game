@@ -3,6 +3,7 @@ import org.gradle.api.tasks.testing.Test
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.aboutlibraries)
     alias(libs.plugins.detekt)
     id("jacoco")
 }
@@ -59,6 +60,10 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
+}
+
+aboutLibraries {
+    // Plugin will auto-generate aboutlibraries.json
 }
 
 tasks.withType<Test> {
@@ -128,6 +133,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.gson)
+    implementation(libs.aboutlibraries.compose.m3)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockito.core)

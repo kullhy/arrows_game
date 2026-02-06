@@ -62,6 +62,8 @@
     <string name="ok_label">ठीक है</string>
     <string name="play_label">खेल</string>
     <string name="privacy_label">गोपनीयता</string>
+    <string name="third_party_licenses_label">तृतीय पक्ष लाइसेंस</string>
+    <string name="licenses_title">तृतीय पक्ष लाइसेंस</string>
     <string name="proceed_label">आगे बढ़ना</string>
     <string name="rate_us_label">हमें रेटिंग दें</string>
     <string name="regenerate_level_label">पुनर्जनन स्तर</string>
