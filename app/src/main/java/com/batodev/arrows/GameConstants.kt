@@ -278,6 +278,7 @@ object GameConstants {
         R.raw.win8,
         R.raw.win9,
         R.raw.win10,
+        R.raw.win11,
         R.raw.win12,
         R.raw.win13,
         R.raw.win14,
@@ -290,6 +291,8 @@ object GameConstants {
         R.raw.win21,
         R.raw.win22,
         R.raw.win23,
-        R.raw.win24
+        R.raw.win24,
+        R.raw.win25,
+        R.raw.win26,
     )
 }

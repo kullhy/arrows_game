@@ -15,6 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -35,8 +37,8 @@ import kotlinx.coroutines.delay
 fun WinCelebrationScreen(onCelebrationComplete: () -> Unit) {
     var videoAlpha by remember { mutableFloatStateOf(0f) }
     var shouldShowCelebration by remember { mutableStateOf(true) }
-    var selectedLabel by remember { mutableStateOf(R.string.congratulations_super) }
-    var selectedVideoResId by remember { mutableStateOf(R.raw.win1) }
+    var selectedLabel by remember { mutableIntStateOf(R.string.congratulations_super) }
+    var selectedVideoResId by remember { mutableIntStateOf(R.raw.win1) }
 
     SelectRandomCelebrationContent { label, videoId ->
         selectedLabel = label

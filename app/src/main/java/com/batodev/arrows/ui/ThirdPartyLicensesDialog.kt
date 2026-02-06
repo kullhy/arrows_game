@@ -58,15 +58,8 @@ fun ThirdPartyLicensesDialog(onDismiss: () -> Unit) {
     var error by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
-        try {
-            val libs = Libs.Builder().withContext(context).build()
-            libraries = libs.libraries.sortedBy { it.name.lowercase() }
-        } catch (e: Exception) {
-            println("Could not load libraries: ${e.message}")
-            error = "Unable to load library information"
-            // Create empty list or fallback libraries
-            libraries = emptyList()
-        }
+        val libs = Libs.Builder().withContext(context).build()
+        libraries = libs.libraries.sortedBy { it.name.lowercase() }
     }
 
     Dialog(
