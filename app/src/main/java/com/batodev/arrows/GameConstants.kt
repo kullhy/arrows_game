@@ -250,7 +250,7 @@ object GameConstants {
     const val VIDEO_PREPARATION_DELAY = 50L
 
     /** Font size for congratulatory text overlay */
-    const val CONGRATULATIONS_FONT_SIZE = 64
+    const val CONGRATULATIONS_FONT_SIZE = 32
 
     /** List of congratulatory message string resource IDs */
     val CONGRATULATION_LABELS = listOf(
