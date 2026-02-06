@@ -23,7 +23,6 @@
     <string name="content_description_back">پیچھے</string>
     <string name="content_description_generate">کسٹم لیول تیار کریں۔</string>
     <string name="content_description_guidance_lines">گائیڈنس لائنز</string>
-    <string name="content_description_levels">سطحیں</string>
     <string name="content_description_life">زندگی</string>
     <string name="content_description_open">کھولیں۔</string>
     <string name="content_description_restart">دوبارہ شروع کریں۔</string>
@@ -62,8 +61,6 @@
     <string name="ok_label">ٹھیک ہے</string>
     <string name="play_label">کھیلیں</string>
     <string name="privacy_label">رازداری</string>
-    <string name="third_party_licenses_label">فریق ثالث لائسنس</string>
-    <string name="licenses_title">فریق ثالث لائسنس</string>
     <string name="proceed_label">آگے بڑھیں۔</string>
     <string name="rate_us_label">ہمیں درجہ دیں۔</string>
     <string name="regenerate_level_label">سطح کو دوبارہ تخلیق کریں۔</string>
@@ -83,9 +80,10 @@
     <string name="theme_orange">کینو</string>
     <string name="theme_red">سرخ</string>
     <string name="theme_yellow">پیلا</string>
+    <string name="third_party_licenses_label">تھرڈ پارٹی لائسنس</string>
     <string name="vibrations_label">وائبریشنز</string>
     <string name="watch_ad_label">اشتہار دیکھیں</string>
-    <string name="watch_ad_to_remove_ads">اشتہار دیکھیں (%1$d باقی)</string>
+    <string name="watch_ad_to_remove_ads">اشتہار دیکھیں (%1$d/%1$d)</string>
     <string name="width_auto_label">چوڑائی (0 آٹو کے لیے)</string>
     <string name="width_label">چوڑائی</string>
     <string name="write_us_label">ہمیں لکھیں۔</string>

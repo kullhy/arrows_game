@@ -23,7 +23,6 @@
     <string name="content_description_back">خلف</string>
     <string name="content_description_generate">إنشاء مستوى مخصص</string>
     <string name="content_description_guidance_lines">خطوط إرشادية</string>
-    <string name="content_description_levels">المستويات</string>
     <string name="content_description_life">حياة</string>
     <string name="content_description_open">يفتح</string>
     <string name="content_description_restart">إعادة تشغيل</string>
@@ -49,7 +48,7 @@
     <string name="generating_progress">جارٍ إنشاء… %1$d%%</string>
     <string name="height_auto_label">الارتفاع (0 للوضع التلقائي)</string>
     <string name="height_label">ارتفاع</string>
-    <string name="hint_label">نصيحة</string>
+    <string name="hint_label">تَلمِيح</string>
     <string name="home_label">بيت</string>
     <string name="level_dialog_title">مستوى</string>
     <string name="level_label">المستوى %1$d</string>
@@ -62,8 +61,6 @@
     <string name="ok_label">نعم</string>
     <string name="play_label">يلعب</string>
     <string name="privacy_label">خصوصية</string>
-    <string name="third_party_licenses_label">تراخيص الطرف الثالث</string>
-    <string name="licenses_title">تراخيص الطرف الثالث</string>
     <string name="proceed_label">يتابع</string>
     <string name="rate_us_label">قيّمونا</string>
     <string name="regenerate_level_label">مستوى التجديد</string>
@@ -83,9 +80,10 @@
     <string name="theme_orange">البرتقالي</string>
     <string name="theme_red">أحمر</string>
     <string name="theme_yellow">أصفر</string>
+    <string name="third_party_licenses_label">تراخيص الطرف الثالث</string>
     <string name="vibrations_label">الاهتزازات</string>
     <string name="watch_ad_label">شاهد الإعلان</string>
-    <string name="watch_ad_to_remove_ads">شاهد الإعلان (تبقى 1%)</string>
+    <string name="watch_ad_to_remove_ads">شاهد الإعلان (%1$d/%1$d)</string>
     <string name="width_auto_label">العرض (0 للوضع التلقائي)</string>
     <string name="width_label">عرض</string>
     <string name="write_us_label">اكتب ساعات</string>

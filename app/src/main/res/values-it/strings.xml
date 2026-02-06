@@ -23,7 +23,6 @@
     <string name="content_description_back">Indietro</string>
     <string name="content_description_generate">Genera livello personalizzato</string>
     <string name="content_description_guidance_lines">Linee guida</string>
-    <string name="content_description_levels">Livelli</string>
     <string name="content_description_life">Vita</string>
     <string name="content_description_open">Aprire</string>
     <string name="content_description_restart">Ricomincia</string>
@@ -62,8 +61,6 @@
     <string name="ok_label">OK</string>
     <string name="play_label">Giocare</string>
     <string name="privacy_label">Riservatezza</string>
-    <string name="third_party_licenses_label">Licenze di terze parti</string>
-    <string name="licenses_title">Licenze di terze parti</string>
     <string name="proceed_label">Procedere</string>
     <string name="rate_us_label">Valutaci</string>
     <string name="regenerate_level_label">Livello di rigenerazione</string>
@@ -83,9 +80,10 @@
     <string name="theme_orange">Arancia</string>
     <string name="theme_red">Rosso</string>
     <string name="theme_yellow">Giallo</string>
+    <string name="third_party_licenses_label">Licenze di terze parti</string>
     <string name="vibrations_label">Vibrazioni</string>
     <string name="watch_ad_label">Guarda l\'annuncio</string>
-    <string name="watch_ad_to_remove_ads">Guarda l\'annuncio (mancano %1$d)</string>
+    <string name="watch_ad_to_remove_ads">Guarda l\'annuncio (%1$d/%1$d)</string>
     <string name="width_auto_label">Larghezza (0 per Auto)</string>
     <string name="width_label">Larghezza</string>
     <string name="write_us_label">Scrivici</string>

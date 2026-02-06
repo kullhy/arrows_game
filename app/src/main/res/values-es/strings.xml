@@ -23,7 +23,6 @@
     <string name="content_description_back">Atrás</string>
     <string name="content_description_generate">Generar nivel personalizado</string>
     <string name="content_description_guidance_lines">Líneas de orientación</string>
-    <string name="content_description_levels">Niveles</string>
     <string name="content_description_life">Vida</string>
     <string name="content_description_open">Abierto</string>
     <string name="content_description_restart">Reanudar</string>
@@ -62,8 +61,6 @@
     <string name="ok_label">DE ACUERDO</string>
     <string name="play_label">Jugar</string>
     <string name="privacy_label">Privacidad</string>
-    <string name="third_party_licenses_label">Licencias de terceros</string>
-    <string name="licenses_title">Licencias de terceros</string>
     <string name="proceed_label">Proceder</string>
     <string name="rate_us_label">Calificanos</string>
     <string name="regenerate_level_label">Nivel de regeneración</string>
@@ -83,9 +80,10 @@
     <string name="theme_orange">Naranja</string>
     <string name="theme_red">Rojo</string>
     <string name="theme_yellow">Amarillo</string>
+    <string name="third_party_licenses_label">Licencias de terceros</string>
     <string name="vibrations_label">Vibraciones</string>
     <string name="watch_ad_label">Ver anuncio</string>
-    <string name="watch_ad_to_remove_ads">Ver anuncio (quedan %1$d)</string>
+    <string name="watch_ad_to_remove_ads">Ver anuncio (%1$d/%1$d)</string>
     <string name="width_auto_label">Ancho (0 para automático)</string>
     <string name="width_label">Ancho</string>
     <string name="write_us_label">Escríbenos</string>

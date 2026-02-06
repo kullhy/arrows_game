@@ -23,7 +23,6 @@
     <string name="content_description_back">Kembali</string>
     <string name="content_description_generate">Buat Level Kustom</string>
     <string name="content_description_guidance_lines">Garis Pedoman</string>
-    <string name="content_description_levels">Tingkat</string>
     <string name="content_description_life">Kehidupan</string>
     <string name="content_description_open">Membuka</string>
     <string name="content_description_restart">Mulai ulang</string>
@@ -62,8 +61,6 @@
     <string name="ok_label">OKE</string>
     <string name="play_label">Bermain</string>
     <string name="privacy_label">Pribadi</string>
-    <string name="third_party_licenses_label">Lisensi Pihak Ketiga</string>
-    <string name="licenses_title">Lisensi Pihak Ketiga</string>
     <string name="proceed_label">Melanjutkan</string>
     <string name="rate_us_label">Beri kami nilai</string>
     <string name="regenerate_level_label">Regenerasi Level</string>
@@ -83,9 +80,10 @@
     <string name="theme_orange">Oranye</string>
     <string name="theme_red">Merah</string>
     <string name="theme_yellow">Kuning</string>
+    <string name="third_party_licenses_label">Lisensi Pihak Ketiga</string>
     <string name="vibrations_label">Getaran</string>
     <string name="watch_ad_label">Tonton Iklan</string>
-    <string name="watch_ad_to_remove_ads">Tonton Iklan (%1$d tersisa)</string>
+    <string name="watch_ad_to_remove_ads">Tonton Iklan (%1$d/%1$d)</string>
     <string name="width_auto_label">Lebar (0 untuk Otomatis)</string>
     <string name="width_label">Lebar</string>
     <string name="write_us_label">Tulis kepada kami</string>

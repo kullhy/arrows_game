@@ -23,7 +23,6 @@
     <string name="content_description_back">后退</string>
     <string name="content_description_generate">生成自定义级别</string>
     <string name="content_description_guidance_lines">指导原则</string>
-    <string name="content_description_levels">级别</string>
     <string name="content_description_life">生活</string>
     <string name="content_description_open">打开</string>
     <string name="content_description_restart">重启</string>
@@ -49,7 +48,7 @@
     <string name="generating_progress">正在生成… %1$d%%</string>
     <string name="height_auto_label">高度（0 表示自动）</string>
     <string name="height_label">高度</string>
-    <string name="hint_label">提示</string>
+    <string name="hint_label">暗示</string>
     <string name="home_label">家</string>
     <string name="level_dialog_title">等级</string>
     <string name="level_label">级别 %1$d</string>
@@ -62,8 +61,6 @@
     <string name="ok_label">好的</string>
     <string name="play_label">玩</string>
     <string name="privacy_label">隐私</string>
-    <string name="third_party_licenses_label">第三方许可证</string>
-    <string name="licenses_title">第三方许可证</string>
     <string name="proceed_label">继续</string>
     <string name="rate_us_label">请给我们评分</string>
     <string name="regenerate_level_label">再生等级</string>
@@ -83,9 +80,10 @@
     <string name="theme_orange">橙子</string>
     <string name="theme_red">红色的</string>
     <string name="theme_yellow">黄色的</string>
+    <string name="third_party_licenses_label">第三方许可</string>
     <string name="vibrations_label">振动</string>
     <string name="watch_ad_label">观看广告</string>
-    <string name="watch_ad_to_remove_ads">观看广告（剩余 %1$d）</string>
+    <string name="watch_ad_to_remove_ads">观看广告 (%1$d/%1$d)</string>
     <string name="width_auto_label">宽度（0 表示自动）</string>
     <string name="width_label">宽度</string>
     <string name="write_us_label">请联系我们</string>

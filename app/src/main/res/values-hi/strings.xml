@@ -23,7 +23,6 @@
     <string name="content_description_back">पीछे</string>
     <string name="content_description_generate">कस्टम स्तर उत्पन्न करें</string>
     <string name="content_description_guidance_lines">मार्गदर्शन रेखाएँ</string>
-    <string name="content_description_levels">स्तरों</string>
     <string name="content_description_life">ज़िंदगी</string>
     <string name="content_description_open">खुला</string>
     <string name="content_description_restart">पुनः आरंभ करें</string>
@@ -49,7 +48,7 @@
     <string name="generating_progress">जनरेट हो रहा है… %1$d%%</string>
     <string name="height_auto_label">ऊंचाई (स्वचालित के लिए 0)</string>
     <string name="height_label">ऊंचाई</string>
-    <string name="hint_label">संकेत</string>
+    <string name="hint_label">संकेत देना</string>
     <string name="home_label">घर</string>
     <string name="level_dialog_title">स्तर</string>
     <string name="level_label">स्तर %1$d</string>
@@ -62,8 +61,6 @@
     <string name="ok_label">ठीक है</string>
     <string name="play_label">खेल</string>
     <string name="privacy_label">गोपनीयता</string>
-    <string name="third_party_licenses_label">तृतीय पक्ष लाइसेंस</string>
-    <string name="licenses_title">तृतीय पक्ष लाइसेंस</string>
     <string name="proceed_label">आगे बढ़ना</string>
     <string name="rate_us_label">हमें रेटिंग दें</string>
     <string name="regenerate_level_label">पुनर्जनन स्तर</string>
@@ -83,9 +80,10 @@
     <string name="theme_orange">नारंगी</string>
     <string name="theme_red">लाल</string>
     <string name="theme_yellow">पीला</string>
+    <string name="third_party_licenses_label">तृतीय पक्ष लाइसेंस</string>
     <string name="vibrations_label">कंपन</string>
     <string name="watch_ad_label">विज्ञापन देखें</string>
-    <string name="watch_ad_to_remove_ads">विज्ञापन देखें (%1$d शेष)</string>
+    <string name="watch_ad_to_remove_ads">विज्ञापन देखें (%1$d/%1$d)</string>
     <string name="width_auto_label">चौड़ाई (स्वचालित के लिए 0)</string>
     <string name="width_label">चौड़ाई</string>
     <string name="write_us_label">हमें लिखना</string>

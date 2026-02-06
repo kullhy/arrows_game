@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.batodev.arrows.GameConstants
 import com.batodev.arrows.R
 import com.batodev.arrows.ads.RewardAdManager
 import com.batodev.arrows.data.UserPreferencesRepository
@@ -138,7 +139,11 @@ private fun AdWatchButton(state: AdNotFreeSectionState, remainingAds: Int) {
             text = when {
                 state.isAdLoading -> stringResource(R.string.loading_ad)
                 !state.isAdLoaded -> stringResource(R.string.ad_not_ready)
-                else -> stringResource(R.string.watch_ad_to_remove_ads, remainingAds)
+                else -> stringResource(
+                    R.string.watch_ad_to_remove_ads,
+                    remainingAds,
+                    REQUIRED_AD_COUNT_FOR_AD_FREE
+                )
             },
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold

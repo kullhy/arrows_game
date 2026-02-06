@@ -23,7 +23,6 @@
     <string name="content_description_back">Z powrotem</string>
     <string name="content_description_generate">Generuj poziom niestandardowy</string>
     <string name="content_description_guidance_lines">Linie pomocnicze</string>
-    <string name="content_description_levels">Poziomy</string>
     <string name="content_description_life">Życie</string>
     <string name="content_description_open">Otwarte</string>
     <string name="content_description_restart">Uruchom ponownie</string>
@@ -49,7 +48,7 @@
     <string name="generating_progress">Generowanie… %1$d%%</string>
     <string name="height_auto_label">Wysokość (0 dla Auto)</string>
     <string name="height_label">Wysokość</string>
-    <string name="hint_label">Podpowiedź</string>
+    <string name="hint_label">Wskazówka</string>
     <string name="home_label">Dom</string>
     <string name="level_dialog_title">Poziom</string>
     <string name="level_label">Poziom %1$d</string>
@@ -62,8 +61,6 @@
     <string name="ok_label">OK</string>
     <string name="play_label">Zagraj</string>
     <string name="privacy_label">Prywatność</string>
-    <string name="third_party_licenses_label">Licencje stron trzecich</string>
-    <string name="licenses_title">Licencje stron trzecich</string>
     <string name="proceed_label">Przystępować</string>
     <string name="rate_us_label">Oceń nas</string>
     <string name="regenerate_level_label">Poziom regeneracji</string>
@@ -83,9 +80,10 @@
     <string name="theme_orange">Pomarańczowy</string>
     <string name="theme_red">Czerwony</string>
     <string name="theme_yellow">Żółty</string>
+    <string name="third_party_licenses_label">Licencje stron trzecich</string>
     <string name="vibrations_label">Wibracje</string>
     <string name="watch_ad_label">Obejrzyj reklamę</string>
-    <string name="watch_ad_to_remove_ads">Obejrzyj reklamę (pozostało %1$d)</string>
+    <string name="watch_ad_to_remove_ads">Obejrzyj reklamę (%1$d/%1$d)</string>
     <string name="width_auto_label">Szerokość (0 dla Auto)</string>
     <string name="width_label">Szerokość</string>
     <string name="write_us_label">Napisz do nas</string>

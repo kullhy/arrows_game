@@ -106,7 +106,7 @@ private fun LicensesTopBar(onDismiss: () -> Unit, themeColors: ThemeColors) {
         }
         Spacer(modifier = Modifier.width(12.dp))
         Text(
-            text = stringResource(R.string.licenses_title),
+            text = stringResource(R.string.third_party_licenses_label),
             color = White,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold

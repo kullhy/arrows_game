@@ -23,7 +23,6 @@
     <string name="content_description_back">戻る</string>
     <string name="content_description_generate">カスタムレベルの生成</string>
     <string name="content_description_guidance_lines">ガイドライン</string>
-    <string name="content_description_levels">レベル</string>
     <string name="content_description_life">人生</string>
     <string name="content_description_open">開ける</string>
     <string name="content_description_restart">再起動</string>
@@ -62,8 +61,6 @@
     <string name="ok_label">わかりました</string>
     <string name="play_label">遊ぶ</string>
     <string name="privacy_label">プライバシー</string>
-    <string name="third_party_licenses_label">サードパーティライセンス</string>
-    <string name="licenses_title">サードパーティライセンス</string>
     <string name="proceed_label">進む</string>
     <string name="rate_us_label">評価してください</string>
     <string name="regenerate_level_label">レベル再生</string>
@@ -83,9 +80,10 @@
     <string name="theme_orange">オレンジ</string>
     <string name="theme_red">赤</string>
     <string name="theme_yellow">黄色</string>
+    <string name="third_party_licenses_label">サードパーティライセンス</string>
     <string name="vibrations_label">振動</string>
     <string name="watch_ad_label">広告を見る</string>
-    <string name="watch_ad_to_remove_ads">広告を見る（残り%1$d）</string>
+    <string name="watch_ad_to_remove_ads">広告を見る (%1$d/%1$d)</string>
     <string name="width_auto_label">幅（自動の場合は0）</string>
     <string name="width_label">幅</string>
     <string name="write_us_label">メールでお問い合わせください</string>

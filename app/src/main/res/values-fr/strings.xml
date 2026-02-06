@@ -23,7 +23,6 @@
     <string name="content_description_back">Dos</string>
     <string name="content_description_generate">Générer un niveau personnalisé</string>
     <string name="content_description_guidance_lines">Lignes directrices</string>
-    <string name="content_description_levels">Niveaux</string>
     <string name="content_description_life">Vie</string>
     <string name="content_description_open">Ouvrir</string>
     <string name="content_description_restart">Redémarrage</string>
@@ -62,8 +61,6 @@
     <string name="ok_label">D\'ACCORD</string>
     <string name="play_label">Jouer</string>
     <string name="privacy_label">Confidentialité</string>
-    <string name="third_party_licenses_label">Licences tierces</string>
-    <string name="licenses_title">Licences tierces</string>
     <string name="proceed_label">Procéder</string>
     <string name="rate_us_label">Évaluez-nous</string>
     <string name="regenerate_level_label">Niveau de régénération</string>
@@ -83,9 +80,10 @@
     <string name="theme_orange">Orange</string>
     <string name="theme_red">Rouge</string>
     <string name="theme_yellow">Jaune</string>
+    <string name="third_party_licenses_label">Licences tierces</string>
     <string name="vibrations_label">Vibrations</string>
     <string name="watch_ad_label">Regardez la publicité</string>
-    <string name="watch_ad_to_remove_ads">Regardez l\'annonce (%1$d restant)</string>
+    <string name="watch_ad_to_remove_ads">Regarder l\'annonce (%1$d/%1$d)</string>
     <string name="width_auto_label">Largeur (0 pour Auto)</string>
     <string name="width_label">Largeur</string>
     <string name="write_us_label">Écrivez-nous</string>
