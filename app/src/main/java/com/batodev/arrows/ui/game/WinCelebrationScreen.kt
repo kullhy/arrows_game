@@ -1,7 +1,10 @@
 package com.batodev.arrows.ui.game
 
-import android.net.Uri
-import android.widget.VideoView
+import android.graphics.SurfaceTexture
+import android.media.AudioAttributes
+import android.media.MediaPlayer
+import android.view.Surface
+import android.view.TextureView
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -27,7 +30,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.batodev.arrows.GameConstants
 import com.batodev.arrows.R
 import kotlinx.coroutines.delay
-import androidx.core.net.toUri
 
 @Composable
 fun WinCelebrationScreen(onCelebrationComplete: () -> Unit) {
@@ -127,20 +129,82 @@ private fun CelebrationContent(
 @Composable
 private fun VideoPlayerView(videoResId: Int, modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    val videoView = remember { VideoView(context) }
+    val mediaPlayer = remember { MediaPlayer() }
 
-    DisposableEffect(videoResId) {
-        val videoUri = "android.resource://${context.packageName}/$videoResId".toUri()
-        videoView.setVideoURI(videoUri)
-        videoView.start()
-
+    DisposableEffect(Unit) {
         onDispose {
-            videoView.stopPlayback()
+            mediaPlayer.release()
         }
     }
 
     AndroidView(
-        factory = { videoView },
+        factory = { ctx ->
+            TextureView(ctx).apply {
+                surfaceTextureListener = createSurfaceTextureListener(mediaPlayer, ctx, videoResId)
+            }
+        },
         modifier = modifier
     )
+}
+
+private fun createSurfaceTextureListener(
+    mediaPlayer: MediaPlayer,
+    context: android.content.Context,
+    videoResId: Int
+): TextureView.SurfaceTextureListener {
+    return object : TextureView.SurfaceTextureListener {
+        override fun onSurfaceTextureAvailable(
+            surfaceTexture: SurfaceTexture,
+            width: Int,
+            height: Int
+        ) {
+            prepareAndStartVideo(mediaPlayer, context, videoResId, Surface(surfaceTexture))
+        }
+
+        override fun onSurfaceTextureSizeChanged(
+            surfaceTexture: SurfaceTexture,
+            width: Int,
+            height: Int
+        ) = Unit
+
+        override fun onSurfaceTextureDestroyed(surfaceTexture: SurfaceTexture): Boolean = true
+
+        override fun onSurfaceTextureUpdated(surfaceTexture: SurfaceTexture) = Unit
+    }
+}
+
+private fun prepareAndStartVideo(
+    mediaPlayer: MediaPlayer,
+    context: android.content.Context,
+    videoResId: Int,
+    surface: Surface
+) {
+    try {
+        mediaPlayer.reset()
+        mediaPlayer.setSurface(surface)
+
+        // Configure audio attributes to NOT request audio focus
+        // This prevents YouTube and other media apps from pausing
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_GAME)
+            .setContentType(AudioAttributes.CONTENT_TYPE_MOVIE)
+            .build()
+        mediaPlayer.setAudioAttributes(audioAttributes)
+
+        // Mute the video completely
+        mediaPlayer.setVolume(0f, 0f)
+
+        val afd = context.resources.openRawResourceFd(videoResId)
+        mediaPlayer.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+        afd.close()
+
+        mediaPlayer.prepareAsync()
+        mediaPlayer.setOnPreparedListener { mp ->
+            mp.start()
+        }
+    } catch (e: java.io.IOException) {
+        android.util.Log.w("WinCelebration", "Failed to play celebration video", e)
+    } catch (e: IllegalStateException) {
+        android.util.Log.w("WinCelebration", "MediaPlayer in invalid state", e)
+    }
 }
