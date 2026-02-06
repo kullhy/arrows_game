@@ -134,7 +134,7 @@ fun PurchasesSection(
             AdFreeSection(themeColors)
         } else {
             AdNotFreeSection(
-                AdNotFreeSectionState(
+                AdSettingsSectionState(
                     repository, rewardAdManager, themeColors, activity, coroutineScope,
                     rewardAdCount, isAdLoaded, isAdLoading
                 )

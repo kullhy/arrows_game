@@ -1,6 +1,5 @@
 package com.batodev.arrows.ui
 
-import android.app.Activity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,22 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.batodev.arrows.R
 import com.batodev.arrows.REQUIRED_AD_COUNT_FOR_AD_FREE
-import com.batodev.arrows.ads.RewardAdManager
-import com.batodev.arrows.data.UserPreferencesRepository
 import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
 import kotlinx.coroutines.launch
-
-data class AdNotFreeSectionState(
-    val repository: UserPreferencesRepository,
-    val rewardAdManager: RewardAdManager,
-    val themeColors: ThemeColors,
-    val activity: Activity?,
-    val coroutineScope: kotlinx.coroutines.CoroutineScope,
-    val rewardAdCount: Int,
-    val isAdLoaded: Boolean,
-    val isAdLoading: Boolean
-)
 
 @Composable
 fun AdFreeSection(themeColors: ThemeColors) {
@@ -73,7 +59,7 @@ fun AdFreeSection(themeColors: ThemeColors) {
 }
 
 @Composable
-fun AdNotFreeSection(state: AdNotFreeSectionState) {
+fun AdNotFreeSection(state: AdSettingsSectionState) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
@@ -114,7 +100,7 @@ fun AdNotFreeSection(state: AdNotFreeSectionState) {
 }
 
 @Composable
-private fun AdWatchButton(state: AdNotFreeSectionState) {
+private fun AdWatchButton(state: AdSettingsSectionState) {
     Button(
         onClick = {
             state.activity?.let { act ->
@@ -143,7 +129,7 @@ private fun AdWatchButton(state: AdNotFreeSectionState) {
     }
 }
 
-private fun handleAdReward(state: AdNotFreeSectionState) {
+private fun handleAdReward(state: AdSettingsSectionState) {
     state.coroutineScope.launch {
         state.repository.incrementRewardAdCount()
         val newCount = state.rewardAdCount + 1

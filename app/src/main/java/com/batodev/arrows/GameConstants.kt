@@ -244,7 +244,7 @@ object GameConstants {
     const val VIDEO_TOTAL_DURATION = 5000
 
     /** Number of available win celebration videos */
-    const val WIN_VIDEOS_COUNT = 22
+    const val WIN_VIDEOS_COUNT = 26
 
     /** Small delay before starting video to ensure it's prepared */
     const val VIDEO_PREPARATION_DELAY = 50L

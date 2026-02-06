@@ -16,7 +16,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -30,20 +29,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.batodev.arrows.GameConstants
-import com.batodev.arrows.R
 import kotlinx.coroutines.delay
 
 @Composable
 fun WinCelebrationScreen(onCelebrationComplete: () -> Unit) {
     var videoAlpha by remember { mutableFloatStateOf(0f) }
     var shouldShowCelebration by remember { mutableStateOf(true) }
-    var selectedLabel by remember { mutableIntStateOf(R.string.congratulations_super) }
-    var selectedVideoResId by remember { mutableIntStateOf(R.raw.win1) }
-
-    SelectRandomCelebrationContent { label, videoId ->
-        selectedLabel = label
-        selectedVideoResId = videoId
-    }
+    val celebration = remember { CelebrationContentSelector.selectContent() }
 
     val animatedAlpha by animateFloatAsState(
         targetValue = videoAlpha,
@@ -61,18 +53,7 @@ fun WinCelebrationScreen(onCelebrationComplete: () -> Unit) {
     )
 
     if (shouldShowCelebration) {
-        CelebrationContent(selectedVideoResId, selectedLabel, animatedAlpha)
-    }
-}
-
-@Composable
-private fun SelectRandomCelebrationContent(
-    onContentSelected: (Int, Int) -> Unit,
-) {
-    LaunchedEffect(Unit) {
-        val label = GameConstants.CONGRATULATION_LABELS.random()
-        val videoId = GameConstants.WIN_VIDEOS.random()
-        onContentSelected(label, videoId)
+        CelebrationContent(celebration.videoResId, celebration.labelResId, animatedAlpha)
     }
 }
 
