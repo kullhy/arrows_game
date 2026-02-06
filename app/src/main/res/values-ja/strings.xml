@@ -70,6 +70,7 @@
     <string name="shape_label">形</string>
     <string name="shape_rectangular">長方形</string>
     <string name="sounds_label">音</string>
+    <string name="source_code_label">ソースコード</string>
     <string name="speed_high">高い</string>
     <string name="speed_low">低い</string>
     <string name="speed_medium">中くらい</string>

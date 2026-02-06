@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Grid4x4
@@ -35,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.batodev.arrows.GameConstants
 import com.batodev.arrows.R
 import com.batodev.arrows.ads.RewardAdManager
 import com.batodev.arrows.data.UserPreferencesRepository
@@ -110,6 +112,9 @@ fun FeedbackSection(context: Context, themeColors: ThemeColors) {
                 context,
                 "https://play.google.com/store/apps/dev?id=8228670503574649511"
             )
+        }
+        SettingsClickableItem(Icons.Default.Code, stringResource(R.string.source_code_label)) {
+            SettingsUtils.launchBrowser(context, GameConstants.GITHUB_REPO_URL)
         }
     }
 }

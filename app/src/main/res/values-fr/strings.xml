@@ -70,6 +70,7 @@
     <string name="shape_label">Forme</string>
     <string name="shape_rectangular">Rectangulaire</string>
     <string name="sounds_label">Sons</string>
+    <string name="source_code_label">Code source</string>
     <string name="speed_high">Haut</string>
     <string name="speed_low">Faible</string>
     <string name="speed_medium">Moyen</string>

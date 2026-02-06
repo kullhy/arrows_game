@@ -70,6 +70,7 @@
     <string name="shape_label">شكل</string>
     <string name="shape_rectangular">مستطيل</string>
     <string name="sounds_label">أصوات</string>
+    <string name="source_code_label">شفرة المصدر</string>
     <string name="speed_high">عالي</string>
     <string name="speed_low">قليل</string>
     <string name="speed_medium">واسطة</string>

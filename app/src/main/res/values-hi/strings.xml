@@ -70,6 +70,7 @@
     <string name="shape_label">आकार</string>
     <string name="shape_rectangular">आयताकार</string>
     <string name="sounds_label">ध्वनि</string>
+    <string name="source_code_label">सोर्स कोड</string>
     <string name="speed_high">उच्च</string>
     <string name="speed_low">कम</string>
     <string name="speed_medium">मध्यम</string>

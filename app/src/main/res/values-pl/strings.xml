@@ -70,6 +70,7 @@
     <string name="shape_label">Kształt</string>
     <string name="shape_rectangular">Prostokątny</string>
     <string name="sounds_label">Dźwięki</string>
+    <string name="source_code_label">Kod źródłowy</string>
     <string name="speed_high">Wysoki</string>
     <string name="speed_low">Niski</string>
     <string name="speed_medium">Średni</string>

@@ -9,6 +9,7 @@
     <string name="hash_d74d1fbab03598972917931757a2234bdc98bad9329c70b085be2e4cfca23283" translatable="false">theme_bw</string>
     <string name="hash_09b28e2b438c7776a82de040c579a7c78e03e39b0f4e76bdf9f527b00e84b20d" translatable="false">write_us_label</string>
     <string name="hash_f3d9ff7e2c4aa6bc1f2756966d833f7c896e76e95b1abb2da35c8f74beb5b3c2" translatable="false">congratulations_outstanding</string>
+    <string name="hash_bc47da663d101bfc1d4edcb3762f37fbe8fab3e931cfd460c69cb432b806d419" translatable="false">source_code_label</string>
     <string name="hash_8e588cd187741f1cd76f5fab77b7208782a8c21d764ce7d7a4cf3ac4e0968873" translatable="false">speed_medium</string>
     <string name="hash_ba19e9c3d5f49882ddaafed4f286a8a81491150426d321179270e27e74a89097" translatable="false">theme_red</string>
     <string name="hash_76900f1bfd16c8d4dd3d25e6f46638d7165aee23883ccea6bfe071c514421769" translatable="false">content_description_back</string>
@@ -41,7 +42,6 @@
     <string name="hash_f451180cfaaeab791ccd81ba68735adbd2203e07a9cff3deacda36310603f9df" translatable="false">content_description_guidance_lines</string>
     <string name="hash_883b5a98f89cc0cb068e268f0d8139ffa86cd41fc86060144c698829166c5297" translatable="false">regenerate_level_label</string>
     <string name="hash_c6c8fb08219ce7f75138db7a08ff4687a87dab553e4a77e99f91a7c4ffce3ce7" translatable="false">fill_board_label</string>
-    <string name="hash_22cae470c2eceb24321dc743c45610c70d956e192becf70ac3ed16adf2822aa9" translatable="false">watch_ad_to_remove_ads</string>
     <string name="hash_f0a9f807ce5132c06020ccaeca76b7e6c18d76b408c1bd3fcd71f6299c69be0c" translatable="false">email_subject</string>
     <string name="hash_3765ea16037b1bc3a463f8fe8b02e133ab6d3eb72d7cb4748dacec664684bc1f" translatable="false">congratulations_great</string>
     <string name="hash_67f68a72462bca9b1642747164bcc1fac7a3d5340059f4ce99dc77ee9829bb6c" translatable="false">congratulations_awesome</string>

@@ -70,6 +70,7 @@
     <string name="shape_label">Forma</string>
     <string name="shape_rectangular">Rettangolare</string>
     <string name="sounds_label">Suoni</string>
+    <string name="source_code_label">Codice sorgente</string>
     <string name="speed_high">Alto</string>
     <string name="speed_low">Basso</string>
     <string name="speed_medium">Medio</string>

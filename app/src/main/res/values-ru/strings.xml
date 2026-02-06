@@ -70,6 +70,7 @@
     <string name="shape_label">Форма</string>
     <string name="shape_rectangular">Прямоугольный</string>
     <string name="sounds_label">Звуки</string>
+    <string name="source_code_label">Исходный код</string>
     <string name="speed_high">Высокий</string>
     <string name="speed_low">Низкий</string>
     <string name="speed_medium">Середина</string>

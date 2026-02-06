@@ -223,6 +223,11 @@ object GameConstants {
     val INTERSTITIAL_AD_UNIT_ID: String get() = BuildConfig.INTERSTITIAL_AD_UNIT_ID
 
     // ====================
+    // EXTERNAL LINKS
+    // ====================
+    const val GITHUB_REPO_URL = "https://github.com/robmat/arrows_game"
+
+    // ====================
     // INPUT HANDLING
     // ====================
     /** Cell center position (0.5 = 50% of cell) used for tap area calculations */

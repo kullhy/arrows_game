@@ -70,6 +70,7 @@
     <string name="shape_label">形状</string>
     <string name="shape_rectangular">矩形的</string>
     <string name="sounds_label">声音</string>
+    <string name="source_code_label">源代码</string>
     <string name="speed_high">高的</string>
     <string name="speed_low">低的</string>
     <string name="speed_medium">中等的</string>
