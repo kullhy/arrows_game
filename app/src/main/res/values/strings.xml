@@ -84,7 +84,6 @@
     <string name="third_party_licenses_label">Third Party Licenses</string>
     <string name="vibrations_label">Vibrations</string>
     <string name="watch_ad_label">Watch Ad</string>
-    <string name="watch_ad_to_remove_ads">Watch Ad (%1$d/%1$d)</string>
     <string name="width_auto_label">Width (0 for Auto)</string>
     <string name="width_label">Width</string>
     <string name="write_us_label">Write us</string>

@@ -83,7 +83,6 @@
     <string name="third_party_licenses_label">サードパーティライセンス</string>
     <string name="vibrations_label">振動</string>
     <string name="watch_ad_label">広告を見る</string>
-    <string name="watch_ad_to_remove_ads">広告を見る (%1$d/%1$d)</string>
     <string name="width_auto_label">幅（自動の場合は0）</string>
     <string name="width_label">幅</string>
     <string name="write_us_label">メールでお問い合わせください</string>

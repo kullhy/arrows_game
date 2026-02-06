@@ -83,7 +83,6 @@
     <string name="third_party_licenses_label">Лицензии третьих сторон</string>
     <string name="vibrations_label">Вибрации</string>
     <string name="watch_ad_label">Смотреть рекламу</string>
-    <string name="watch_ad_to_remove_ads">Смотреть рекламу (%1$d/%1$d)</string>
     <string name="width_auto_label">Ширина (0 для автоматического режима)</string>
     <string name="width_label">Ширина</string>
     <string name="write_us_label">Напишите нам</string>

@@ -83,7 +83,6 @@
     <string name="third_party_licenses_label">تراخيص الطرف الثالث</string>
     <string name="vibrations_label">الاهتزازات</string>
     <string name="watch_ad_label">شاهد الإعلان</string>
-    <string name="watch_ad_to_remove_ads">شاهد الإعلان (%1$d/%1$d)</string>
     <string name="width_auto_label">العرض (0 للوضع التلقائي)</string>
     <string name="width_label">عرض</string>
     <string name="write_us_label">اكتب ساعات</string>

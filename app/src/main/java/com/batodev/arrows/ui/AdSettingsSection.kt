@@ -22,15 +22,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.batodev.arrows.GameConstants
 import com.batodev.arrows.R
+import com.batodev.arrows.REQUIRED_AD_COUNT_FOR_AD_FREE
 import com.batodev.arrows.ads.RewardAdManager
 import com.batodev.arrows.data.UserPreferencesRepository
 import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
 import kotlinx.coroutines.launch
-
-const val REQUIRED_AD_COUNT_FOR_AD_FREE = 30
 
 data class AdNotFreeSectionState(
     val repository: UserPreferencesRepository,
@@ -76,8 +74,6 @@ fun AdFreeSection(themeColors: ThemeColors) {
 
 @Composable
 fun AdNotFreeSection(state: AdNotFreeSectionState) {
-    val remainingAds = maxOf(0, REQUIRED_AD_COUNT_FOR_AD_FREE - state.rewardAdCount)
-
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
@@ -100,7 +96,7 @@ fun AdNotFreeSection(state: AdNotFreeSectionState) {
                 modifier = Modifier.weight(1f)
             )
             Text(
-                text = "${state.rewardAdCount} / $REQUIRED_AD_COUNT_FOR_AD_FREE",
+                text = "${state.rewardAdCount} / ${REQUIRED_AD_COUNT_FOR_AD_FREE}",
                 fontSize = 14.sp,
                 color = state.themeColors.accent,
                 fontWeight = FontWeight.Bold
@@ -113,12 +109,12 @@ fun AdNotFreeSection(state: AdNotFreeSectionState) {
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             color = state.themeColors.accent
         )
-        AdWatchButton(state, remainingAds)
+        AdWatchButton(state)
     }
 }
 
 @Composable
-private fun AdWatchButton(state: AdNotFreeSectionState, remainingAds: Int) {
+private fun AdWatchButton(state: AdNotFreeSectionState) {
     Button(
         onClick = {
             state.activity?.let { act ->
@@ -139,11 +135,7 @@ private fun AdWatchButton(state: AdNotFreeSectionState, remainingAds: Int) {
             text = when {
                 state.isAdLoading -> stringResource(R.string.loading_ad)
                 !state.isAdLoaded -> stringResource(R.string.ad_not_ready)
-                else -> stringResource(
-                    R.string.watch_ad_to_remove_ads,
-                    remainingAds,
-                    REQUIRED_AD_COUNT_FOR_AD_FREE
-                )
+                else -> stringResource(R.string.watch_ad_label)
             },
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold

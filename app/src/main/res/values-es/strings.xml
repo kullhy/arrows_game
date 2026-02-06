@@ -83,7 +83,6 @@
     <string name="third_party_licenses_label">Licencias de terceros</string>
     <string name="vibrations_label">Vibraciones</string>
     <string name="watch_ad_label">Ver anuncio</string>
-    <string name="watch_ad_to_remove_ads">Ver anuncio (%1$d/%1$d)</string>
     <string name="width_auto_label">Ancho (0 para automático)</string>
     <string name="width_label">Ancho</string>
     <string name="write_us_label">Escríbenos</string>

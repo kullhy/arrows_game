@@ -296,3 +296,6 @@ object GameConstants {
         R.raw.win26,
     )
 }
+
+/** Ads to watch to remove all ads. */
+const val REQUIRED_AD_COUNT_FOR_AD_FREE = 30

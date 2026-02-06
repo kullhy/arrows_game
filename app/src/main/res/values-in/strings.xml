@@ -83,7 +83,6 @@
     <string name="third_party_licenses_label">Lisensi Pihak Ketiga</string>
     <string name="vibrations_label">Getaran</string>
     <string name="watch_ad_label">Tonton Iklan</string>
-    <string name="watch_ad_to_remove_ads">Tonton Iklan (%1$d/%1$d)</string>
     <string name="width_auto_label">Lebar (0 untuk Otomatis)</string>
     <string name="width_label">Lebar</string>
     <string name="write_us_label">Tulis kepada kami</string>

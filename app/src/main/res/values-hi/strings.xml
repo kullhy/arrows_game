@@ -83,7 +83,6 @@
     <string name="third_party_licenses_label">तृतीय पक्ष लाइसेंस</string>
     <string name="vibrations_label">कंपन</string>
     <string name="watch_ad_label">विज्ञापन देखें</string>
-    <string name="watch_ad_to_remove_ads">विज्ञापन देखें (%1$d/%1$d)</string>
     <string name="width_auto_label">चौड़ाई (स्वचालित के लिए 0)</string>
     <string name="width_label">चौड़ाई</string>
     <string name="write_us_label">हमें लिखना</string>
