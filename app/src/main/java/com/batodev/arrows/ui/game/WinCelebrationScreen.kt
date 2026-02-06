@@ -33,7 +33,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun WinCelebrationScreen(onCelebrationComplete: () -> Unit) {
-    var videoAlpha by remember { mutableStateOf(0f) }
+    var videoAlpha by remember { mutableFloatStateOf(0f) }
     var shouldShowCelebration by remember { mutableStateOf(true) }
     var selectedLabel by remember { mutableStateOf(R.string.congratulations_super) }
     var selectedVideoResId by remember { mutableStateOf(R.raw.win1) }
