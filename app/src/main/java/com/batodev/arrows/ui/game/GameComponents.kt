@@ -42,14 +42,26 @@ import com.batodev.arrows.ui.theme.White
 
 private const val PROGRESS_ANIM_DURATION = 500
 
+data class HintButtonState(
+    val isAdFree: Boolean = false,
+    val isAdLoaded: Boolean = false,
+    val isAdLoading: Boolean = false
+)
+
+data class GameTopBarState(
+    val lives: Int,
+    val maxLives: Int,
+    val hintState: HintButtonState = HintButtonState()
+)
+
+data class GameTopBarCallbacks(
+    val onRestart: () -> Unit,
+    val onHint: () -> Unit,
+    val onBack: () -> Unit
+)
+
 @Composable
-fun GameTopBar(
-    lives: Int,
-    maxLives: Int,
-    onRestart: () -> Unit,
-    onHint: () -> Unit,
-    onBack: () -> Unit
-) {
+fun GameTopBar(state: GameTopBarState, callbacks: GameTopBarCallbacks) {
     val themeColors = LocalThemeColors.current
 
     Row(
@@ -57,9 +69,9 @@ fun GameTopBar(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        GameControls(onBack, onRestart, themeColors)
-        HeartsDisplay(lives, maxLives)
-        HintButton(themeColors, onHint)
+        GameControls(callbacks.onBack, callbacks.onRestart, themeColors)
+        HeartsDisplay(state.lives, state.maxLives)
+        HintButton(themeColors, callbacks.onHint, state.hintState)
     }
 }
 
@@ -110,7 +122,14 @@ private fun HeartsDisplay(lives: Int, maxLives: Int) {
 }
 
 @Composable
-private fun HintButton(themeColors: ThemeColors, onClick: () -> Unit) {
+private fun HintButton(themeColors: ThemeColors, onClick: () -> Unit, state: HintButtonState) {
+    val buttonText = when {
+        state.isAdFree -> stringResource(R.string.hint_label)
+        state.isAdLoading -> stringResource(R.string.loading_label)
+        state.isAdLoaded -> stringResource(R.string.hint_label)
+        else -> stringResource(R.string.ad_not_ready)
+    }
+
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = themeColors.topBarButton, contentColor = White),
@@ -124,7 +143,7 @@ private fun HintButton(themeColors: ThemeColors, onClick: () -> Unit) {
             modifier = Modifier.size(16.dp)
         )
         Spacer(modifier = Modifier.width(4.dp))
-        Text(text = stringResource(R.string.loading_label), fontSize = 12.sp)
+        Text(text = buttonText, fontSize = 12.sp)
     }
 }
 

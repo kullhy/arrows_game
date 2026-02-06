@@ -49,6 +49,7 @@
     <string name="generating_progress">Génération en cours… %1$d%%</string>
     <string name="height_auto_label">Hauteur (0 pour Auto)</string>
     <string name="height_label">Hauteur</string>
+    <string name="hint_label">Indice</string>
     <string name="home_label">Maison</string>
     <string name="level_dialog_title">Niveau</string>
     <string name="level_label">Niveau %1$d</string>

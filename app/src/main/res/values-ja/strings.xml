@@ -49,6 +49,7 @@
     <string name="generating_progress">生成中…%1$d%%</string>
     <string name="height_auto_label">高さ（自動の場合は0）</string>
     <string name="height_label">身長</string>
+    <string name="hint_label">ヒント</string>
     <string name="home_label">家</string>
     <string name="level_dialog_title">レベル</string>
     <string name="level_label">レベル %1$d</string>

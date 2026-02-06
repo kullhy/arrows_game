@@ -49,6 +49,7 @@
     <string name="generating_progress">जनरेट हो रहा है… %1$d%%</string>
     <string name="height_auto_label">ऊंचाई (स्वचालित के लिए 0)</string>
     <string name="height_label">ऊंचाई</string>
+    <string name="hint_label">संकेत</string>
     <string name="home_label">घर</string>
     <string name="level_dialog_title">स्तर</string>
     <string name="level_label">स्तर %1$d</string>

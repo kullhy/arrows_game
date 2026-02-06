@@ -65,6 +65,9 @@ import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.ads.BannerAdView
 import com.batodev.arrows.ui.game.GameProgressBar
 import com.batodev.arrows.ui.game.GameTopBar
+import com.batodev.arrows.ui.game.GameTopBarCallbacks
+import com.batodev.arrows.ui.game.GameTopBarState
+import com.batodev.arrows.ui.game.HintButtonState
 import com.batodev.arrows.ui.game.WinCelebrationScreen
 import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.HeartRed
@@ -185,8 +188,8 @@ fun ArrowsGameView(
         GameScreenContent(
             GameScreenContentParams(
                 engine, activity, context, tapAnimations, guidanceAlpha, showGuidanceLines, themeColors,
-                rewardAdManager, isAdFree, handleHint, { showGuidanceLines = !showGuidanceLines },
-                showCelebrationVideo, onCelebrationComplete
+                rewardAdManager, isAdFree, isAdLoaded, isAdLoading, handleHint,
+                { showGuidanceLines = !showGuidanceLines }, showCelebrationVideo, onCelebrationComplete
             )
         )
     }
@@ -275,11 +278,16 @@ private fun ColumnScope.GameArea(params: GameAreaParams) {
 private fun GameScreenContent(params: GameScreenContentParams) {
     Column(modifier = Modifier.fillMaxSize()) {
         GameTopBar(
-            lives = params.engine.lives,
-            maxLives = params.engine.maxLives,
-            onRestart = { params.engine.restartLevel() },
-            onHint = params.handleHint,
-            onBack = { (params.context as? Activity)?.finish() }
+            state = GameTopBarState(
+                lives = params.engine.lives,
+                maxLives = params.engine.maxLives,
+                hintState = HintButtonState(params.isAdFree, params.isAdLoaded, params.isAdLoading)
+            ),
+            callbacks = GameTopBarCallbacks(
+                onRestart = { params.engine.restartLevel() },
+                onHint = params.handleHint,
+                onBack = { (params.context as? Activity)?.finish() }
+            )
         )
         GameProgressBar(
             totalSnakes = params.engine.totalSnakesInLevel,

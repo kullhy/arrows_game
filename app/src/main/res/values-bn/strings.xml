@@ -49,6 +49,7 @@
     <string name="generating_progress">তৈরি হচ্ছে… %1$d%%</string>
     <string name="height_auto_label">উচ্চতা (অটোর জন্য ০)</string>
     <string name="height_label">উচ্চতা</string>
+    <string name="hint_label">ইঙ্গিত</string>
     <string name="home_label">হোম</string>
     <string name="level_dialog_title">স্তর</string>
     <string name="level_label">স্তর %1$d</string>

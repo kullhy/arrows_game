@@ -69,6 +69,8 @@ data class GameScreenContentParams(
     val themeColors: ThemeColors,
     val rewardAdManager: RewardAdManager,
     val isAdFree: Boolean,
+    val isAdLoaded: Boolean,
+    val isAdLoading: Boolean,
     val handleHint: () -> Unit,
     val onToggleGuidance: () -> Unit,
     val showCelebrationVideo: Boolean,

@@ -49,6 +49,7 @@
     <string name="generating_progress">تیار ہو رہا ہے… %1$d%%</string>
     <string name="height_auto_label">اونچائی (0 آٹو کے لیے)</string>
     <string name="height_label">اونچائی</string>
+    <string name="hint_label">اشارہ</string>
     <string name="home_label">گھر</string>
     <string name="level_dialog_title">سطح</string>
     <string name="level_label">لیول %1$d</string>

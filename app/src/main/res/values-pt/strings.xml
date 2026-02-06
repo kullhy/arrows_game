@@ -49,6 +49,7 @@
     <string name="generating_progress">Gerando… %1$d%%</string>
     <string name="height_auto_label">Altura (0 para Automático)</string>
     <string name="height_label">Altura</string>
+    <string name="hint_label">Dica</string>
     <string name="home_label">Lar</string>
     <string name="level_dialog_title">Nível</string>
     <string name="level_label">Nível %1$d</string>

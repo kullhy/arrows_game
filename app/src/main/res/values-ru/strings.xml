@@ -49,6 +49,7 @@
     <string name="generating_progress">Генерация… %1$d%%</string>
     <string name="height_auto_label">Высота (0 для автоматического режима)</string>
     <string name="height_label">Высота</string>
+    <string name="hint_label">Подсказка</string>
     <string name="home_label">Дом</string>
     <string name="level_dialog_title">Уровень</string>
     <string name="level_label">Уровень %1$d</string>

@@ -49,6 +49,7 @@
     <string name="generating_progress">جارٍ إنشاء… %1$d%%</string>
     <string name="height_auto_label">الارتفاع (0 للوضع التلقائي)</string>
     <string name="height_label">ارتفاع</string>
+    <string name="hint_label">نصيحة</string>
     <string name="home_label">بيت</string>
     <string name="level_dialog_title">مستوى</string>
     <string name="level_label">المستوى %1$d</string>

@@ -49,6 +49,7 @@
     <string name="generating_progress">Menghasilkan… %1$d%%</string>
     <string name="height_auto_label">Tinggi (0 untuk Otomatis)</string>
     <string name="height_label">Tinggi</string>
+    <string name="hint_label">Petunjuk</string>
     <string name="home_label">Rumah</string>
     <string name="level_dialog_title">Tingkat</string>
     <string name="level_label">Level %1$d</string>
