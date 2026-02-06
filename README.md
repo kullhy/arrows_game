@@ -6,13 +6,48 @@
 This project is an experiment in board generation: the main goal is to create a robust board generator for puzzle games, focusing on solvability and variety. The generator logic attempts to fill the board with "snakes" (arrow paths) while ensuring each level is solvable and interesting.
 
 ## Features
+
+### Gameplay
 - Procedural board generation with customizable shapes and sizes
 - Solvability checker to ensure every generated board can be completed
 - Multiple board shapes via `BoardShapeProvider`
 - Dynamic level progression and difficulty scaling
 - Touch-based gameplay with animated feedback
-- User preferences for vibration, sound, and animation speed
-- Debug and custom game modes
+- Lives system with game-over recovery via rewarded ads
+- Hint system (free when ad-free, otherwise rewarded-ad-gated)
+- Pinch-to-zoom and pan on the game board
+- Toggleable guidance lines overlay to help aim
+
+### Win Celebration
+- Full-screen celebration with fade-in/out video playback (26 videos)
+- 10 randomized congratulatory messages
+- Confetti particle animation
+
+### Custom Level Generator
+- Unlocked at level 20
+- Adjustable board width and height
+- Shape selection (rectangular or custom shapes)
+- Fill-the-board mode for denser puzzles
+
+### Settings & Customization
+- 6 color themes: Dark, Green, Red, Yellow, Orange, Black and White
+- 3 animation speed levels: High, Medium, Low
+- Vibration and sound toggles
+- Fill board toggle
+
+### Monetization
+- Banner, rewarded, and interstitial ads
+- Ad-free unlock by watching 30 rewarded ads (with progress bar)
+
+### Localization
+- 15 languages: English, Arabic, Bengali, German, Spanish, French, Hindi, Indonesian, Italian, Japanese, Polish, Portuguese, Russian, Urdu, Chinese
+
+### Feedback & Legal
+- In-app review (Rate Us), email support (Write Us), developer store link (More Games)
+- Privacy policy link and third-party licenses dialog
+
+### Debug
+- Debug menu to force board dimensions, lives, and shapes
 
 ## Board Generator
 The board generator (`GameGenerator`) is the heart of the project. It:
