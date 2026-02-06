@@ -8,7 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-private const val FLASH_DURATION_MS = 1000L
+private const val FLASH_DURATION_MS = 3000L
 
 class TapHandler(
     private val coroutineScope: CoroutineScope,
@@ -47,6 +47,6 @@ class TapHandler(
         soundManager?.playRandomSwitch()
         onSuccess()
     }
-    
+
     fun clearFlash() { flashingSnakeId = null }
 }

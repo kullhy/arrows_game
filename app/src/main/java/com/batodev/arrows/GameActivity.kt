@@ -2,6 +2,7 @@ package com.batodev.arrows
 
 import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.view.HapticFeedbackConstants
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -163,15 +164,25 @@ fun ArrowsGameView(
     HandleGameWonState(gameWonParams) { showCelebrationVideo = true }
     confettiState = updateConfettiState(engine, confettiState)
     val handleHint: () -> Unit = {
-        if (isAdFree || !isAdLoaded || isAdLoading) {
-            engine.showHint()
-        } else {
-            activity?.let { act ->
-                rewardAdManager.showRewardAd(
-                    activity = act,
-                    onRewarded = { engine.showHint() },
-                    onAdDismissed = { /* No action needed */ }
-                )
+        when {
+            isAdFree -> engine.showHint()
+            isAdLoading -> { /* Do nothing while ad is loading */ }
+            !isAdLoaded -> engine.showHint() // Ad failed to load
+            else -> { // Ad is loaded
+                var wasRewarded = false
+                activity?.let { act ->
+                    rewardAdManager.showRewardAd(
+                        activity = act,
+                        onRewarded = {
+                            wasRewarded = true
+                        },
+                        onAdDismissed = {
+                            if (wasRewarded) {
+                                engine.showHint()
+                            }
+                        }
+                    )
+                }
             }
         }
     }

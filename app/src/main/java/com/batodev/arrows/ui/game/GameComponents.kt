@@ -126,12 +126,13 @@ private fun HintButton(themeColors: ThemeColors, onClick: () -> Unit, state: Hin
     val buttonText = when {
         state.isAdFree -> stringResource(R.string.hint_label)
         state.isAdLoading -> stringResource(R.string.loading_label)
-        state.isAdLoaded -> stringResource(R.string.hint_label)
-        else -> stringResource(R.string.ad_not_ready)
+        else -> stringResource(R.string.hint_label)
     }
+    val buttonEnabled = state.isAdFree || !state.isAdLoading
 
     Button(
         onClick = onClick,
+        enabled = buttonEnabled,
         colors = ButtonDefaults.buttonColors(containerColor = themeColors.topBarButton, contentColor = White),
         shape = RoundedCornerShape(12.dp),
         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
