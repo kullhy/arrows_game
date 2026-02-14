@@ -33,14 +33,13 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.batodev.arrows.GameConstants
 import com.batodev.arrows.R
 import com.batodev.arrows.ui.theme.HeartRed
 import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.ProgressBarGreen
 import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
-
-private const val PROGRESS_ANIM_DURATION = 500
 
 data class HintButtonState(
     val isAdFree: Boolean = false,
@@ -158,7 +157,7 @@ fun GameProgressBar(
 
     val animatedProgress by animateFloatAsState(
         targetValue = targetProgress,
-        animationSpec = tween(durationMillis = PROGRESS_ANIM_DURATION),
+        animationSpec = tween(durationMillis = GameConstants.PROGRESS_ANIM_DURATION),
         label = "ProgressBarAnimation"
     )
 

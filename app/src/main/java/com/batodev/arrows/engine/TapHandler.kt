@@ -3,12 +3,11 @@ package com.batodev.arrows.engine
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.batodev.arrows.GameConstants
 import com.batodev.arrows.SoundManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
-private const val FLASH_DURATION_MS = 3000L
 
 class TapHandler(
     private val coroutineScope: CoroutineScope,
@@ -30,7 +29,7 @@ class TapHandler(
     fun flashSnake(snakeId: Int) {
         flashingSnakeId = snakeId
         coroutineScope.launch {
-            delay(FLASH_DURATION_MS)
+            delay(GameConstants.FLASH_DURATION_MS)
             if (flashingSnakeId == snakeId) flashingSnakeId = null
         }
     }

@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
-import com.batodev.arrows.engine.DEFAULT_TOLERANCE
 import com.batodev.arrows.engine.Direction
 import com.batodev.arrows.engine.GameLevel
 import com.batodev.arrows.engine.Snake
@@ -32,30 +31,6 @@ import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sin
-
-/**
- * Factor to determine the tail length for single-block snakes.
- * The tail length is calculated as: cellWidth * SINGLE_BLOCK_TAIL_FACTOR
- */
-const val SINGLE_BLOCK_TAIL_FACTOR: Float = 0.2f
-
-/**
- * Factor to determine the arrow head size relative to cell width.
- * The arrow head size is calculated as: cellWidth * ARROW_HEAD_SIZE_FACTOR
- */
-const val ARROW_HEAD_SIZE_FACTOR = 0.2f
-
-/**
- * Factor to determine how much the tap area is shifted in the arrow direction.
- * The offset is calculated as: cellWidth * TAP_AREA_OFFSET_FACTOR
- * This makes it easier to tap arrows by moving the tap target toward the arrow head.
- */
-const val TAP_AREA_OFFSET_FACTOR = 0.3f
-
-/**
- * Renderer responsible for drawing the arrows game board including snakes, arrow heads,
- * tap areas, and animations.
- */
 
 object ArrowsBoardRenderer {
     /**
@@ -148,7 +123,7 @@ object ArrowsBoardRenderer {
             cellHeight = cellSize,
             strokeWidth = cellSize * GameConstants.BOARD_STROKE_WIDTH_FACTOR,
             cornerRadius = cellSize * GameConstants.BOARD_CORNER_RADIUS_FACTOR,
-            arrowHeadSize = cellSize * ARROW_HEAD_SIZE_FACTOR,
+            arrowHeadSize = cellSize * GameConstants.ARROW_HEAD_SIZE_FACTOR,
             moveDist = max(
                 canvasSize.width,
                 canvasSize.height
@@ -226,12 +201,12 @@ object ArrowsBoardRenderer {
             val head = snake.body.first()
             val headCx = head.x * metrics.cellWidth + metrics.cellWidth / 2
             val headCy = head.y * metrics.cellHeight + metrics.cellHeight / 2
-            val tapRadius = DEFAULT_TOLERANCE * metrics.cellWidth
+            val tapRadius = GameConstants.DEFAULT_TOLERANCE * metrics.cellWidth
 
             val tapOffsetX =
-                headCx + snake.headDirection.dx * metrics.cellWidth * TAP_AREA_OFFSET_FACTOR
+                headCx + snake.headDirection.dx * metrics.cellWidth * GameConstants.TAP_AREA_OFFSET_FACTOR
             val tapOffsetY =
-                headCy + snake.headDirection.dy * metrics.cellHeight * TAP_AREA_OFFSET_FACTOR
+                headCy + snake.headDirection.dy * metrics.cellHeight * GameConstants.TAP_AREA_OFFSET_FACTOR
 
             drawCircle(
                 color = LightGray.copy(alpha = GameConstants.TAP_AREA_ALPHA),
@@ -370,7 +345,7 @@ object ArrowsBoardRenderer {
         lineEndY: Float,
         snakeColor: Color,
     ) {
-        val tailLength = metrics.cellWidth * SINGLE_BLOCK_TAIL_FACTOR
+        val tailLength = metrics.cellWidth * GameConstants.SINGLE_BLOCK_TAIL_FACTOR
         val tailStartX = lineEndX - snake.headDirection.dx * (tailLength + metrics.cornerRadius)
         val tailStartY = lineEndY - snake.headDirection.dy * (tailLength + metrics.cornerRadius)
 

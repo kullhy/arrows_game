@@ -8,13 +8,11 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.batodev.arrows.GameConstants
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-
-private const val DEFAULT_LEVEL = 1
-private const val DEFAULT_LIVES = 5
 
 @Suppress("TooManyFunctions")
 open class UserPreferencesRepository(private val dataStore: DataStore<Preferences>) {
@@ -35,6 +33,7 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
         val IS_AD_FREE = booleanPreferencesKey("is_ad_free")
         val REWARD_AD_COUNT = intPreferencesKey("reward_ad_count")
         val GAMES_COMPLETED = intPreferencesKey("games_completed")
+        val INTRO_COMPLETED = booleanPreferencesKey("intro_completed")
     }
 
     open val theme: Flow<String> get() = getStringFlow(PreferencesKeys.THEME, "Green")
@@ -42,8 +41,8 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
     open val isVibrationEnabled: Flow<Boolean> get() = getBooleanFlow(PreferencesKeys.VIBRATION_ENABLED, true)
     open val isSoundsEnabled: Flow<Boolean> get() = getBooleanFlow(PreferencesKeys.SOUNDS_ENABLED, true)
     open val isFillBoardEnabled: Flow<Boolean> get() = getBooleanFlow(PreferencesKeys.FILL_BOARD_ENABLED, false)
-    open val levelNumber: Flow<Int> get() = getIntFlow(PreferencesKeys.LEVEL_NUMBER, DEFAULT_LEVEL)
-    open val currentLives: Flow<Int> get() = getIntFlow(PreferencesKeys.CURRENT_LIVES, DEFAULT_LIVES)
+    open val levelNumber: Flow<Int> get() = getIntFlow(PreferencesKeys.LEVEL_NUMBER, GameConstants.DEFAULT_LEVEL)
+    open val currentLives: Flow<Int> get() = getIntFlow(PreferencesKeys.CURRENT_LIVES, GameConstants.DEFAULT_LIVES)
     open val debugForcedWidth: Flow<Int?> get() = getNullableIntFlow(PreferencesKeys.DEBUG_FORCED_WIDTH)
     open val debugForcedHeight: Flow<Int?> get() = getNullableIntFlow(PreferencesKeys.DEBUG_FORCED_HEIGHT)
     open val debugForcedLives: Flow<Int?> get() = getNullableIntFlow(PreferencesKeys.DEBUG_FORCED_LIVES)
@@ -53,6 +52,7 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
     open val isAdFree: Flow<Boolean> get() = getBooleanFlow(PreferencesKeys.IS_AD_FREE, false)
     open val rewardAdCount: Flow<Int> get() = getIntFlow(PreferencesKeys.REWARD_AD_COUNT, 0)
     open val gamesCompleted: Flow<Int> get() = getIntFlow(PreferencesKeys.GAMES_COMPLETED, 0)
+    open val introCompleted: Flow<Boolean> get() = getBooleanFlow(PreferencesKeys.INTRO_COMPLETED, false)
 
     open suspend fun saveThemePreference(theme: String) = save(PreferencesKeys.THEME, theme)
     open suspend fun saveAnimationSpeed(speed: String) = save(PreferencesKeys.ANIMATION_SPEED, speed)
@@ -85,6 +85,8 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
     }
 
     open suspend fun resetRewardAdCount() = save(PreferencesKeys.REWARD_AD_COUNT, 0)
+
+    open suspend fun saveIntroCompleted(completed: Boolean) = save(PreferencesKeys.INTRO_COMPLETED, completed)
 
     open suspend fun incrementGamesCompleted() {
         dataStore.edit { preferences ->

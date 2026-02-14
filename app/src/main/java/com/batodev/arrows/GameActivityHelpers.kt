@@ -29,7 +29,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 
-private const val GAMES_BETWEEN_INTERSTITIALS = 5
 
 data class GameWonStateParams(
     val engine: GameEngine,
@@ -55,7 +54,9 @@ data class GameAreaParams(
     val rewardAdManager: RewardAdManager,
     val activity: Activity?,
     val isAdFree: Boolean,
-    val onToggleGuidance: () -> Unit
+    val onToggleGuidance: () -> Unit,
+    val showIntro: Boolean,
+    val onDismissIntro: () -> Unit
 )
 
 data class GameScreenContentParams(
@@ -73,7 +74,9 @@ data class GameScreenContentParams(
     val handleHint: () -> Unit,
     val onToggleGuidance: () -> Unit,
     val showCelebrationVideo: Boolean,
-    val onCelebrationComplete: () -> Unit
+    val onCelebrationComplete: () -> Unit,
+    val showIntro: Boolean,
+    val onDismissIntro: () -> Unit
 )
 
 data class HintHandlerParams(
@@ -159,7 +162,7 @@ fun BoxScope.GuidanceToggleButton(
 suspend fun finishGameAfterCelebration(params: GameWonStateParams) {
     params.repository.incrementGamesCompleted()
     val gamesCompleted = params.repository.gamesCompleted.first()
-    if (!params.isAdFree && gamesCompleted % GAMES_BETWEEN_INTERSTITIALS == 0) {
+    if (!params.isAdFree && gamesCompleted % GameConstants.GAMES_BETWEEN_INTERSTITIALS == 0) {
         params.activity?.let { act ->
             params.application.interstitialAdManager.showInterstitialAd(act) {
                 params.activity.finish()

@@ -50,6 +50,8 @@
     <string name="height_label">উচ্চতা</string>
     <string name="hint_label">ইঙ্গিত</string>
     <string name="home_label">হোম</string>
+    <string name="intro_got_it">পেয়েছি!</string>
+    <string name="intro_instruction">তীরটি সরাতে তীরের মাথায় ট্যাপ করুন</string>
     <string name="level_dialog_title">স্তর</string>
     <string name="level_label">স্তর %1$d</string>
     <string name="lives_auto_label">জীবন (অটোর জন্য ০)</string>

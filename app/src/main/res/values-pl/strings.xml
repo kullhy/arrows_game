@@ -50,6 +50,8 @@
     <string name="height_label">Wysokość</string>
     <string name="hint_label">Wskazówka</string>
     <string name="home_label">Dom</string>
+    <string name="intro_got_it">Zrozumiałem!</string>
+    <string name="intro_instruction">Aby usunąć strzałkę, dotknij grotu strzałki</string>
     <string name="level_dialog_title">Poziom</string>
     <string name="level_label">Poziom %1$d</string>
     <string name="lives_auto_label">Życia (0 dla Auto)</string>

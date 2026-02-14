@@ -21,8 +21,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.batodev.arrows.GameConstants
 import com.batodev.arrows.R
-import com.batodev.arrows.REQUIRED_AD_COUNT_FOR_AD_FREE
 import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
 import kotlinx.coroutines.launch
@@ -82,14 +82,14 @@ fun AdNotFreeSection(state: AdSettingsSectionState) {
                 modifier = Modifier.weight(1f)
             )
             Text(
-                text = "${state.rewardAdCount} / ${REQUIRED_AD_COUNT_FOR_AD_FREE}",
+                text = "${state.rewardAdCount} / ${GameConstants.REQUIRED_AD_COUNT_FOR_AD_FREE}",
                 fontSize = 14.sp,
                 color = state.themeColors.accent,
                 fontWeight = FontWeight.Bold
             )
         }
         LinearProgressIndicator(
-            progress = { state.rewardAdCount.toFloat() / REQUIRED_AD_COUNT_FOR_AD_FREE },
+            progress = { state.rewardAdCount.toFloat() / GameConstants.REQUIRED_AD_COUNT_FOR_AD_FREE },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -133,7 +133,7 @@ private fun handleAdReward(state: AdSettingsSectionState) {
     state.coroutineScope.launch {
         state.repository.incrementRewardAdCount()
         val newCount = state.rewardAdCount + 1
-        if (newCount >= REQUIRED_AD_COUNT_FOR_AD_FREE) {
+        if (newCount >= GameConstants.REQUIRED_AD_COUNT_FOR_AD_FREE) {
             state.repository.saveIsAdFree(true)
             state.repository.resetRewardAdCount()
         }

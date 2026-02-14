@@ -50,6 +50,8 @@
     <string name="height_label">Altura</string>
     <string name="hint_label">Dica</string>
     <string name="home_label">Lar</string>
+    <string name="intro_got_it">Entendi!</string>
+    <string name="intro_instruction">Toque na ponta da seta para removê-la.</string>
     <string name="level_dialog_title">Nível</string>
     <string name="level_label">Nível %1$d</string>
     <string name="lives_auto_label">Vidas (0 para Automático)</string>

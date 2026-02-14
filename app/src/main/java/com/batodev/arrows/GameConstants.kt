@@ -4,6 +4,12 @@ import kotlin.math.PI
 
 object GameConstants {
     // ====================
+    // GAME ENGINE DEFAULTS
+    // ====================
+    /** Default initial number of lives for the player */
+    const val INITIAL_LIVES = 5
+
+    // ====================
     // GAME PROGRESSION
     // ====================
     /** Player level required to unlock custom level generator feature */
@@ -49,10 +55,6 @@ object GameConstants {
     /** Bitmask (0xFF = 255) to extract a single color component (8 bits) from color integer */
     const val COLOR_MASK = 0xFF
 
-    /** Radius in pixels for gap-filling algorithm when processing multi-part shapes.
-     *  Fills gaps up to 8 pixels to connect separated shape parts like lips and person */
-    const val GAP_FILL_RADIUS = 8
-
     // ====================
     // LEVEL GENERATION ENGINE
     // ====================
@@ -69,13 +71,70 @@ object GameConstants {
     const val FIRST_SNAKE_MAX_ATTEMPTS = 100
 
     // ====================
+    // LEVEL PROGRESSION
+    // ====================
+    /** Base board size for level 1 (in cells) */
+    const val BASE_BOARD_SIZE = 5
+
+    /** Board size reduction per progression step (in cells) */
+    const val SIZE_REDUCTION_PER_STEP = 3
+
+    /** Lives reduction per progression step */
+    const val LIVES_REDUCTION_PER_STEP = 1
+
+    /** Number of levels per progression step */
+    const val LEVELS_PER_PROGRESSION_STEP = 10
+
+    /** Default number of initial lives */
+    const val DEFAULT_INITIAL_LIVES = 5
+
+    /** Base minimum snake length */
+    const val MIN_SNAKE_LENGTH_BASE = 3
+
+    /** Minimum allowed snake length */
+    const val MIN_SNAKE_LENGTH_MIN = 4
+
+    /** Maximum allowed snake length */
+    const val MIN_SNAKE_LENGTH_MAX = 30
+
+    // ====================
+    // LEVEL MANAGER (SHAPE PROBABILITY)
+    // ====================
+    /** Minimum board size for shapes to appear */
+    const val MIN_BOARD_SIZE_FOR_SHAPES = 20
+
+    /** Board size at which shapes always appear */
+    const val MAX_BOARD_SIZE_FOR_ALWAYS_SHAPE = 100
+
+    /** Base probability for shape selection */
+    const val BASE_SHAPE_PROBABILITY = 0.5f
+
+    // ====================
+    // GAME FLOW & ANIMATIONS
+    // ====================
+    // ====================
+    // ZOOM & PAN
+    // ====================
+    /** Minimum zoom scale factor (0.2x = 20% of original size) */
+    const val MIN_SCALE = 0.2f
+
+    /** Maximum zoom scale factor (6x = 600% of original size) */
+    const val MAX_SCALE = 6f
+
+    // ====================
     // GAME FLOW & ANIMATIONS
     // ====================
     /** Delay in milliseconds before automatically exiting game screen after winning (3 seconds) */
     const val GAME_WON_EXIT_DELAY = 3000L
 
+    /** Number of games between interstitial ads */
+    const val GAMES_BETWEEN_INTERSTITIALS = 5
+
     /** Duration in milliseconds for guidance line fade animation (0.5 seconds) */
     const val GUIDANCE_ANIM_DURATION = 500
+
+    /** Duration in milliseconds for progress bar animation (0.5 seconds) */
+    const val PROGRESS_ANIM_DURATION = 500
 
     /** Width of the progress bar during level generation display (in dp) */
     const val PROGRESS_BAR_WIDTH = 200
@@ -165,6 +224,12 @@ object GameConstants {
     /** Alpha/opacity (30%) for debug tap area circles in debug visualization */
     const val TAP_AREA_ALPHA = 0.3f
 
+    /** Tail length for single-block snakes as factor of cell width (0.2 = 20%) */
+    const val SINGLE_BLOCK_TAIL_FACTOR = 0.2f
+
+    /** Arrow head size as factor of cell width (0.2 = 20%) */
+    const val ARROW_HEAD_SIZE_FACTOR = 0.2f
+
     /** Snake line stroke width as a factor of cell width (0.15 = 15% of cell width) */
     const val BOARD_STROKE_WIDTH_FACTOR = 0.15f
 
@@ -176,6 +241,9 @@ object GameConstants {
 
     /** Arrow head outline stroke width as factor of arrow size (0.3 = 30%) */
     const val ARROW_HEAD_STROKE_WIDTH_FACTOR = 0.3f
+
+    /** Duration in milliseconds for snake flash after wrong tap (3 seconds) */
+    const val FLASH_DURATION_MS = 3000L
 
     /** Duration in milliseconds for flashing snake pulse animation during removal (0.25 seconds) */
     const val FLASH_PULSE_DURATION = 250
@@ -223,6 +291,48 @@ object GameConstants {
     val INTERSTITIAL_AD_UNIT_ID: String get() = BuildConfig.INTERSTITIAL_AD_UNIT_ID
 
     // ====================
+    // VIEW MODEL
+    // ====================
+    /** Timeout in milliseconds for StateFlow WhileSubscribed (5 seconds) */
+    const val STOP_TIMEOUT_MILLIS = 5000L
+
+    // ====================
+    // USER PREFERENCES DEFAULTS
+    // ====================
+    /** Default starting level number */
+    const val DEFAULT_LEVEL = 1
+
+    /** Default number of lives */
+    const val DEFAULT_LIVES = 5
+
+    // ====================
+    // ADS
+    // ====================
+    /** Number of reward ads to watch to remove all ads */
+    const val REQUIRED_AD_COUNT_FOR_AD_FREE = 30
+
+    // ====================
+    // INTRO OVERLAY
+    // ====================
+    /** Background overlay alpha for intro screen */
+    const val INTRO_OVERLAY_ALPHA = 0.85f
+
+    /** Font size for intro instruction text */
+    const val INTRO_INSTRUCTION_FONT_SIZE = 22
+
+    /** Font size for intro button text */
+    const val INTRO_BUTTON_FONT_SIZE = 18
+
+    /** Corner radius for intro card */
+    const val INTRO_CARD_CORNER_RADIUS = 16
+
+    /** Padding inside intro card */
+    const val INTRO_CARD_PADDING = 32
+
+    /** Spacing between intro instruction text and button */
+    const val INTRO_SPACING = 24
+
+    // ====================
     // EXTERNAL LINKS
     // ====================
     const val GITHUB_REPO_URL = "https://github.com/robmat/arrows_game"
@@ -232,6 +342,12 @@ object GameConstants {
     // ====================
     /** Cell center position (0.5 = 50% of cell) used for tap area calculations */
     const val CELL_CENTER = 0.5f
+
+    /** Tap area offset in arrow direction as factor of cell width (0.3 = 30%) */
+    const val TAP_AREA_OFFSET_FACTOR = 0.3f
+
+    /** Maximum distance in grid cells for a tap to register on a snake head */
+    const val DEFAULT_TOLERANCE = 1.3f
 
     // ====================
     // WIN CELEBRATION VIDEO
@@ -244,9 +360,6 @@ object GameConstants {
 
     /** Video fade out duration in milliseconds (1 second) */
     const val VIDEO_FADE_OUT_DURATION = 1000
-
-    /** Total video celebration duration in milliseconds (5 seconds) */
-    const val VIDEO_TOTAL_DURATION = 5000
 
     /** Number of available win celebration videos */
     const val WIN_VIDEOS_COUNT = 26
@@ -301,6 +414,3 @@ object GameConstants {
         R.raw.win26,
     )
 }
-
-/** Ads to watch to remove all ads. */
-const val REQUIRED_AD_COUNT_FOR_AD_FREE = 30

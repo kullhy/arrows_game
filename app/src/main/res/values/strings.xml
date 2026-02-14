@@ -50,6 +50,8 @@
     <string name="height_label">Height</string>
     <string name="hint_label">Hint</string>
     <string name="home_label">Home</string>
+    <string name="intro_got_it">Got it!</string>
+    <string name="intro_instruction">Tap the arrowhead to remove the arrow</string>
     <string name="level_dialog_title">Level</string>
     <string name="level_label">Level %1$d</string>
     <string name="lives_auto_label">Lives (0 for Auto)</string>

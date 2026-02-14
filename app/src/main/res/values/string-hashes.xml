@@ -3,6 +3,7 @@
     <string name="hash_048892c080a69dcd893e82b3049ae7a22e55b29b07ee53eb4196ad44339292c3" translatable="false">forced_lives_label</string>
     <string name="hash_161fdcce3e2e7cdbe03869c07b0affd475cdf4bf5bc2b3b6e1e4f037131666bc" translatable="false">congratulations_amazing</string>
     <string name="hash_ac8b4b580a241f37c61d75d6621e4ca2daf6fffa62146f8f981b24454ec265f8" translatable="false">remove_ads_label</string>
+    <string name="hash_c9cbf132e201750f9b9b01cbeb0f7480316cee96dcfa5c83acd0c9be2cde8a51" translatable="false">intro_instruction</string>
     <string name="hash_0666941148e8876aae30f0e84fea955ff02f5ad094f7e3307a5795d1c6f77435" translatable="false">generate_start_label</string>
     <string name="hash_a7b4cf9f7e429771071ef073b93bbfff8d271b9429dd9bb77581128a3e68e0ae" translatable="false">hint_label</string>
     <string name="hash_1ade60abe93f5cfce908a10bb2d1b474f024779843faba4bb1f2ef06f277d3c7" translatable="false">custom_gen_title</string>
@@ -85,6 +86,7 @@
     <string name="hash_12b86303da60d0976d665ff586f5b32fbde74f728c812fdcc8c57ac609cabaf5" translatable="false">vibrations_label</string>
     <string name="hash_297958d3e0a981c8879070f000c222be71a5652d5f6e904e232bf542ea5bdf1f" translatable="false">width_auto_label</string>
     <string name="hash_2c8167f144be310a72ba4192ef0deea57099b713dafe8067c5193798246f25e1" translatable="false">debug_menu_title</string>
+    <string name="hash_aca2a322337d288aa5135518bf338737faa56aa1249c327a4f9b644dfbe69c40" translatable="false">intro_got_it</string>
     <string name="hash_19766ed6ccb2f4a32778eed80d1928d2c87a18d7c275ccb163ec6709d3eb2e27" translatable="false">cancel_label</string>
     <string name="hash_ed077f3d8125d60dca1979c7133601bd187d47c73ed9975028f677e49e709942" translatable="false">content_description_open</string>
 </resources>

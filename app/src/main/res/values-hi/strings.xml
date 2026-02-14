@@ -50,6 +50,8 @@
     <string name="height_label">ऊंचाई</string>
     <string name="hint_label">संकेत देना</string>
     <string name="home_label">घर</string>
+    <string name="intro_got_it">समझ गया!</string>
+    <string name="intro_instruction">तीर को हटाने के लिए तीर के सिरे पर टैप करें।</string>
     <string name="level_dialog_title">स्तर</string>
     <string name="level_label">स्तर %1$d</string>
     <string name="lives_auto_label">जीवन (स्वचालित के लिए 0)</string>

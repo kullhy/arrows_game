@@ -72,6 +72,9 @@ class FakeUserPreferencesRepository : UserPreferencesRepository(
     val gamesCompletedFlow = MutableStateFlow(0)
     override val gamesCompleted: Flow<Int> = gamesCompletedFlow
 
+    val introCompletedFlow = MutableStateFlow(false)
+    override val introCompleted: Flow<Boolean> = introCompletedFlow
+
     override suspend fun saveThemePreference(theme: String) {
         themeFlow.value = theme
     }
@@ -143,5 +146,9 @@ class FakeUserPreferencesRepository : UserPreferencesRepository(
 
     override suspend fun incrementGamesCompleted() {
         gamesCompletedFlow.value += 1
+    }
+
+    override suspend fun saveIntroCompleted(completed: Boolean) {
+        introCompletedFlow.value = completed
     }
 }

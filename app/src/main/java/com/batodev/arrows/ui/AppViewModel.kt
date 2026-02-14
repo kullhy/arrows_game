@@ -3,14 +3,13 @@ package com.batodev.arrows.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.batodev.arrows.GameConstants
 import com.batodev.arrows.data.UserPreferencesRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-
-private const val STOP_TIMEOUT_MILLIS = 5000L
 
 class AppViewModel(private val userPreferencesRepository: UserPreferencesRepository) : ViewModel() {
 
@@ -22,67 +21,67 @@ class AppViewModel(private val userPreferencesRepository: UserPreferencesReposit
 
     val theme: StateFlow<String> = userPreferencesRepository.theme.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+        started = SharingStarted.WhileSubscribed(GameConstants.STOP_TIMEOUT_MILLIS),
         initialValue = "Dark"
     )
 
     val animationSpeed: StateFlow<String> = userPreferencesRepository.animationSpeed.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+        started = SharingStarted.WhileSubscribed(GameConstants.STOP_TIMEOUT_MILLIS),
         initialValue = "Medium"
     )
 
     val isVibrationEnabled: StateFlow<Boolean> = userPreferencesRepository.isVibrationEnabled.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+        started = SharingStarted.WhileSubscribed(GameConstants.STOP_TIMEOUT_MILLIS),
         initialValue = true
     )
 
     val isSoundsEnabled: StateFlow<Boolean> = userPreferencesRepository.isSoundsEnabled.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+        started = SharingStarted.WhileSubscribed(GameConstants.STOP_TIMEOUT_MILLIS),
         initialValue = true
     )
 
     val isFillBoardEnabled: StateFlow<Boolean> = userPreferencesRepository.isFillBoardEnabled.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+        started = SharingStarted.WhileSubscribed(GameConstants.STOP_TIMEOUT_MILLIS),
         initialValue = false
     )
 
     val levelNumber: StateFlow<Int> = userPreferencesRepository.levelNumber.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+        started = SharingStarted.WhileSubscribed(GameConstants.STOP_TIMEOUT_MILLIS),
         initialValue = 1
     )
 
     val debugForcedWidth: StateFlow<Int?> = userPreferencesRepository.debugForcedWidth.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+        started = SharingStarted.WhileSubscribed(GameConstants.STOP_TIMEOUT_MILLIS),
         initialValue = null
     )
 
     val debugForcedHeight: StateFlow<Int?> = userPreferencesRepository.debugForcedHeight.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+        started = SharingStarted.WhileSubscribed(GameConstants.STOP_TIMEOUT_MILLIS),
         initialValue = null
     )
 
     val debugForcedLives: StateFlow<Int?> = userPreferencesRepository.debugForcedLives.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+        started = SharingStarted.WhileSubscribed(GameConstants.STOP_TIMEOUT_MILLIS),
         initialValue = null
     )
 
     val debugForcedShape: StateFlow<String?> = userPreferencesRepository.debugForcedShape.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+        started = SharingStarted.WhileSubscribed(GameConstants.STOP_TIMEOUT_MILLIS),
         initialValue = null
     )
 
     val hasSavedLevel: StateFlow<Boolean> = userPreferencesRepository.currentLevel.map { it != null }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+        started = SharingStarted.WhileSubscribed(GameConstants.STOP_TIMEOUT_MILLIS),
         initialValue = false
     )
 

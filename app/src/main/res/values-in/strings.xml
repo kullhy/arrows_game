@@ -50,6 +50,8 @@
     <string name="height_label">Tinggi</string>
     <string name="hint_label">Petunjuk</string>
     <string name="home_label">Rumah</string>
+    <string name="intro_got_it">Mengerti!</string>
+    <string name="intro_instruction">Ketuk ujung panah untuk menghapus panah.</string>
     <string name="level_dialog_title">Tingkat</string>
     <string name="level_label">Level %1$d</string>
     <string name="lives_auto_label">Nyawa (0 untuk Otomatis)</string>

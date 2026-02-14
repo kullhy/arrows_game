@@ -63,6 +63,8 @@ import com.batodev.arrows.ui.game.GameTopBar
 import com.batodev.arrows.ui.game.GameTopBarCallbacks
 import com.batodev.arrows.ui.game.GameTopBarState
 import com.batodev.arrows.ui.game.HintButtonState
+import com.batodev.arrows.ui.game.IntroOverlay
+import com.batodev.arrows.ui.game.rememberIntroState
 import com.batodev.arrows.ui.game.WinCelebrationScreen
 import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.HeartRed
@@ -138,6 +140,7 @@ fun ArrowsGameView(
     val engine = remember {
         createGameEngine(coroutineScope, view, context, repository, customParams)
     }
+    val introState = rememberIntroState(repository, engine.isLoading, coroutineScope)
     var confettiState by remember { mutableStateOf<List<Party>>(emptyList()) }
     var showGuidanceLines by remember { mutableStateOf(false) }
     var showCelebrationVideo by remember { mutableStateOf(false) }
@@ -170,7 +173,8 @@ fun ArrowsGameView(
             GameScreenContentParams(
                 engine, activity, context, tapAnimations, guidanceAlpha, showGuidanceLines, themeColors,
                 rewardAdManager, isAdFree, isAdLoaded, isAdLoading, handleHint,
-                { showGuidanceLines = !showGuidanceLines }, showCelebrationVideo, onCelebrationComplete
+                { showGuidanceLines = !showGuidanceLines }, showCelebrationVideo, onCelebrationComplete,
+                introState.showIntro, introState.onDismiss
             )
         )
     }
@@ -243,6 +247,9 @@ private fun ColumnScope.GameArea(params: GameAreaParams) {
                 parties = updateConfettiState(params.engine, emptyList())
             )
         }
+        if (params.showIntro) {
+            IntroOverlay(onDismiss = params.onDismissIntro)
+        }
         if (params.engine.lives <= 0) {
             GameOverDialog(
                 rewardAdManager = params.rewardAdManager,
@@ -278,7 +285,7 @@ private fun GameScreenContent(params: GameScreenContentParams) {
             GameAreaParams(
                 params.engine, params.tapAnimations, params.guidanceAlpha, params.showGuidanceLines,
                 params.themeColors, params.rewardAdManager, params.activity, params.isAdFree,
-                params.onToggleGuidance
+                params.onToggleGuidance, params.showIntro, params.onDismissIntro
             )
         )
         if (!params.isAdFree) {

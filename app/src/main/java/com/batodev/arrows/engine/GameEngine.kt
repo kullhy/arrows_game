@@ -6,13 +6,12 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import com.batodev.arrows.GameConstants
 import com.batodev.arrows.SoundManager
 import com.batodev.arrows.data.UserPreferencesRepository
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-
-const val INITIAL_LIVES = 5
 
 data class GameEngineConfig(
     val coroutineScope: CoroutineScope,
@@ -68,9 +67,9 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
         private set
     var loadingProgress by mutableFloatStateOf(0f)
         private set
-    var lives by mutableIntStateOf(INITIAL_LIVES)
+    var lives by mutableIntStateOf(GameConstants.INITIAL_LIVES)
         private set
-    var maxLives by mutableIntStateOf(INITIAL_LIVES)
+    var maxLives by mutableIntStateOf(GameConstants.INITIAL_LIVES)
         private set
 
     val scale get() = transformationState.scale

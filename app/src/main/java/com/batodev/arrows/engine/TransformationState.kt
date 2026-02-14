@@ -4,9 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
-
-private const val MIN_SCALE = 0.2f
-private const val MAX_SCALE = 6f
+import com.batodev.arrows.GameConstants
 
 class TransformationState {
     var scale by mutableFloatStateOf(1f)
@@ -20,7 +18,7 @@ class TransformationState {
     }
 
     fun transform(pan: Offset, zoom: Float) {
-        scale = (scale * zoom).coerceIn(MIN_SCALE, MAX_SCALE)
+        scale = (scale * zoom).coerceIn(GameConstants.MIN_SCALE, GameConstants.MAX_SCALE)
         offsetX += pan.x
         offsetY += pan.y
     }

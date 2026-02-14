@@ -50,6 +50,8 @@
     <string name="height_label">Höhe</string>
     <string name="hint_label">Hinweis</string>
     <string name="home_label">Heim</string>
+    <string name="intro_got_it">Habe es!</string>
+    <string name="intro_instruction">Tippe auf die Pfeilspitze, um den Pfeil zu entfernen.</string>
     <string name="level_dialog_title">Ebene</string>
     <string name="level_label">Level %1$d</string>
     <string name="lives_auto_label">Leben (0 für Auto)</string>

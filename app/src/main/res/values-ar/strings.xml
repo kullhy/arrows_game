@@ -50,6 +50,8 @@
     <string name="height_label">ارتفاع</string>
     <string name="hint_label">تَلمِيح</string>
     <string name="home_label">بيت</string>
+    <string name="intro_got_it">فهمتها!</string>
+    <string name="intro_instruction">انقر على رأس السهم لإزالة السهم</string>
     <string name="level_dialog_title">مستوى</string>
     <string name="level_label">المستوى %1$d</string>
     <string name="lives_auto_label">الأرواح (0 للسيارة)</string>

@@ -1,14 +1,11 @@
 package com.batodev.arrows.engine
 
+import com.batodev.arrows.GameConstants
 import com.batodev.arrows.data.UserPreferencesRepository
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
-
-private const val MIN_BOARD_SIZE_FOR_SHAPES = 20
-private const val MAX_BOARD_SIZE_FOR_ALWAYS_SHAPE = 100
-private const val BASE_SHAPE_PROBABILITY = 0.5f
 
 data class LevelConfiguration(val width: Int, val height: Int, val maxSnakeLength: Int, val maxLives: Int)
 
@@ -82,12 +79,12 @@ class LevelManager(
     private fun shouldApplyShape(config: LevelConfiguration): Boolean {
         val size = maxOf(config.width, config.height)
         val probability = when {
-            size < MIN_BOARD_SIZE_FOR_SHAPES -> 0f
-            size >= MAX_BOARD_SIZE_FOR_ALWAYS_SHAPE -> 1f
+            size < GameConstants.MIN_BOARD_SIZE_FOR_SHAPES -> 0f
+            size >= GameConstants.MAX_BOARD_SIZE_FOR_ALWAYS_SHAPE -> 1f
             else -> {
-                val ratio = (size - MIN_BOARD_SIZE_FOR_SHAPES).toFloat() /
-                        (MAX_BOARD_SIZE_FOR_ALWAYS_SHAPE - MIN_BOARD_SIZE_FOR_SHAPES)
-                BASE_SHAPE_PROBABILITY + (1f - BASE_SHAPE_PROBABILITY) * ratio
+                val ratio = (size - GameConstants.MIN_BOARD_SIZE_FOR_SHAPES).toFloat() /
+                        (GameConstants.MAX_BOARD_SIZE_FOR_ALWAYS_SHAPE - GameConstants.MIN_BOARD_SIZE_FOR_SHAPES)
+                GameConstants.BASE_SHAPE_PROBABILITY + (1f - GameConstants.BASE_SHAPE_PROBABILITY) * ratio
             }
         }
 

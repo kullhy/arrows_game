@@ -2,10 +2,9 @@ package com.batodev.arrows.engine
 
 import androidx.compose.ui.geometry.Offset
 import com.batodev.arrows.GameConstants
+import com.batodev.arrows.GameConstants.DEFAULT_TOLERANCE
+import com.batodev.arrows.GameConstants.TAP_AREA_OFFSET_FACTOR
 import kotlin.math.min
-
-const val TAP_AREA_OFFSET_FACTOR = 0.3f
-internal const val DEFAULT_TOLERANCE = 1.3f
 
 class InputHandler {
     

@@ -50,6 +50,8 @@
     <string name="height_label">Altezza</string>
     <string name="hint_label">Suggerimento</string>
     <string name="home_label">Casa</string>
+    <string name="intro_got_it">Fatto!</string>
+    <string name="intro_instruction">Tocca la punta della freccia per rimuovere la freccia</string>
     <string name="level_dialog_title">Livello</string>
     <string name="level_label">Livello %1$d</string>
     <string name="lives_auto_label">Vite (0 per Auto)</string>
