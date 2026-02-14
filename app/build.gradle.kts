@@ -33,7 +33,7 @@ android {
             )
             buildConfigField("Boolean", "DRAW_DEBUG_STUFF", "false")
             // Production Ad IDs - replace with real IDs before release
-            buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-9667420067790140~5728073317\"")
+            manifestPlaceholders["admobAppId"] = "ca-app-pub-9667420067790140~5728073317"
             buildConfigField("String", "BANNER_AD_UNIT_ID", "\"ca-app-pub-9667420067790140/3105779401\"")
             buildConfigField("String", "REWARDED_AD_UNIT_ID", "\"ca-app-pub-9667420067790140/6849583291\"")
             buildConfigField("String", "INTERSTITIAL_AD_UNIT_ID", "\"ca-app-pub-9667420067790140/3915454308\"")
@@ -43,7 +43,7 @@ android {
             enableAndroidTestCoverage = true
             buildConfigField("Boolean", "DRAW_DEBUG_STUFF", "false")
             // Test Ad IDs for development
-            buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-3940256099942544~3347511713\"")
+            manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
             buildConfigField("String", "BANNER_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/6300978111\"")
             buildConfigField("String", "REWARDED_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/5224354917\"")
             buildConfigField("String", "INTERSTITIAL_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/1033173712\"")

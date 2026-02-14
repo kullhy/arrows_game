@@ -278,9 +278,6 @@ object GameConstants {
     // ====================
     // ADMOB AD UNIT IDS
     // ====================
-    /** AdMob App ID - uses test ID in debug, production ID in release */
-    val ADMOB_APP_ID: String get() = BuildConfig.ADMOB_APP_ID
-
     /** Banner ad unit ID - uses test ID in debug, production ID in release */
     val BANNER_AD_UNIT_ID: String get() = BuildConfig.BANNER_AD_UNIT_ID
 
