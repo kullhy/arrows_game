@@ -7,12 +7,12 @@ import androidx.compose.ui.geometry.Offset
 import com.batodev.arrows.GameConstants
 
 class TransformationState {
-    var scale by mutableFloatStateOf(1f)
+    var scale by mutableFloatStateOf(GameConstants.DEFAULT_SCALE)
     var offsetX by mutableFloatStateOf(0f)
     var offsetY by mutableFloatStateOf(0f)
 
     fun reset() {
-        scale = 1f
+        scale = GameConstants.DEFAULT_SCALE
         offsetX = 0f
         offsetY = 0f
     }
