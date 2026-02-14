@@ -88,5 +88,6 @@
     <string name="watch_ad_label">Guarda l\'annuncio</string>
     <string name="width_auto_label">Larghezza (0 per Auto)</string>
     <string name="width_label">Larghezza</string>
+    <string name="win_videos_label">Guarda il video della vittoria</string>
     <string name="write_us_label">Scrivici</string>
 </resources>

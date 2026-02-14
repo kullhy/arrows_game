@@ -49,6 +49,12 @@ class AppViewModel(private val userPreferencesRepository: UserPreferencesReposit
         initialValue = false
     )
 
+    val isWinVideosEnabled: StateFlow<Boolean> = userPreferencesRepository.isWinVideosEnabled.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(GameConstants.STOP_TIMEOUT_MILLIS),
+        initialValue = true
+    )
+
     val levelNumber: StateFlow<Int> = userPreferencesRepository.levelNumber.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(GameConstants.STOP_TIMEOUT_MILLIS),
@@ -106,6 +112,12 @@ class AppViewModel(private val userPreferencesRepository: UserPreferencesReposit
     fun saveFillBoard(enabled: Boolean) {
         viewModelScope.launch {
             userPreferencesRepository.saveFillBoardPreference(enabled)
+        }
+    }
+
+    fun saveWinVideosEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveWinVideosEnabled(enabled)
         }
     }
 

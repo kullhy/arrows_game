@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Vibration
+import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
@@ -50,6 +51,7 @@ fun PreferencesSection(params: PreferencesParams) {
     val isVibrationEnabled by params.viewModel.isVibrationEnabled.collectAsState()
     val isSoundsEnabled by params.viewModel.isSoundsEnabled.collectAsState()
     val isFillBoardEnabled by params.viewModel.isFillBoardEnabled.collectAsState()
+    val isWinVideosEnabled by params.viewModel.isWinVideosEnabled.collectAsState()
 
     SettingsGroup(params.themeColors.topBarButton) {
         SettingsSwitchItem(
@@ -60,6 +62,10 @@ fun PreferencesSection(params: PreferencesParams) {
             Icons.AutoMirrored.Filled.VolumeUp, stringResource(R.string.sounds_label),
             isSoundsEnabled, params.themeColors.accent
         ) { params.viewModel.saveSounds(it) }
+        SettingsSwitchItem(
+            Icons.Default.VideoLibrary, stringResource(R.string.win_videos_label),
+            isWinVideosEnabled, params.themeColors.accent
+        ) { params.viewModel.saveWinVideosEnabled(it) }
         SettingsSwitchItem(
             Icons.Default.Grid4x4, stringResource(R.string.fill_board_label),
             isFillBoardEnabled, params.themeColors.accent

@@ -88,5 +88,6 @@
     <string name="watch_ad_label">Regardez la publicité</string>
     <string name="width_auto_label">Largeur (0 pour Auto)</string>
     <string name="width_label">Largeur</string>
+    <string name="win_videos_label">Jouez à la vidéo gagnante</string>
     <string name="write_us_label">Écrivez-nous</string>
 </resources>

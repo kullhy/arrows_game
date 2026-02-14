@@ -141,6 +141,7 @@ fun ArrowsGameView(
         createGameEngine(coroutineScope, view, context, repository, customParams)
     }
     val introState = rememberIntroState(repository, engine.isLoading, coroutineScope)
+    val isWinVideosEnabled by repository.isWinVideosEnabled.collectAsState(initial = true)
     var confettiState by remember { mutableStateOf<List<Party>>(emptyList()) }
     var showGuidanceLines by remember { mutableStateOf(false) }
     var showCelebrationVideo by remember { mutableStateOf(false) }
@@ -154,14 +155,14 @@ fun ArrowsGameView(
     val gameWonParams = remember(activity, application, isAdFree) {
         GameWonStateParams(engine, repository, activity, application, isAdFree)
     }
-    HandleGameWonState(gameWonParams) { showCelebrationVideo = true }
+    HandleGameWonState(gameWonParams, isWinVideosEnabled) { showCelebrationVideo = true }
     confettiState = updateConfettiState(engine, confettiState)
     val handleHint = buildHintHandler(
         HintHandlerParams(isAdFree, isAdLoading, isAdLoaded, engine, activity, rewardAdManager)
     )
     val onCelebrationComplete: () -> Unit = {
         coroutineScope.launch {
-            finishGameAfterCelebration(gameWonParams)
+            finishGameAfterCelebration(gameWonParams, waitForConfetti = false)
         }
     }
     val celebrationParams = CelebrationParams(
@@ -183,11 +184,16 @@ fun ArrowsGameView(
 @Composable
 private fun HandleGameWonState(
     params: GameWonStateParams,
+    isWinVideosEnabled: Boolean,
     onShowCelebration: () -> Unit
 ) {
     LaunchedEffect(params.engine.isGameWon) {
         if (params.engine.isGameWon) {
-            onShowCelebration()
+            if (isWinVideosEnabled) {
+                onShowCelebration()
+            } else {
+                finishGameAfterCelebration(params, waitForConfetti = true)
+            }
         }
     }
 }

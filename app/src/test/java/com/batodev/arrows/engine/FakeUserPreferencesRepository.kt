@@ -75,6 +75,9 @@ class FakeUserPreferencesRepository : UserPreferencesRepository(
     val introCompletedFlow = MutableStateFlow(false)
     override val introCompleted: Flow<Boolean> = introCompletedFlow
 
+    val winVideosEnabledFlow = MutableStateFlow(true)
+    override val isWinVideosEnabled: Flow<Boolean> = winVideosEnabledFlow
+
     override suspend fun saveThemePreference(theme: String) {
         themeFlow.value = theme
     }
@@ -150,5 +153,9 @@ class FakeUserPreferencesRepository : UserPreferencesRepository(
 
     override suspend fun saveIntroCompleted(completed: Boolean) {
         introCompletedFlow.value = completed
+    }
+
+    override suspend fun saveWinVideosEnabled(enabled: Boolean) {
+        winVideosEnabledFlow.value = enabled
     }
 }

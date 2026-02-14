@@ -159,20 +159,23 @@ fun BoxScope.GuidanceToggleButton(
     }
 }
 
-suspend fun finishGameAfterCelebration(params: GameWonStateParams) {
+fun shouldShowInterstitialAd(isAdFree: Boolean, gamesCompleted: Int): Boolean {
+    return !isAdFree && gamesCompleted % GameConstants.GAMES_BETWEEN_INTERSTITIALS == 0
+}
+
+suspend fun finishGameAfterCelebration(params: GameWonStateParams, waitForConfetti: Boolean) {
+    if (waitForConfetti) {
+        delay(GameConstants.GAME_WON_EXIT_DELAY)
+    }
     params.repository.incrementGamesCompleted()
     val gamesCompleted = params.repository.gamesCompleted.first()
-    if (!params.isAdFree && gamesCompleted % GameConstants.GAMES_BETWEEN_INTERSTITIALS == 0) {
+    if (shouldShowInterstitialAd(params.isAdFree, gamesCompleted)) {
         params.activity?.let { act ->
             params.application.interstitialAdManager.showInterstitialAd(act) {
                 params.activity.finish()
             }
-        } ?: run {
-            delay(GameConstants.GAME_WON_EXIT_DELAY)
-            params.activity?.finish()
-        }
+        } ?: params.activity?.finish()
     } else {
-        delay(GameConstants.GAME_WON_EXIT_DELAY)
         params.activity?.finish()
     }
 }

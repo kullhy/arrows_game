@@ -37,6 +37,7 @@
     <string name="hash_0f2631d569298f50e252a964bd2fd48010011d99fee4c044f8f1880067d35f93" translatable="false">watch_ad_label</string>
     <string name="hash_c4ebc6d4a5832cd9415f906ad03661110c705a72381c8b8b145761d02e2dd23a" translatable="false">speed_high</string>
     <string name="hash_fe3de96a70ed7a23f583e26509de58a430b95471ec153412b06cae4d6f98c004" translatable="false">error_could_not_open_email</string>
+    <string name="hash_2867c9942ca6b69c1c087c74b0f4d2e9b8480891ccef11190def178b0f00acfa" translatable="false">win_videos_label</string>
     <string name="hash_6f305c4b18748376b835adf8bf633e2c633814744a5c363583103a0e3a8308fb" translatable="false">sounds_label</string>
     <string name="hash_7c8f737e61e9ab26857b3c0d5dbe4f21e6cfac9f32cb2d1ebcf4298662c557ec" translatable="false">current_level_label</string>
     <string name="hash_53aff142d75cb156cb307d047c308770dfceb3368b994e27b6c55e177b852730" translatable="false">forced_shape_label</string>

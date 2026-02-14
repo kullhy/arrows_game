@@ -34,6 +34,7 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
         val REWARD_AD_COUNT = intPreferencesKey("reward_ad_count")
         val GAMES_COMPLETED = intPreferencesKey("games_completed")
         val INTRO_COMPLETED = booleanPreferencesKey("intro_completed")
+        val WIN_VIDEOS_ENABLED = booleanPreferencesKey("win_videos_enabled")
     }
 
     open val theme: Flow<String> get() = getStringFlow(PreferencesKeys.THEME, "Green")
@@ -53,6 +54,7 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
     open val rewardAdCount: Flow<Int> get() = getIntFlow(PreferencesKeys.REWARD_AD_COUNT, 0)
     open val gamesCompleted: Flow<Int> get() = getIntFlow(PreferencesKeys.GAMES_COMPLETED, 0)
     open val introCompleted: Flow<Boolean> get() = getBooleanFlow(PreferencesKeys.INTRO_COMPLETED, false)
+    open val isWinVideosEnabled: Flow<Boolean> get() = getBooleanFlow(PreferencesKeys.WIN_VIDEOS_ENABLED, true)
 
     open suspend fun saveThemePreference(theme: String) = save(PreferencesKeys.THEME, theme)
     open suspend fun saveAnimationSpeed(speed: String) = save(PreferencesKeys.ANIMATION_SPEED, speed)
@@ -87,6 +89,7 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
     open suspend fun resetRewardAdCount() = save(PreferencesKeys.REWARD_AD_COUNT, 0)
 
     open suspend fun saveIntroCompleted(completed: Boolean) = save(PreferencesKeys.INTRO_COMPLETED, completed)
+    open suspend fun saveWinVideosEnabled(enabled: Boolean) = save(PreferencesKeys.WIN_VIDEOS_ENABLED, enabled)
 
     open suspend fun incrementGamesCompleted() {
         dataStore.edit { preferences ->

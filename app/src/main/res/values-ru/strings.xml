@@ -88,5 +88,6 @@
     <string name="watch_ad_label">Смотреть рекламу</string>
     <string name="width_auto_label">Ширина (0 для автоматического режима)</string>
     <string name="width_label">Ширина</string>
+    <string name="win_videos_label">Играть в видео с победой</string>
     <string name="write_us_label">Напишите нам</string>
 </resources>

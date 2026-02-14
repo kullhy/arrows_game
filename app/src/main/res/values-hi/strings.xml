@@ -88,5 +88,6 @@
     <string name="watch_ad_label">विज्ञापन देखें</string>
     <string name="width_auto_label">चौड़ाई (स्वचालित के लिए 0)</string>
     <string name="width_label">चौड़ाई</string>
+    <string name="win_videos_label">प्ले विन वीडियो</string>
     <string name="write_us_label">हमें लिखना</string>
 </resources>

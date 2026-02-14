@@ -88,5 +88,6 @@
     <string name="watch_ad_label">观看广告</string>
     <string name="width_auto_label">宽度（0 表示自动）</string>
     <string name="width_label">宽度</string>
+    <string name="win_videos_label">播放赢视频</string>
     <string name="write_us_label">请联系我们</string>
 </resources>

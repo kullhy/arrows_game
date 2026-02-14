@@ -88,5 +88,6 @@
     <string name="watch_ad_label">বিজ্ঞাপন দেখুন</string>
     <string name="width_auto_label">প্রস্থ (অটোর জন্য ০)</string>
     <string name="width_label">প্রস্থ</string>
+    <string name="win_videos_label">উইন ভিডিও চালান</string>
     <string name="write_us_label">আমাদের লিখুন</string>
 </resources>
