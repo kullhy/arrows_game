@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CenterFocusWeak
 import androidx.compose.material.icons.filled.Grid4x4
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -154,6 +155,27 @@ fun BoxScope.GuidanceToggleButton(
         Icon(
             imageVector = Icons.Default.Grid4x4,
             contentDescription = stringResource(R.string.content_description_guidance_lines),
+            tint = White
+        )
+    }
+}
+
+@Composable
+fun BoxScope.ResetViewButton(
+    themeColors: ThemeColors,
+    onResetView: () -> Unit
+) {
+    IconButton(
+        onClick = onResetView,
+        modifier = Modifier.align(Alignment.BottomStart).padding(8.dp).size(48.dp),
+        colors = IconButtonDefaults.iconButtonColors(
+            containerColor = themeColors.topBarButton,
+            contentColor = White
+        )
+    ) {
+        Icon(
+            imageVector = Icons.Default.CenterFocusWeak,
+            contentDescription = stringResource(R.string.content_description_reset_view),
             tint = White
         )
     }

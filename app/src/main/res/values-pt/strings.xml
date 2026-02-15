@@ -25,6 +25,7 @@
     <string name="content_description_guidance_lines">Linhas de orientação</string>
     <string name="content_description_life">Vida</string>
     <string name="content_description_open">Abrir</string>
+    <string name="content_description_reset_view">Redefinir visualização</string>
     <string name="content_description_restart">Reiniciar</string>
     <string name="continue_label">Continuar</string>
     <string name="current_level_label">Nível atual</string>

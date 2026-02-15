@@ -239,6 +239,7 @@ private fun ColumnScope.GameArea(params: GameAreaParams) {
             }
     ) {
         BoardLayer(params.engine, params.guidanceAlpha)
+        ResetViewButton(params.themeColors) { params.engine.transformationState.reset() }
         GuidanceToggleButton(params.showGuidanceLines, params.themeColors, params.onToggleGuidance)
         if (BuildConfig.DRAW_DEBUG_STUFF) DebugOverlay(params.tapAnimations)
         TapAnimationsLayer(params.tapAnimations)

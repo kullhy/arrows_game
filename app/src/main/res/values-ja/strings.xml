@@ -25,6 +25,7 @@
     <string name="content_description_guidance_lines">ガイドライン</string>
     <string name="content_description_life">人生</string>
     <string name="content_description_open">開ける</string>
+    <string name="content_description_reset_view">ビューをリセット</string>
     <string name="content_description_restart">再起動</string>
     <string name="continue_label">続く</string>
     <string name="current_level_label">現在のレベル</string>

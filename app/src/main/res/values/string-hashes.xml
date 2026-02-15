@@ -7,6 +7,7 @@
     <string name="hash_0666941148e8876aae30f0e84fea955ff02f5ad094f7e3307a5795d1c6f77435" translatable="false">generate_start_label</string>
     <string name="hash_a7b4cf9f7e429771071ef073b93bbfff8d271b9429dd9bb77581128a3e68e0ae" translatable="false">hint_label</string>
     <string name="hash_1ade60abe93f5cfce908a10bb2d1b474f024779843faba4bb1f2ef06f277d3c7" translatable="false">custom_gen_title</string>
+    <string name="hash_7f19f60f9123c6bd8592dd6e50c3ae0591a2dcadd678c0c51ecd74e252c09b80" translatable="false">content_description_reset_view</string>
     <string name="hash_d74d1fbab03598972917931757a2234bdc98bad9329c70b085be2e4cfca23283" translatable="false">theme_bw</string>
     <string name="hash_09b28e2b438c7776a82de040c579a7c78e03e39b0f4e76bdf9f527b00e84b20d" translatable="false">write_us_label</string>
     <string name="hash_f3d9ff7e2c4aa6bc1f2756966d833f7c896e76e95b1abb2da35c8f74beb5b3c2" translatable="false">congratulations_outstanding</string>

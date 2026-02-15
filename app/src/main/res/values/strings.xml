@@ -25,6 +25,7 @@
     <string name="content_description_guidance_lines">Guidance Lines</string>
     <string name="content_description_life">Life</string>
     <string name="content_description_open">Open</string>
+    <string name="content_description_reset_view">Reset View</string>
     <string name="content_description_restart">Restart</string>
     <string name="continue_label">Continue</string>
     <string name="current_level_label">Current Level</string>

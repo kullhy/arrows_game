@@ -25,6 +25,7 @@
     <string name="content_description_guidance_lines">নির্দেশিকা লাইন</string>
     <string name="content_description_life">জীবন</string>
     <string name="content_description_open">খোলা</string>
+    <string name="content_description_reset_view">ভিউ রিসেট করুন</string>
     <string name="content_description_restart">পুনরারম্ভ করুন</string>
     <string name="continue_label">চালিয়ে যান</string>
     <string name="current_level_label">বর্তমান স্তর</string>

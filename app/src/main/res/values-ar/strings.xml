@@ -25,6 +25,7 @@
     <string name="content_description_guidance_lines">خطوط إرشادية</string>
     <string name="content_description_life">حياة</string>
     <string name="content_description_open">يفتح</string>
+    <string name="content_description_reset_view">إعادة ضبط العرض</string>
     <string name="content_description_restart">إعادة تشغيل</string>
     <string name="continue_label">يكمل</string>
     <string name="current_level_label">المستوى الحالي</string>

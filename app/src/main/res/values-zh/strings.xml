@@ -25,6 +25,7 @@
     <string name="content_description_guidance_lines">指导原则</string>
     <string name="content_description_life">生活</string>
     <string name="content_description_open">打开</string>
+    <string name="content_description_reset_view">重置视图</string>
     <string name="content_description_restart">重启</string>
     <string name="continue_label">继续</string>
     <string name="current_level_label">当前级别</string>

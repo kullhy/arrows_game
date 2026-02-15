@@ -25,6 +25,7 @@
     <string name="content_description_guidance_lines">Руководящие принципы</string>
     <string name="content_description_life">Жизнь</string>
     <string name="content_description_open">Открыть</string>
+    <string name="content_description_reset_view">Сбросить вид</string>
     <string name="content_description_restart">Перезапуск</string>
     <string name="continue_label">Продолжать</string>
     <string name="current_level_label">Текущий уровень</string>

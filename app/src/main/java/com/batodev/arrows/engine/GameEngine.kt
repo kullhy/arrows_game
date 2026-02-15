@@ -43,7 +43,7 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
     private val levelManager = LevelManager(
         repository, config.gameGenerator, features.shapeProvider, features.random, gson
     )
-    private val transformationState = TransformationState()
+    internal val transformationState = TransformationState()
     private val removalAnimator = RemovalAnimator(coroutineScope)
     private val tapHandler = TapHandler(coroutineScope, soundManager, features.onVibrate)
 

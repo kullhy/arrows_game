@@ -25,6 +25,7 @@
     <string name="content_description_guidance_lines">मार्गदर्शन रेखाएँ</string>
     <string name="content_description_life">ज़िंदगी</string>
     <string name="content_description_open">खुला</string>
+    <string name="content_description_reset_view">फिर से देख्ना</string>
     <string name="content_description_restart">पुनः आरंभ करें</string>
     <string name="continue_label">जारी रखना</string>
     <string name="current_level_label">वर्तमान स्तर</string>

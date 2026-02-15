@@ -25,6 +25,7 @@
     <string name="content_description_guidance_lines">Garis Pedoman</string>
     <string name="content_description_life">Kehidupan</string>
     <string name="content_description_open">Membuka</string>
+    <string name="content_description_reset_view">Atur Ulang Tampilan</string>
     <string name="content_description_restart">Mulai ulang</string>
     <string name="continue_label">Melanjutkan</string>
     <string name="current_level_label">Tingkat Saat Ini</string>
