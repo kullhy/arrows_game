@@ -54,7 +54,7 @@ open class UserPreferencesRepository(private val dataStore: DataStore<Preference
     open val rewardAdCount: Flow<Int> get() = getIntFlow(PreferencesKeys.REWARD_AD_COUNT, 0)
     open val gamesCompleted: Flow<Int> get() = getIntFlow(PreferencesKeys.GAMES_COMPLETED, 0)
     open val introCompleted: Flow<Boolean> get() = getBooleanFlow(PreferencesKeys.INTRO_COMPLETED, false)
-    open val isWinVideosEnabled: Flow<Boolean> get() = getBooleanFlow(PreferencesKeys.WIN_VIDEOS_ENABLED, true)
+    open val isWinVideosEnabled: Flow<Boolean> get() = getBooleanFlow(PreferencesKeys.WIN_VIDEOS_ENABLED, false)
 
     open suspend fun saveThemePreference(theme: String) = save(PreferencesKeys.THEME, theme)
     open suspend fun saveAnimationSpeed(speed: String) = save(PreferencesKeys.ANIMATION_SPEED, speed)

@@ -89,6 +89,6 @@
     <string name="watch_ad_label">Tonton Iklan</string>
     <string name="width_auto_label">Lebar (0 untuk Otomatis)</string>
     <string name="width_label">Lebar</string>
-    <string name="win_videos_label">Mainkan video menangkan</string>
+    <string name="win_videos_label">Video diaktifkan</string>
     <string name="write_us_label">Tulis kepada kami</string>
 </resources>

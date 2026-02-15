@@ -89,6 +89,6 @@
     <string name="watch_ad_label">شاهد الإعلان</string>
     <string name="width_auto_label">العرض (0 للوضع التلقائي)</string>
     <string name="width_label">عرض</string>
-    <string name="win_videos_label">شاهد الفيديو واربح</string>
+    <string name="win_videos_label">تم تفعيل الفيديوهات</string>
     <string name="write_us_label">اكتب ساعات</string>
 </resources>

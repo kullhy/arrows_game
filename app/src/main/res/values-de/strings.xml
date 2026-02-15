@@ -89,6 +89,6 @@
     <string name="watch_ad_label">Werbung ansehen</string>
     <string name="width_auto_label">Breite (0 für Auto)</string>
     <string name="width_label">Breite</string>
-    <string name="win_videos_label">Spiele das Spiel „Gewinnen“</string>
+    <string name="win_videos_label">Videos aktiviert</string>
     <string name="write_us_label">Schreiben Sie uns</string>
 </resources>

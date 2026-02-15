@@ -89,6 +89,6 @@
     <string name="watch_ad_label">Veja o anúncio</string>
     <string name="width_auto_label">Largura (0 para Automático)</string>
     <string name="width_label">Largura</string>
-    <string name="win_videos_label">Assista ao vídeo "Play Win"</string>
+    <string name="win_videos_label">Vídeos ativados</string>
     <string name="write_us_label">Escreva-nos</string>
 </resources>

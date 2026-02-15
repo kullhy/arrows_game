@@ -89,6 +89,6 @@
     <string name="watch_ad_label">Ver anuncio</string>
     <string name="width_auto_label">Ancho (0 para automático)</string>
     <string name="width_label">Ancho</string>
-    <string name="win_videos_label">Reproducir el vídeo de victoria</string>
+    <string name="win_videos_label">Vídeos habilitados</string>
     <string name="write_us_label">Escríbenos</string>
 </resources>
