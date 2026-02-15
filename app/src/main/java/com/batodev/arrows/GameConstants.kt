@@ -115,8 +115,8 @@ object GameConstants {
     // ====================
     // ZOOM & PAN
     // ====================
-    /** Default zoom scale factor (0.98 = 2% zoom out to ensure board fits) */
-    const val DEFAULT_SCALE = 0.98f
+    /** Default zoom scale factor */
+    const val DEFAULT_SCALE = 0.96f
 
     /** Minimum zoom scale factor (0.2x = 20% of original size) */
     const val MIN_SCALE = 0.2f
