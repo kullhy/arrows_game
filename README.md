@@ -1,4 +1,4 @@
-# arrows_game
+# Arrows game
 
 **Arrows Game** is an Android puzzle game inspired by "Arrows – Puzzle Escape".
 
