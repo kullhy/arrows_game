@@ -1,8 +1,8 @@
 [versions]
 aboutlibraries = "14.0.0-b02"
-activityCompose = "1.12.3"
-agp = "9.0.0"
-composeBom = "2026.01.01"
+activityCompose = "1.12.4"
+agp = "9.0.1"
+composeBom = "2026.02.00"
 coreKtx = "1.17.0"
 coroutinesTest = "1.10.2"
 datastore = "1.2.0"
