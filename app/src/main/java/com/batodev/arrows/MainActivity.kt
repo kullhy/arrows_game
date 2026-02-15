@@ -73,14 +73,14 @@ fun MainScreen() {
         containerColor = themeColors.background,
         bottomBar = {
             Column(modifier = Modifier.fillMaxWidth()) {
+                if (!isAdFree) {
+                    BannerAdView()
+                }
                 AppNavigationBar(
                     selectedDestination = NavigationDestination.HOME,
                     levelNumber = levelNumber,
                     themeColors = themeColors
                 )
-                if (!isAdFree) {
-                    BannerAdView()
-                }
             }
         }
     ) { innerPadding ->

@@ -118,14 +118,14 @@ private fun SettingsScaffold(params: SettingsScaffoldParams) {
         containerColor = params.themeColors.background,
         bottomBar = {
             Column(modifier = Modifier.fillMaxWidth()) {
+                if (!params.isAdFree) {
+                    BannerAdView()
+                }
                 AppNavigationBar(
                     selectedDestination = NavigationDestination.SETTINGS,
                     levelNumber = params.levelNumber,
                     themeColors = params.themeColors
                 )
-                if (!params.isAdFree) {
-                    BannerAdView()
-                }
             }
         }
     ) {

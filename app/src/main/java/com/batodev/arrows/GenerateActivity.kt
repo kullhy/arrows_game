@@ -167,14 +167,14 @@ private fun GenerateScaffoldContent(state: GenerateScaffoldState) {
         },
         bottomBar = {
             Column(modifier = Modifier.fillMaxWidth()) {
+                if (!state.isAdFree) {
+                    BannerAdView()
+                }
                 AppNavigationBar(
                     selectedDestination = NavigationDestination.GENERATOR,
                     levelNumber = state.levelNumber,
                     themeColors = state.themeColors
                 )
-                if (!state.isAdFree) {
-                    BannerAdView()
-                }
             }
         },
         containerColor = state.themeColors.background
