@@ -2,6 +2,8 @@
 
 **Arrows Game** is an Android puzzle game inspired by "Arrows – Puzzle Escape".
 
+Google play link to the game: https://play.google.com/store/apps/details?id=com.batodev.arrows
+
 ## Project Rationale
 This project is an experiment in board generation: the main goal is to create a robust board generator for puzzle games, focusing on solvability and variety. The generator logic attempts to fill the board with "snakes" (arrow paths) while ensuring each level is solvable and interesting.
 
