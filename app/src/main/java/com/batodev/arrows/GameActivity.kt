@@ -102,7 +102,7 @@ class GameActivity : ComponentActivity() {
         val application = applicationContext as ArrowsApplication
         setContent {
             val viewModel: AppViewModel = viewModel(
-                factory = AppViewModel.Factory(application.userPreferencesRepository)
+                factory = AppViewModel.Factory(application.userPreferencesRepository, application.gameStateDao)
             )
             val currentTheme by viewModel.theme.collectAsState()
 
@@ -138,7 +138,7 @@ fun ArrowsGameView(
     val isAdLoaded by rewardAdManager.isAdLoaded.collectAsState()
     val isAdLoading by rewardAdManager.isAdLoading.collectAsState()
     val engine: GameEngine = viewModel(
-        factory = createGameEngineFactory(view, context, repository, customParams)
+        factory = createGameEngineFactory(view, context, repository, application.gameStateDao, customParams)
     )
     val introState = rememberIntroState(appViewModel, engine.isLoading, coroutineScope)
     val isWinVideosEnabled by appViewModel.isWinVideosEnabled.collectAsState()

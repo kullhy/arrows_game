@@ -50,7 +50,7 @@ class SettingsActivity : ComponentActivity() {
         val shapeProvider = AndroidResourceBoardShapeProvider(this)
         setContent {
             val viewModel: AppViewModel = viewModel(
-                factory = AppViewModel.Factory(application.userPreferencesRepository)
+                factory = AppViewModel.Factory(application.userPreferencesRepository, application.gameStateDao)
             )
             viewModel.shapeProvider = shapeProvider
             val currentTheme by viewModel.theme.collectAsState()

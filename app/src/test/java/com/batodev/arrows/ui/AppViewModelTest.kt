@@ -1,5 +1,6 @@
 package com.batodev.arrows.ui
 
+import com.batodev.arrows.engine.FakeGameStateDao
 import com.batodev.arrows.engine.FakeUserPreferencesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -10,7 +11,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -20,12 +22,13 @@ import org.junit.Test
 class AppViewModelTest {
 
     private val repository = FakeUserPreferencesRepository()
+    private val gameStateDao = FakeGameStateDao()
     private lateinit var viewModel: AppViewModel
 
     @Before
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        viewModel = AppViewModel(repository)
+        viewModel = AppViewModel(repository, gameStateDao)
     }
 
     @After
@@ -79,12 +82,18 @@ class AppViewModelTest {
 
     @Test
     fun `test regenerateCurrentLevel clears saved level`() = runTest {
-        repository.saveInitialLevel("{}")
-        repository.saveCurrentLevel("{}")
+        val collectJob = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.hasSavedLevel.collect {}
+        }
+
+        gameStateDao.saveGameLevel("INITIAL", 5, 5, emptyList())
+        gameStateDao.saveGameLevel("CURRENT", 5, 5, emptyList())
+        assertTrue(viewModel.hasSavedLevel.value)
 
         viewModel.regenerateCurrentLevel()
 
-        assertNull(repository.initialLevelFlow.value)
-        assertNull(repository.currentLevelFlow.value)
+        assertFalse(viewModel.hasSavedLevel.value)
+
+        collectJob.cancel()
     }
 }

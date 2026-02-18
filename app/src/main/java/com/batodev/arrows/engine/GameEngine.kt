@@ -11,13 +11,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.batodev.arrows.GameConstants
 import com.batodev.arrows.SoundManager
+import com.batodev.arrows.data.GameStateDao
 import com.batodev.arrows.data.UserPreferencesRepository
-import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 data class GameEngineConfig(
     val repository: UserPreferencesRepository,
+    val gameStateDao: GameStateDao,
     val gameGenerator: GameGenerator = GameGenerator(),
     val autoLoad: Boolean = true,
     val isCustomGame: Boolean = false,
@@ -41,10 +42,9 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
     private val isCustomGame = config.isCustomGame
     private val backgroundDispatcher = config.backgroundDispatcher
     private val soundManager = features.soundManager
-    private val gson = Gson()
     private val inputHandler = InputHandler()
     private val levelManager = LevelManager(
-        repository, config.gameGenerator, features.shapeProvider, features.random, gson
+        repository, config.gameGenerator, features.shapeProvider, features.random, config.gameStateDao
     )
     internal val transformationState = TransformationState()
     private val removalAnimator = RemovalAnimator(coroutineScope)

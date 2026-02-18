@@ -4,14 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.batodev.arrows.GameConstants
+import com.batodev.arrows.data.GameStateDao
 import com.batodev.arrows.data.UserPreferencesRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class AppViewModel(private val userPreferencesRepository: UserPreferencesRepository) : ViewModel() {
+class AppViewModel(
+    private val userPreferencesRepository: UserPreferencesRepository,
+    private val gameStateDao: GameStateDao
+) : ViewModel() {
 
     enum class DebugOption {
         WIDTH, HEIGHT, LIVES, SHAPE
@@ -85,7 +88,7 @@ class AppViewModel(private val userPreferencesRepository: UserPreferencesReposit
         initialValue = null
     )
 
-    val hasSavedLevel: StateFlow<Boolean> = userPreferencesRepository.currentLevel.map { it != null }.stateIn(
+    val hasSavedLevel: StateFlow<Boolean> = gameStateDao.hasSavedLevel().stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(GameConstants.STOP_TIMEOUT_MILLIS),
         initialValue = false
@@ -159,7 +162,7 @@ class AppViewModel(private val userPreferencesRepository: UserPreferencesReposit
 
     fun regenerateCurrentLevel() {
         viewModelScope.launch {
-            userPreferencesRepository.clearSavedLevel()
+            gameStateDao.clearAllSavedLevels()
         }
     }
 
@@ -204,11 +207,14 @@ class AppViewModel(private val userPreferencesRepository: UserPreferencesReposit
         }
     }
 
-    class Factory(private val userPreferencesRepository: UserPreferencesRepository) : ViewModelProvider.Factory {
+    class Factory(
+        private val userPreferencesRepository: UserPreferencesRepository,
+        private val gameStateDao: GameStateDao
+    ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(AppViewModel::class.java)) {
-                return AppViewModel(userPreferencesRepository) as T
+                return AppViewModel(userPreferencesRepository, gameStateDao) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

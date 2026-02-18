@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.batodev.arrows.ads.RewardAdManager
 import com.batodev.arrows.data.AndroidResourceBoardShapeProvider
+import com.batodev.arrows.data.GameStateDao
 import com.batodev.arrows.data.UserPreferencesRepository
 import com.batodev.arrows.engine.GameEngine
 import com.batodev.arrows.engine.GameEngineConfig
@@ -119,11 +120,13 @@ fun createGameEngineFactory(
     view: android.view.View,
     context: Context,
     repository: UserPreferencesRepository,
+    gameStateDao: GameStateDao,
     customParams: CustomGameParams
 ): GameEngine.Factory {
     return GameEngine.Factory(
         config = GameEngineConfig(
             repository = repository,
+            gameStateDao = gameStateDao,
             isCustomGame = customParams.isCustom
         ),
         features = GameEngineFeatures(

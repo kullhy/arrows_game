@@ -33,6 +33,7 @@ class CustomGameShapeTest {
             config = GameEngineConfig(
                 coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = repo,
+                gameStateDao = FakeGameStateDao(),
                 isCustomGame = true,
                 gameGenerator = generator,
                 autoLoad = false,
@@ -70,6 +71,7 @@ class CustomGameShapeTest {
             config = GameEngineConfig(
                 coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = repo,
+                gameStateDao = FakeGameStateDao(),
                 isCustomGame = true,
                 gameGenerator = generator,
                 autoLoad = false,
@@ -107,6 +109,7 @@ class CustomGameShapeTest {
             config = GameEngineConfig(
                 coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = repo,
+                gameStateDao = FakeGameStateDao(),
                 isCustomGame = false,  // Regular game
                 gameGenerator = generator,
                 autoLoad = false,
@@ -139,6 +142,7 @@ class CustomGameShapeTest {
             config = GameEngineConfig(
                 coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = customRepo,
+                gameStateDao = FakeGameStateDao(),
                 isCustomGame = true,
                 gameGenerator = customGenerator,
                 autoLoad = false,
@@ -171,6 +175,7 @@ class CustomGameShapeTest {
             config = GameEngineConfig(
                 coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = regularRepo,
+                gameStateDao = FakeGameStateDao(),
                 isCustomGame = false,
                 gameGenerator = regularGenerator,
                 autoLoad = false,

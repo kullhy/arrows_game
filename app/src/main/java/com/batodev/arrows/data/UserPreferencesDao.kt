@@ -47,12 +47,6 @@ interface UserPreferencesDao {
     @Query("SELECT debugForcedShape FROM user_preferences WHERE id = 1")
     fun getDebugForcedShape(): Flow<String?>
 
-    @Query("SELECT initialLevel FROM user_preferences WHERE id = 1")
-    fun getInitialLevel(): Flow<String?>
-
-    @Query("SELECT currentLevel FROM user_preferences WHERE id = 1")
-    fun getCurrentLevel(): Flow<String?>
-
     @Query("SELECT isAdFree FROM user_preferences WHERE id = 1")
     fun getIsAdFree(): Flow<Boolean>
 
@@ -101,15 +95,6 @@ interface UserPreferencesDao {
 
     @Query("UPDATE user_preferences SET debugForcedShape = :value WHERE id = 1")
     suspend fun updateDebugForcedShape(value: String?)
-
-    @Query("UPDATE user_preferences SET initialLevel = :value WHERE id = 1")
-    suspend fun updateInitialLevel(value: String)
-
-    @Query("UPDATE user_preferences SET currentLevel = :value WHERE id = 1")
-    suspend fun updateCurrentLevel(value: String)
-
-    @Query("UPDATE user_preferences SET initialLevel = NULL, currentLevel = NULL WHERE id = 1")
-    suspend fun clearSavedLevel()
 
     @Query("UPDATE user_preferences SET isAdFree = :value WHERE id = 1")
     suspend fun updateIsAdFree(value: Boolean)

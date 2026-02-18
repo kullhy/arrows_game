@@ -30,12 +30,6 @@ class FakeUserPreferencesRepository : UserPreferencesRepository(
     val currentLivesFlow = MutableStateFlow(5)
     override val currentLives: Flow<Int> = currentLivesFlow
 
-    val initialLevelFlow = MutableStateFlow<String?>(null)
-    override val initialLevel: Flow<String?> = initialLevelFlow
-
-    val currentLevelFlow = MutableStateFlow<String?>(null)
-    override val currentLevel: Flow<String?> = currentLevelFlow
-
     val debugForcedWidthFlow = MutableStateFlow<Int?>(null)
     override val debugForcedWidth: Flow<Int?> = debugForcedWidthFlow
 
@@ -91,14 +85,6 @@ class FakeUserPreferencesRepository : UserPreferencesRepository(
         currentLivesFlow.value = lives
     }
 
-    override suspend fun saveInitialLevel(levelJson: String) {
-        initialLevelFlow.value = levelJson
-    }
-
-    override suspend fun saveCurrentLevel(levelJson: String) {
-        currentLevelFlow.value = levelJson
-    }
-
     override suspend fun saveDebugForcedWidth(width: Int?) {
         debugForcedWidthFlow.value = width
     }
@@ -113,11 +99,6 @@ class FakeUserPreferencesRepository : UserPreferencesRepository(
 
     override suspend fun saveDebugForcedShape(shape: String?) {
         debugForcedShapeFlow.value = shape
-    }
-
-    override suspend fun clearSavedLevel() {
-        initialLevelFlow.value = null
-        currentLevelFlow.value = null
     }
 
     override suspend fun saveIsAdFree(isAdFree: Boolean) {

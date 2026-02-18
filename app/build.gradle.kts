@@ -143,7 +143,6 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.gson)
     implementation(libs.aboutlibraries.compose.m3)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

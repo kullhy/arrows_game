@@ -14,8 +14,6 @@ data class UserPreferencesEntity(
     val isFillBoardEnabled: Boolean = false,
     val levelNumber: Int = GameConstants.DEFAULT_LEVEL,
     val currentLives: Int = GameConstants.DEFAULT_LIVES,
-    val initialLevel: String? = null,
-    val currentLevel: String? = null,
     val debugForcedWidth: Int? = null,
     val debugForcedHeight: Int? = null,
     val debugForcedLives: Int? = null,

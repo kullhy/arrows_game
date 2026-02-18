@@ -76,7 +76,7 @@ class GenerateActivity : ComponentActivity() {
         val application = applicationContext as ArrowsApplication
         setContent {
             val viewModel: AppViewModel = viewModel(
-                factory = AppViewModel.Factory(application.userPreferencesRepository)
+                factory = AppViewModel.Factory(application.userPreferencesRepository, application.gameStateDao)
             )
             val currentTheme by viewModel.theme.collectAsState()
 
@@ -92,7 +92,7 @@ class GenerateActivity : ComponentActivity() {
 fun GenerateScreen() {
     val context = LocalContext.current
     val application = context.applicationContext as ArrowsApplication
-    val viewModel: AppViewModel = viewModel(factory = AppViewModel.Factory(application.userPreferencesRepository))
+    val viewModel: AppViewModel = viewModel(factory = AppViewModel.Factory(application.userPreferencesRepository, application.gameStateDao))
     val hasSavedLevel by viewModel.hasSavedLevel.collectAsState()
     val isFillBoardEnabled by viewModel.isFillBoardEnabled.collectAsState()
     val levelNumber by viewModel.levelNumber.collectAsState()

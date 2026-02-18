@@ -1,7 +1,8 @@
 package com.batodev.arrows.engine
 
 import androidx.compose.ui.geometry.Offset
-import com.google.gson.Gson
+import com.batodev.arrows.data.PointData
+import com.batodev.arrows.data.SnakeSaveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -15,21 +16,30 @@ import org.junit.Test
 
 class GameEngineTapTest {
 
+    private fun GameLevel.toSaveData(): List<SnakeSaveData> =
+        snakes.map { snake ->
+            SnakeSaveData(
+                id = snake.id,
+                headDirection = snake.headDirection.name,
+                bodyPoints = snake.body.map { PointData(it.x, it.y) }
+            )
+        }
+
+    private suspend fun saveLevelToDao(dao: FakeGameStateDao, level: GameLevel) {
+        val saveData = level.toSaveData()
+        dao.saveGameLevel("INITIAL", level.width, level.height, saveData)
+        dao.saveGameLevel("CURRENT", level.width, level.height, saveData)
+    }
+
     @Test
     fun `test closest snake is selected within tolerance`() = runTest {
-        val gson = Gson()
-        // Setup levels
-        // Snake 1 (1,1) RIGHT -> target center roughly (1.8, 1.5)
-        // Snake 2 (3,1) LEFT -> target center roughly (3.2, 1.5)
         val snake1 = Snake(1, listOf(Point(1, 1)), Direction.RIGHT)
         val snake2 = Snake(2, listOf(Point(3, 1)), Direction.LEFT)
         val level = GameLevel(5, 5, listOf(snake1, snake2))
-        val levelJson = gson.toJson(level)
 
-        // Mock repo
         val repo = FakeUserPreferencesRepository()
-        repo.saveInitialLevel(levelJson)
-        repo.saveCurrentLevel(levelJson)
+        val fakeDao = FakeGameStateDao()
+        saveLevelToDao(fakeDao, level)
         repo.saveVibrationPreference(false)
         repo.saveSoundsPreference(true)
         repo.saveFillBoardPreference(false)
@@ -42,6 +52,7 @@ class GameEngineTapTest {
             config = GameEngineConfig(
                 coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = repo,
+                gameStateDao = fakeDao,
                 autoLoad = false,
                 backgroundDispatcher = testDispatcher
             )
@@ -58,17 +69,6 @@ class GameEngineTapTest {
         val boardSize = 500f
         val cellWidth = boardSize / 5f // 100f
 
-        // Target centers (calculated based on TAP_AREA_OFFSET_FACTOR = 0.3)
-        // Snake 1: x = 1.0 + 0.5 + 0.3 = 1.8.  y = 1.5.
-        // Snake 2: x = 3.0 + 0.5 - 0.3 = 3.2.  y = 1.5.
-
-                // Tap closer to Snake 1
-                // Tap at x = 2.4.
-                // Dist to S1 (1.8): 0.6.
-                // Dist to S2 (3.2): 0.8.
-                // Both are within tolerance 1.3.
-                // Should pick S1.
-
                 val tapOffset = Offset(2.4f * cellWidth, 1.5f * cellWidth)
                 engine.onTap(tapOffset, boardSize, boardSize)
 
@@ -79,12 +79,6 @@ class GameEngineTapTest {
                 engine.restartLevel()
                 runCurrent()
 
-                // Tap closer to Snake 2
-                // Tap at x = 2.6.
-                // Dist to S1 (1.8): 0.8.
-                // Dist to S2 (3.2): 0.6.
-                // Should pick S2.
-
                 val tapOffset2 = Offset(2.6f * cellWidth, 1.5f * cellWidth)
                 engine.onTap(tapOffset2, boardSize, boardSize)
 
@@ -94,18 +88,13 @@ class GameEngineTapTest {
 
     @Test
     fun `test animating snake does not obstruct others`() = runTest {
-        val gson = Gson()
-        // S1 is at (1,1) moving RIGHT.
-        // S2 is at (3,1) moving RIGHT.
-        // S1 is obstructed by S2.
         val s1 = Snake(1, listOf(Point(1, 1)), Direction.RIGHT)
         val s2 = Snake(2, listOf(Point(3, 1)), Direction.RIGHT)
         val level = GameLevel(5, 5, listOf(s1, s2))
-        val levelJson = gson.toJson(level)
 
         val repo = FakeUserPreferencesRepository()
-        repo.saveInitialLevel(levelJson)
-        repo.saveCurrentLevel(levelJson)
+        val fakeDao = FakeGameStateDao()
+        saveLevelToDao(fakeDao, level)
         repo.saveVibrationPreference(false)
         repo.saveSoundsPreference(false)
         repo.saveFillBoardPreference(false)
@@ -118,6 +107,7 @@ class GameEngineTapTest {
             config = GameEngineConfig(
                 coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = repo,
+                gameStateDao = fakeDao,
                 autoLoad = false,
                 backgroundDispatcher = testDispatcher
             )

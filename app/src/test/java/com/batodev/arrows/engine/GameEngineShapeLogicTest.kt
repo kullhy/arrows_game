@@ -39,6 +39,7 @@ class GameEngineShapeLogicTest {
             config = GameEngineConfig(
                 coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = repo,
+                gameStateDao = FakeGameStateDao(),
                 gameGenerator = generator,
                 autoLoad = false,
                 backgroundDispatcher = testDispatcher
@@ -74,6 +75,7 @@ class GameEngineShapeLogicTest {
             config = GameEngineConfig(
                 coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = repo,
+                gameStateDao = FakeGameStateDao(),
                 gameGenerator = generator,
                 autoLoad = false,
                 backgroundDispatcher = testDispatcher
@@ -109,6 +111,7 @@ class GameEngineShapeLogicTest {
             config = GameEngineConfig(
                 coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = repo,
+                gameStateDao = FakeGameStateDao(),
                 gameGenerator = generator,
                 autoLoad = false,
                 backgroundDispatcher = testDispatcher
@@ -147,6 +150,7 @@ class GameEngineShapeLogicTest {
             config = GameEngineConfig(
                 coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = repo,
+                gameStateDao = FakeGameStateDao(),
                 gameGenerator = generator,
                 autoLoad = false,
                 backgroundDispatcher = testDispatcher
