@@ -67,10 +67,8 @@ class SettingsActivity : ComponentActivity() {
 @Composable
 fun SettingsScreen(viewModel: AppViewModel, rewardAdManager: RewardAdManager) {
     val context = LocalContext.current
-    val application = context.applicationContext as ArrowsApplication
-    val repository = application.userPreferencesRepository
-    val levelNumber by repository.levelNumber.collectAsState(initial = 1)
-    val isAdFree by repository.isAdFree.collectAsState(initial = false)
+    val levelNumber by viewModel.levelNumber.collectAsState()
+    val isAdFree by viewModel.isAdFree.collectAsState()
     val themeColors = LocalThemeColors.current
     var showThemeDialog by remember { mutableStateOf(false) }
     var showSpeedDialog by remember { mutableStateOf(false) }
@@ -90,7 +88,7 @@ fun SettingsScreen(viewModel: AppViewModel, rewardAdManager: RewardAdManager) {
 
     SettingsScaffold(
         SettingsScaffoldParams(
-            viewModel, rewardAdManager, repository, context, themeColors,
+            viewModel, rewardAdManager, context, themeColors,
             levelNumber, isAdFree, currentTheme, currentSpeed,
             { showThemeDialog = true }, { showSpeedDialog = true }, { showLicensesDialog = true }
         )
@@ -100,7 +98,6 @@ fun SettingsScreen(viewModel: AppViewModel, rewardAdManager: RewardAdManager) {
 private data class SettingsScaffoldParams(
     val viewModel: AppViewModel,
     val rewardAdManager: RewardAdManager,
-    val repository: com.batodev.arrows.data.UserPreferencesRepository,
     val context: android.content.Context,
     val themeColors: com.batodev.arrows.ui.theme.ThemeColors,
     val levelNumber: Int,
@@ -146,7 +143,7 @@ private fun SettingsScaffold(params: SettingsScaffoldParams) {
             )
             FeedbackSection(params.context, params.themeColors)
             PurchasesSection(
-                repository = params.repository,
+                viewModel = params.viewModel,
                 rewardAdManager = params.rewardAdManager,
                 themeColors = params.themeColors
             )

@@ -29,7 +29,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -40,7 +39,6 @@ import androidx.compose.ui.unit.sp
 import com.batodev.arrows.GameConstants
 import com.batodev.arrows.R
 import com.batodev.arrows.ads.RewardAdManager
-import com.batodev.arrows.data.UserPreferencesRepository
 import com.batodev.arrows.ui.theme.InactiveIcon
 import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.ThemeColors
@@ -127,16 +125,15 @@ fun FeedbackSection(context: Context, themeColors: ThemeColors) {
 
 @Composable
 fun PurchasesSection(
-    repository: UserPreferencesRepository,
+    viewModel: AppViewModel,
     rewardAdManager: RewardAdManager,
     themeColors: ThemeColors
 ) {
     val context = LocalContext.current
     val activity = context as? Activity
-    val coroutineScope = rememberCoroutineScope()
 
-    val isAdFree by repository.isAdFree.collectAsState(initial = false)
-    val rewardAdCount by repository.rewardAdCount.collectAsState(initial = 0)
+    val isAdFree by viewModel.isAdFree.collectAsState()
+    val rewardAdCount by viewModel.rewardAdCount.collectAsState()
     val isAdLoaded by rewardAdManager.isAdLoaded.collectAsState()
     val isAdLoading by rewardAdManager.isAdLoading.collectAsState()
 
@@ -146,7 +143,7 @@ fun PurchasesSection(
         } else {
             AdNotFreeSection(
                 AdSettingsSectionState(
-                    repository, rewardAdManager, themeColors, activity, coroutineScope,
+                    viewModel, rewardAdManager, themeColors, activity,
                     rewardAdCount, isAdLoaded, isAdLoading
                 )
             )

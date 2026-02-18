@@ -31,7 +31,7 @@ class CustomGameShapeTest {
 
         val engine = GameEngine(
             config = GameEngineConfig(
-                coroutineScope = CoroutineScope(testDispatcher),
+                coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = repo,
                 isCustomGame = true,
                 gameGenerator = generator,
@@ -68,7 +68,7 @@ class CustomGameShapeTest {
 
         val engine = GameEngine(
             config = GameEngineConfig(
-                coroutineScope = CoroutineScope(testDispatcher),
+                coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = repo,
                 isCustomGame = true,
                 gameGenerator = generator,
@@ -105,7 +105,7 @@ class CustomGameShapeTest {
 
         val engine = GameEngine(
             config = GameEngineConfig(
-                coroutineScope = CoroutineScope(testDispatcher),
+                coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = repo,
                 isCustomGame = false,  // Regular game
                 gameGenerator = generator,
@@ -137,7 +137,7 @@ class CustomGameShapeTest {
 
         val customEngine = GameEngine(
             config = GameEngineConfig(
-                coroutineScope = CoroutineScope(testDispatcher),
+                coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = customRepo,
                 isCustomGame = true,
                 gameGenerator = customGenerator,
@@ -169,7 +169,7 @@ class CustomGameShapeTest {
 
         val regularEngine = GameEngine(
             config = GameEngineConfig(
-                coroutineScope = CoroutineScope(testDispatcher),
+                coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = regularRepo,
                 isCustomGame = false,
                 gameGenerator = regularGenerator,

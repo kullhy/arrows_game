@@ -40,7 +40,7 @@ class GameEngineTapTest {
         val testDispatcher = UnconfinedTestDispatcher(testScheduler)
         val engine = GameEngine(
             config = GameEngineConfig(
-                coroutineScope = CoroutineScope(testDispatcher),
+                coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = repo,
                 autoLoad = false,
                 backgroundDispatcher = testDispatcher
@@ -116,7 +116,7 @@ class GameEngineTapTest {
         val testDispatcher = UnconfinedTestDispatcher(testScheduler)
         val engine = GameEngine(
             config = GameEngineConfig(
-                coroutineScope = CoroutineScope(testDispatcher),
+                coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = repo,
                 autoLoad = false,
                 backgroundDispatcher = testDispatcher

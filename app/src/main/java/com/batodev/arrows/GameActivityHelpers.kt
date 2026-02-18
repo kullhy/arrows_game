@@ -24,16 +24,16 @@ import com.batodev.arrows.data.UserPreferencesRepository
 import com.batodev.arrows.engine.GameEngine
 import com.batodev.arrows.engine.GameEngineConfig
 import com.batodev.arrows.engine.GameEngineFeatures
+import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
+
 
 
 data class GameWonStateParams(
     val engine: GameEngine,
-    val repository: UserPreferencesRepository,
+    val viewModel: AppViewModel,
     val activity: Activity?,
     val application: ArrowsApplication,
     val isAdFree: Boolean
@@ -115,16 +115,15 @@ fun extractCustomGameParams(intent: android.content.Intent?): CustomGameParams {
     return CustomGameParams(isCustom, customWidth, customHeight, customShape)
 }
 
-fun createGameEngine(
-    coroutineScope: CoroutineScope,
+fun createGameEngineFactory(
     view: android.view.View,
     context: Context,
     repository: UserPreferencesRepository,
     customParams: CustomGameParams
-): GameEngine {
-    return GameEngine(
+): GameEngine.Factory {
+    return GameEngine.Factory(
         config = GameEngineConfig(
-            coroutineScope = coroutineScope, repository = repository,
+            repository = repository,
             isCustomGame = customParams.isCustom
         ),
         features = GameEngineFeatures(
@@ -189,8 +188,8 @@ suspend fun finishGameAfterCelebration(params: GameWonStateParams, waitForConfet
     if (waitForConfetti) {
         delay(GameConstants.GAME_WON_EXIT_DELAY)
     }
-    params.repository.incrementGamesCompleted()
-    val gamesCompleted = params.repository.gamesCompleted.first()
+    params.viewModel.incrementGamesCompleted()
+    val gamesCompleted = params.viewModel.gamesCompleted.value
     if (shouldShowInterstitialAd(params.isAdFree, gamesCompleted)) {
         params.activity?.let { act ->
             params.application.interstitialAdManager.showInterstitialAd(act) {

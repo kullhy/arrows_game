@@ -91,6 +91,30 @@ class AppViewModel(private val userPreferencesRepository: UserPreferencesReposit
         initialValue = false
     )
 
+    val isAdFree: StateFlow<Boolean> = userPreferencesRepository.isAdFree.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(GameConstants.STOP_TIMEOUT_MILLIS),
+        initialValue = false
+    )
+
+    val rewardAdCount: StateFlow<Int> = userPreferencesRepository.rewardAdCount.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(GameConstants.STOP_TIMEOUT_MILLIS),
+        initialValue = 0
+    )
+
+    val gamesCompleted: StateFlow<Int> = userPreferencesRepository.gamesCompleted.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(GameConstants.STOP_TIMEOUT_MILLIS),
+        initialValue = 0
+    )
+
+    val introCompleted: StateFlow<Boolean> = userPreferencesRepository.introCompleted.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(GameConstants.STOP_TIMEOUT_MILLIS),
+        initialValue = false
+    )
+
     fun saveTheme(theme: String) {
         viewModelScope.launch {
             userPreferencesRepository.saveThemePreference(theme)
@@ -136,6 +160,36 @@ class AppViewModel(private val userPreferencesRepository: UserPreferencesReposit
     fun regenerateCurrentLevel() {
         viewModelScope.launch {
             userPreferencesRepository.clearSavedLevel()
+        }
+    }
+
+    fun saveIsAdFree(isAdFree: Boolean) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveIsAdFree(isAdFree)
+        }
+    }
+
+    fun incrementRewardAdCount() {
+        viewModelScope.launch {
+            userPreferencesRepository.incrementRewardAdCount()
+        }
+    }
+
+    fun resetRewardAdCount() {
+        viewModelScope.launch {
+            userPreferencesRepository.resetRewardAdCount()
+        }
+    }
+
+    fun incrementGamesCompleted() {
+        viewModelScope.launch {
+            userPreferencesRepository.incrementGamesCompleted()
+        }
+    }
+
+    fun saveIntroCompleted(completed: Boolean) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveIntroCompleted(completed)
         }
     }
 

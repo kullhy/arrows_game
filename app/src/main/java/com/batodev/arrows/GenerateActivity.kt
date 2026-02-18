@@ -92,12 +92,11 @@ class GenerateActivity : ComponentActivity() {
 fun GenerateScreen() {
     val context = LocalContext.current
     val application = context.applicationContext as ArrowsApplication
-    val repository = application.userPreferencesRepository
-    val viewModel: AppViewModel = viewModel(factory = AppViewModel.Factory(repository))
+    val viewModel: AppViewModel = viewModel(factory = AppViewModel.Factory(application.userPreferencesRepository))
     val hasSavedLevel by viewModel.hasSavedLevel.collectAsState()
     val isFillBoardEnabled by viewModel.isFillBoardEnabled.collectAsState()
-    val levelNumber by repository.levelNumber.collectAsState(initial = 1)
-    val isAdFree by repository.isAdFree.collectAsState(initial = false)
+    val levelNumber by viewModel.levelNumber.collectAsState()
+    val isAdFree by viewModel.isAdFree.collectAsState()
     val themeColors = LocalThemeColors.current
     val maxSize = if (isFillBoardEnabled) GameConstants.GENERATOR_MAX_SIZE_FILL_BOARD
                   else GameConstants.GENERATOR_MAX_SIZE

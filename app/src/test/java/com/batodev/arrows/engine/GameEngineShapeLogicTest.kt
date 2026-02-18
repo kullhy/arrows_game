@@ -37,7 +37,7 @@ class GameEngineShapeLogicTest {
 
         val engine = GameEngine(
             config = GameEngineConfig(
-                coroutineScope = CoroutineScope(testDispatcher),
+                coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = repo,
                 gameGenerator = generator,
                 autoLoad = false,
@@ -72,7 +72,7 @@ class GameEngineShapeLogicTest {
 
         val engine = GameEngine(
             config = GameEngineConfig(
-                coroutineScope = CoroutineScope(testDispatcher),
+                coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = repo,
                 gameGenerator = generator,
                 autoLoad = false,
@@ -107,7 +107,7 @@ class GameEngineShapeLogicTest {
 
         val engine = GameEngine(
             config = GameEngineConfig(
-                coroutineScope = CoroutineScope(testDispatcher),
+                coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = repo,
                 gameGenerator = generator,
                 autoLoad = false,
@@ -145,7 +145,7 @@ class GameEngineShapeLogicTest {
 
         val engine = GameEngine(
             config = GameEngineConfig(
-                coroutineScope = CoroutineScope(testDispatcher),
+                coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = repo,
                 gameGenerator = generator,
                 autoLoad = false,

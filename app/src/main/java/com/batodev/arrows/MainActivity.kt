@@ -63,10 +63,12 @@ class MainActivity : ComponentActivity() {
 fun MainScreen() {
     val context = LocalContext.current
     val application = context.applicationContext as ArrowsApplication
-    val repository = application.userPreferencesRepository
-    val currentLevel by repository.currentLevel.collectAsState(initial = null)
-    val levelNumber by repository.levelNumber.collectAsState(initial = 1)
-    val isAdFree by repository.isAdFree.collectAsState(initial = false)
+    val viewModel: AppViewModel = viewModel(
+        factory = AppViewModel.Factory(application.userPreferencesRepository)
+    )
+    val hasSavedLevel by viewModel.hasSavedLevel.collectAsState()
+    val levelNumber by viewModel.levelNumber.collectAsState()
+    val isAdFree by viewModel.isAdFree.collectAsState()
     val themeColors = LocalThemeColors.current
 
     Scaffold(
@@ -95,7 +97,7 @@ fun MainScreen() {
             Spacer(modifier = Modifier.weight(1f))
             LogoSection(levelNumber, themeColors)
             Spacer(modifier = Modifier.weight(1f))
-            PlayButton(currentLevel != null, themeColors)
+            PlayButton(hasSavedLevel, themeColors)
             Spacer(modifier = Modifier.height(48.dp))
         }
     }

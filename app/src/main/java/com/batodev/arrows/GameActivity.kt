@@ -107,15 +107,14 @@ class GameActivity : ComponentActivity() {
             val currentTheme by viewModel.theme.collectAsState()
 
             ArrowsTheme(themeName = currentTheme) {
-                val repository = application.userPreferencesRepository
-                val isAdFree by repository.isAdFree.collectAsState(initial = false)
+                val isAdFree by viewModel.isAdFree.collectAsState()
                 val themeColors = LocalThemeColors.current
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = themeColors.background
                 ) { innerPadding ->
                     Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-                        ArrowsGameView(repository, isAdFree, application.rewardAdManager)
+                        ArrowsGameView(viewModel, isAdFree, application.rewardAdManager)
                     }
                 }
             }
@@ -125,7 +124,7 @@ class GameActivity : ComponentActivity() {
 
 @Composable
 fun ArrowsGameView(
-    repository: com.batodev.arrows.data.UserPreferencesRepository,
+    appViewModel: AppViewModel,
     isAdFree: Boolean,
     rewardAdManager: RewardAdManager
 ) {
@@ -134,14 +133,15 @@ fun ArrowsGameView(
     val context = LocalContext.current
     val activity = context as? Activity
     val application = context.applicationContext as ArrowsApplication
+    val repository = application.userPreferencesRepository
     val customParams = extractCustomGameParams(activity?.intent)
     val isAdLoaded by rewardAdManager.isAdLoaded.collectAsState()
     val isAdLoading by rewardAdManager.isAdLoading.collectAsState()
-    val engine = remember {
-        createGameEngine(coroutineScope, view, context, repository, customParams)
-    }
-    val introState = rememberIntroState(repository, engine.isLoading, coroutineScope)
-    val isWinVideosEnabled by repository.isWinVideosEnabled.collectAsState(initial = true)
+    val engine: GameEngine = viewModel(
+        factory = createGameEngineFactory(view, context, repository, customParams)
+    )
+    val introState = rememberIntroState(appViewModel, engine.isLoading, coroutineScope)
+    val isWinVideosEnabled by appViewModel.isWinVideosEnabled.collectAsState()
     var confettiState by remember { mutableStateOf<List<Party>>(emptyList()) }
     var showGuidanceLines by remember { mutableStateOf(false) }
     var showCelebrationVideo by remember { mutableStateOf(false) }
@@ -153,7 +153,7 @@ fun ArrowsGameView(
     val tapAnimations = remember { androidx.compose.runtime.mutableStateListOf<TapAnimationState>() }
     val themeColors = LocalThemeColors.current
     val gameWonParams = remember(activity, application, isAdFree) {
-        GameWonStateParams(engine, repository, activity, application, isAdFree)
+        GameWonStateParams(engine, appViewModel, activity, application, isAdFree)
     }
     HandleGameWonState(gameWonParams, isWinVideosEnabled) { showCelebrationVideo = true }
     confettiState = updateConfettiState(engine, confettiState)

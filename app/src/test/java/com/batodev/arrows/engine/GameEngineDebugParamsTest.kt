@@ -47,7 +47,7 @@ class GameEngineDebugParamsTest {
 
         val engine = GameEngine(
             config = GameEngineConfig(
-                coroutineScope = CoroutineScope(testDispatcher),
+                coroutineScopeOverride = CoroutineScope(testDispatcher),
                 repository = repo,
                 gameGenerator = generator,
                 autoLoad = false,

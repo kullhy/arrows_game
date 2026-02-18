@@ -6,6 +6,9 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.batodev.arrows.GameConstants
 import com.batodev.arrows.SoundManager
 import com.batodev.arrows.data.UserPreferencesRepository
@@ -14,12 +17,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 data class GameEngineConfig(
-    val coroutineScope: CoroutineScope,
     val repository: UserPreferencesRepository,
     val gameGenerator: GameGenerator = GameGenerator(),
     val autoLoad: Boolean = true,
     val isCustomGame: Boolean = false,
     val backgroundDispatcher: kotlinx.coroutines.CoroutineDispatcher = kotlinx.coroutines.Dispatchers.Default,
+    val coroutineScopeOverride: CoroutineScope? = null,
 )
 
 data class GameEngineFeatures(
@@ -32,8 +35,8 @@ data class GameEngineFeatures(
     val forcedShape: String? = null,
 )
 
-class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEngineFeatures()) {
-    private val coroutineScope = config.coroutineScope
+class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEngineFeatures()) : ViewModel() {
+    private val coroutineScope = config.coroutineScopeOverride ?: viewModelScope
     private val repository = config.repository
     private val isCustomGame = config.isCustomGame
     private val backgroundDispatcher = config.backgroundDispatcher
@@ -237,5 +240,18 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
 
     private fun saveState() {
         coroutineScope.launch(backgroundDispatcher) { levelManager.saveState(level, lives) }
+    }
+
+    class Factory(
+        private val config: GameEngineConfig,
+        private val features: GameEngineFeatures = GameEngineFeatures()
+    ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(GameEngine::class.java)) {
+                return GameEngine(config, features) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
     }
 }

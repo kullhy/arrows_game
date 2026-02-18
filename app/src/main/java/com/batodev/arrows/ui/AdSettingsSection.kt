@@ -25,7 +25,7 @@ import com.batodev.arrows.GameConstants
 import com.batodev.arrows.R
 import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
-import kotlinx.coroutines.launch
+
 
 @Composable
 fun AdFreeSection(themeColors: ThemeColors) {
@@ -130,12 +130,10 @@ private fun AdWatchButton(state: AdSettingsSectionState) {
 }
 
 private fun handleAdReward(state: AdSettingsSectionState) {
-    state.coroutineScope.launch {
-        state.repository.incrementRewardAdCount()
-        val newCount = state.rewardAdCount + 1
-        if (newCount >= GameConstants.REQUIRED_AD_COUNT_FOR_AD_FREE) {
-            state.repository.saveIsAdFree(true)
-            state.repository.resetRewardAdCount()
-        }
+    state.viewModel.incrementRewardAdCount()
+    val newCount = state.rewardAdCount + 1
+    if (newCount >= GameConstants.REQUIRED_AD_COUNT_FOR_AD_FREE) {
+        state.viewModel.saveIsAdFree(true)
+        state.viewModel.resetRewardAdCount()
     }
 }
