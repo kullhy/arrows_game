@@ -1,10 +1,12 @@
 package com.batodev.arrows
 
 import android.app.Application
+import androidx.room.Room
 import com.batodev.arrows.ads.InterstitialAdManager
 import com.batodev.arrows.ads.RewardAdManager
+import com.batodev.arrows.data.AppDatabase
+import com.batodev.arrows.data.UserPreferencesEntity
 import com.batodev.arrows.data.UserPreferencesRepository
-import com.batodev.arrows.data.dataStore
 import com.google.android.gms.ads.MobileAds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,10 +18,20 @@ class ArrowsApplication : Application() {
         private set
     lateinit var interstitialAdManager: InterstitialAdManager
         private set
+    lateinit var database: AppDatabase
+        private set
 
     override fun onCreate() {
         super.onCreate()
-        userPreferencesRepository = UserPreferencesRepository(dataStore)
+        database = Room.databaseBuilder(this, AppDatabase::class.java, "arrows_db").build()
+        val dao = database.userPreferencesDao()
+
+        // Seed the default row if it doesn't exist
+        CoroutineScope(Dispatchers.IO).launch {
+            dao.insertDefault(UserPreferencesEntity())
+        }
+
+        userPreferencesRepository = UserPreferencesRepository(dao)
         rewardAdManager = RewardAdManager(this)
         interstitialAdManager = InterstitialAdManager(this)
 

@@ -1,0 +1,133 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "022e891f7a9a2924785c1266ae4c1c74",
+    "entities": [
+      {
+        "tableName": "user_preferences",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `theme` TEXT NOT NULL, `animationSpeed` TEXT NOT NULL, `isVibrationEnabled` INTEGER NOT NULL, `isSoundsEnabled` INTEGER NOT NULL, `isFillBoardEnabled` INTEGER NOT NULL, `levelNumber` INTEGER NOT NULL, `currentLives` INTEGER NOT NULL, `initialLevel` TEXT, `currentLevel` TEXT, `debugForcedWidth` INTEGER, `debugForcedHeight` INTEGER, `debugForcedLives` INTEGER, `debugForcedShape` TEXT, `isAdFree` INTEGER NOT NULL, `rewardAdCount` INTEGER NOT NULL, `gamesCompleted` INTEGER NOT NULL, `introCompleted` INTEGER NOT NULL, `isWinVideosEnabled` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "theme",
+            "columnName": "theme",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "animationSpeed",
+            "columnName": "animationSpeed",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isVibrationEnabled",
+            "columnName": "isVibrationEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isSoundsEnabled",
+            "columnName": "isSoundsEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isFillBoardEnabled",
+            "columnName": "isFillBoardEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "levelNumber",
+            "columnName": "levelNumber",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currentLives",
+            "columnName": "currentLives",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "initialLevel",
+            "columnName": "initialLevel",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "currentLevel",
+            "columnName": "currentLevel",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "debugForcedWidth",
+            "columnName": "debugForcedWidth",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "debugForcedHeight",
+            "columnName": "debugForcedHeight",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "debugForcedLives",
+            "columnName": "debugForcedLives",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "debugForcedShape",
+            "columnName": "debugForcedShape",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isAdFree",
+            "columnName": "isAdFree",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rewardAdCount",
+            "columnName": "rewardAdCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gamesCompleted",
+            "columnName": "gamesCompleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "introCompleted",
+            "columnName": "introCompleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isWinVideosEnabled",
+            "columnName": "isWinVideosEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '022e891f7a9a2924785c1266ae4c1c74')"
+    ]
+  }
+}

@@ -1,28 +1,13 @@
 package com.batodev.arrows.engine
 
-import androidx.datastore.core.DataStoreFactory
-import androidx.datastore.core.Serializer
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.emptyPreferences
+import com.batodev.arrows.data.UserPreferencesDao
 import com.batodev.arrows.data.UserPreferencesRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import java.io.InputStream
-import java.io.OutputStream
+import org.mockito.Mockito
 
 class FakeUserPreferencesRepository : UserPreferencesRepository(
-    DataStoreFactory.create(
-        serializer = object : Serializer<Preferences> {
-            override val defaultValue: Preferences
-                get() = emptyPreferences()
-            override suspend fun readFrom(input: InputStream): Preferences = defaultValue
-            override suspend fun writeTo(t: Preferences, output: OutputStream) {
-                // no-op
-            }
-        }
-    ) { 
-        java.io.File.createTempFile("test_datastore", ".preferences_pb").apply { deleteOnExit() }
-    }
+    Mockito.mock(UserPreferencesDao::class.java)
 ) {
     val themeFlow = MutableStateFlow("Dark")
     override val theme: Flow<String> = themeFlow

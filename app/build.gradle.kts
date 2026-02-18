@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.aboutlibraries)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.ksp)
     id("jacoco")
 }
 
@@ -60,6 +61,14 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
+}
+
+detekt {
+    // Use default detekt 2.0 config; old 1.x config removed due to rule renames
+}
+
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 aboutLibraries {
@@ -130,7 +139,9 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.play.review.ktx)
     implementation(libs.play.services.ads)
-    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.gson)
     implementation(libs.aboutlibraries.compose.m3)
