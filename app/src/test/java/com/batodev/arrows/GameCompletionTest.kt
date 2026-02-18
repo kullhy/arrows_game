@@ -22,6 +22,7 @@ class GameCompletionTest {
 
     @Test
     fun `test no interstitial between intervals`() {
+        assertFalse(shouldShowInterstitialAd(isAdFree = false, gamesCompleted = 0))
         assertFalse(shouldShowInterstitialAd(isAdFree = false, gamesCompleted = 1))
         assertFalse(shouldShowInterstitialAd(isAdFree = false, gamesCompleted = 3))
         assertFalse(shouldShowInterstitialAd(isAdFree = false, gamesCompleted = 7))

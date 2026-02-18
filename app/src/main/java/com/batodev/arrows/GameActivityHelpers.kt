@@ -184,7 +184,7 @@ fun BoxScope.ResetViewButton(
 }
 
 fun shouldShowInterstitialAd(isAdFree: Boolean, gamesCompleted: Int): Boolean {
-    return !isAdFree && gamesCompleted % GameConstants.GAMES_BETWEEN_INTERSTITIALS == 0
+    return !isAdFree && gamesCompleted > 0 && gamesCompleted % GameConstants.GAMES_BETWEEN_INTERSTITIALS == 0
 }
 
 suspend fun finishGameAfterCelebration(params: GameWonStateParams, waitForConfetti: Boolean) {

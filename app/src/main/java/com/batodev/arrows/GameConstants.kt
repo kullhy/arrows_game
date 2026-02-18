@@ -130,7 +130,6 @@ object GameConstants {
     /** Delay in milliseconds before automatically exiting game screen after winning (3 seconds) */
     const val GAME_WON_EXIT_DELAY = 3000L
 
-    /** Number of games between interstitial ads */
     const val GAMES_BETWEEN_INTERSTITIALS = 5
 
     /** Duration in milliseconds for guidance line fade animation (0.5 seconds) */
