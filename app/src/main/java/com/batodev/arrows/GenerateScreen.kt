@@ -1,10 +1,5 @@
 package com.batodev.arrows
 
-import android.content.Intent
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -56,7 +51,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.batodev.arrows.data.AndroidResourceBoardShapeProvider
 import com.batodev.arrows.data.ShapeRegistry
 import com.batodev.arrows.navigation.NavTarget
@@ -64,51 +58,9 @@ import com.batodev.arrows.ui.AppNavigationBar
 import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.NavigationDestination
 import com.batodev.arrows.ui.ads.BannerAdView
-import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
-
-class GenerateActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        val application = applicationContext as ArrowsApplication
-        setContent {
-            val viewModel: AppViewModel = viewModel(
-                factory = AppViewModel.Factory(application.userPreferencesRepository, application.gameStateDao)
-            )
-            val currentTheme by viewModel.theme.collectAsState()
-
-            ArrowsTheme(themeName = currentTheme) {
-                GenerateScreen(
-                    appViewModel = viewModel,
-                    onStartCustomGame = { target ->
-                        viewModel.regenerateCurrentLevel()
-                        val intent = Intent(this@GenerateActivity, GameActivity::class.java).apply {
-                            putExtra("IS_CUSTOM", target.isCustom)
-                            putExtra("CUSTOM_WIDTH", target.customWidth ?: 0)
-                            putExtra("CUSTOM_HEIGHT", target.customHeight ?: 0)
-                            putExtra("CUSTOM_SHAPE", target.customShape)
-                        }
-                        startActivity(intent)
-                    },
-                    onBack = { finish() },
-                    onNavigateHome = {
-                        val intent = Intent(this@GenerateActivity, MainActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                        startActivity(intent)
-                    },
-                    onNavigateToSettings = {
-                        val intent = Intent(this@GenerateActivity, SettingsActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                        startActivity(intent)
-                    }
-                )
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

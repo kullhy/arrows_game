@@ -1,10 +1,5 @@
 package com.batodev.arrows
 
-import android.content.Intent
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -24,9 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.batodev.arrows.ads.RewardAdManager
-import com.batodev.arrows.data.AndroidResourceBoardShapeProvider
 import com.batodev.arrows.ui.AnimationSpeedSelectionDialog
 import com.batodev.arrows.ui.AppNavigationBar
 import com.batodev.arrows.ui.AppViewModel
@@ -40,40 +33,7 @@ import com.batodev.arrows.ui.PurchasesSection
 import com.batodev.arrows.ui.ThemeSelectionDialog
 import com.batodev.arrows.ui.ThirdPartyLicensesDialog
 import com.batodev.arrows.ui.ads.BannerAdView
-import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.LocalThemeColors
-
-
-class SettingsActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        val application = applicationContext as ArrowsApplication
-        val shapeProvider = AndroidResourceBoardShapeProvider(this)
-        setContent {
-            val viewModel: AppViewModel = viewModel(
-                factory = AppViewModel.Factory(application.userPreferencesRepository, application.gameStateDao)
-            )
-            viewModel.shapeProvider = shapeProvider
-            val currentTheme by viewModel.theme.collectAsState()
-            ArrowsTheme(themeName = currentTheme) {
-                SettingsScreen(
-                    viewModel = viewModel,
-                    rewardAdManager = application.rewardAdManager,
-                    onNavigateHome = {
-                        val intent = Intent(this@SettingsActivity, MainActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                        startActivity(intent)
-                    },
-                    onNavigateToGenerate = {
-                        val intent = Intent(this@SettingsActivity, GenerateActivity::class.java)
-                        startActivity(intent)
-                    }
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun SettingsScreen(

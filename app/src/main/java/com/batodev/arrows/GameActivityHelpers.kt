@@ -110,14 +110,6 @@ fun buildHintHandler(params: HintHandlerParams): () -> Unit = {
     }
 }
 
-fun extractCustomGameParams(intent: android.content.Intent?): CustomGameParams {
-    val isCustom = intent?.getBooleanExtra("IS_CUSTOM", false) ?: false
-    val customWidth = intent?.getIntExtra("CUSTOM_WIDTH", 0)?.takeIf { it > 0 }
-    val customHeight = intent?.getIntExtra("CUSTOM_HEIGHT", 0)?.takeIf { it > 0 }
-    val customShape = intent?.getStringExtra("CUSTOM_SHAPE")
-    return CustomGameParams(isCustom, customWidth, customHeight, customShape)
-}
-
 fun createGameEngineFactory(
     view: android.view.View,
     context: Context,

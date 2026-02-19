@@ -1,11 +1,8 @@
 package com.batodev.arrows
 
 import android.app.Activity
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -27,7 +24,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -53,7 +49,6 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.batodev.arrows.ads.RewardAdManager
 import com.batodev.arrows.engine.GameEngine
 import com.batodev.arrows.ui.AppViewModel
@@ -66,7 +61,6 @@ import com.batodev.arrows.ui.game.HintButtonState
 import com.batodev.arrows.ui.game.IntroOverlay
 import com.batodev.arrows.ui.game.WinCelebrationScreen
 import com.batodev.arrows.ui.game.rememberIntroState
-import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.HeartRed
 import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.ProgressBarGreen
@@ -94,40 +88,6 @@ private val CONFETTI_COLORS = listOf(
     GameConstants.CONFETTI_COLOR_3,
     GameConstants.CONFETTI_COLOR_4
 )
-
-class GameActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        val application = applicationContext as ArrowsApplication
-        val customParams = extractCustomGameParams(intent)
-        setContent {
-            val viewModel: AppViewModel = viewModel(
-                factory = AppViewModel.Factory(application.userPreferencesRepository, application.gameStateDao)
-            )
-            val currentTheme by viewModel.theme.collectAsState()
-
-            ArrowsTheme(themeName = currentTheme) {
-                val isAdFree by viewModel.isAdFree.collectAsState()
-                val themeColors = LocalThemeColors.current
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    containerColor = themeColors.background
-                ) { innerPadding ->
-                    Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-                        ArrowsGameView(
-                            appViewModel = viewModel,
-                            isAdFree = isAdFree,
-                            rewardAdManager = application.rewardAdManager,
-                            customParams = customParams,
-                            onBack = { finish() }
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun ArrowsGameView(
