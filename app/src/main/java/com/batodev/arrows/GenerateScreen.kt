@@ -300,7 +300,7 @@ private fun ShapeSelectionSection(
 
     FlowRow(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         shapes.forEach { shape ->
@@ -337,6 +337,7 @@ private fun SizeSlider(
             value = value,
             onValueChange = onValueChange,
             valueRange = GameConstants.GENERATOR_MIN_SIZE..maxSize,
+            modifier = Modifier.padding(horizontal = 12.dp),
             colors = SliderDefaults.colors(
                 thumbColor = themeColors.accent,
                 activeTrackColor = themeColors.accent,
