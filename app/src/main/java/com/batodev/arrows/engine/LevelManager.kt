@@ -1,8 +1,8 @@
 package com.batodev.arrows.engine
 
 import com.batodev.arrows.GameConstants
-import com.batodev.arrows.data.GameStateDao
 import com.batodev.arrows.data.GameLevelData
+import com.batodev.arrows.data.GameStateDao
 import com.batodev.arrows.data.PointData
 import com.batodev.arrows.data.SnakeSaveData
 import com.batodev.arrows.data.UserPreferencesRepository

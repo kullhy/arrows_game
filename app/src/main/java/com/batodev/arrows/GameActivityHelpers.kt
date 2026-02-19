@@ -35,9 +35,10 @@ import kotlinx.coroutines.delay
 data class GameWonStateParams(
     val engine: GameEngine,
     val viewModel: AppViewModel,
-    val activity: Activity?,
+    val activity: Activity,
     val application: ArrowsApplication,
-    val isAdFree: Boolean
+    val isAdFree: Boolean,
+    val onFinish: () -> Unit = {}
 )
 
 data class CustomGameParams(
@@ -78,7 +79,8 @@ data class GameScreenContentParams(
     val showCelebrationVideo: Boolean,
     val onCelebrationComplete: () -> Unit,
     val showIntro: Boolean,
-    val onDismissIntro: () -> Unit
+    val onDismissIntro: () -> Unit,
+    val onBack: () -> Unit = {}
 )
 
 data class HintHandlerParams(
@@ -194,12 +196,10 @@ suspend fun finishGameAfterCelebration(params: GameWonStateParams, waitForConfet
     params.viewModel.incrementGamesCompleted()
     val gamesCompleted = params.viewModel.gamesCompleted.value
     if (shouldShowInterstitialAd(params.isAdFree, gamesCompleted)) {
-        params.activity?.let { act ->
-            params.application.interstitialAdManager.showInterstitialAd(act) {
-                params.activity.finish()
-            }
-        } ?: params.activity?.finish()
+        params.application.interstitialAdManager.showInterstitialAd(params.activity) {
+            params.onFinish()
+        }
     } else {
-        params.activity?.finish()
+        params.onFinish()
     }
 }

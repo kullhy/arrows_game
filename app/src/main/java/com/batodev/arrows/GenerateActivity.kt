@@ -1,6 +1,5 @@
 package com.batodev.arrows
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -60,6 +59,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.batodev.arrows.data.AndroidResourceBoardShapeProvider
 import com.batodev.arrows.data.ShapeRegistry
+import com.batodev.arrows.navigation.NavTarget
 import com.batodev.arrows.ui.AppNavigationBar
 import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.NavigationDestination
@@ -81,7 +81,30 @@ class GenerateActivity : ComponentActivity() {
             val currentTheme by viewModel.theme.collectAsState()
 
             ArrowsTheme(themeName = currentTheme) {
-                GenerateScreen()
+                GenerateScreen(
+                    appViewModel = viewModel,
+                    onStartCustomGame = { target ->
+                        viewModel.regenerateCurrentLevel()
+                        val intent = Intent(this@GenerateActivity, GameActivity::class.java).apply {
+                            putExtra("IS_CUSTOM", target.isCustom)
+                            putExtra("CUSTOM_WIDTH", target.customWidth ?: 0)
+                            putExtra("CUSTOM_HEIGHT", target.customHeight ?: 0)
+                            putExtra("CUSTOM_SHAPE", target.customShape)
+                        }
+                        startActivity(intent)
+                    },
+                    onBack = { finish() },
+                    onNavigateHome = {
+                        val intent = Intent(this@GenerateActivity, MainActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                        startActivity(intent)
+                    },
+                    onNavigateToSettings = {
+                        val intent = Intent(this@GenerateActivity, SettingsActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                        startActivity(intent)
+                    }
+                )
             }
         }
     }
@@ -89,14 +112,18 @@ class GenerateActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GenerateScreen() {
+fun GenerateScreen(
+    appViewModel: AppViewModel,
+    onStartCustomGame: (NavTarget.Game) -> Unit,
+    onBack: () -> Unit = {},
+    onNavigateHome: () -> Unit = {},
+    onNavigateToSettings: () -> Unit = {}
+) {
     val context = LocalContext.current
-    val application = context.applicationContext as ArrowsApplication
-    val viewModel: AppViewModel = viewModel(factory = AppViewModel.Factory(application.userPreferencesRepository, application.gameStateDao))
-    val hasSavedLevel by viewModel.hasSavedLevel.collectAsState()
-    val isFillBoardEnabled by viewModel.isFillBoardEnabled.collectAsState()
-    val levelNumber by viewModel.levelNumber.collectAsState()
-    val isAdFree by viewModel.isAdFree.collectAsState()
+    val hasSavedLevel by appViewModel.hasSavedLevel.collectAsState()
+    val isFillBoardEnabled by appViewModel.isFillBoardEnabled.collectAsState()
+    val levelNumber by appViewModel.levelNumber.collectAsState()
+    val isAdFree by appViewModel.isAdFree.collectAsState()
     val themeColors = LocalThemeColors.current
     val maxSize = if (isFillBoardEnabled) GameConstants.GENERATOR_MAX_SIZE_FILL_BOARD
                   else GameConstants.GENERATOR_MAX_SIZE
@@ -113,16 +140,16 @@ fun GenerateScreen() {
     if (showWarning) {
         WarningDialog(
             themeColors = themeColors,
-            onConfirm = { startCustomGame(context, viewModel, width, selectedShape, height) },
+            onConfirm = { startCustomGameNavigation(appViewModel, onStartCustomGame, width, selectedShape, height) },
             onDismiss = { showWarning = false }
         )
     }
     val scaffoldState = GenerateScaffoldState(
         context, themeColors, levelNumber, width, height, maxSize, shapes, selectedShape, isAdFree,
-        { width = it }, { height = it }, { selectedShape = it }
+        { width = it }, { height = it }, { selectedShape = it }, onBack, onNavigateHome, onNavigateToSettings
     ) {
         if (hasSavedLevel) showWarning = true
-        else startCustomGame(context, viewModel, width, selectedShape, height)
+        else startCustomGameNavigation(appViewModel, onStartCustomGame, width, selectedShape, height)
     }
     GenerateScaffoldContent(scaffoldState)
 }
@@ -140,6 +167,9 @@ private data class GenerateScaffoldState(
     val onWidthChange: (Float) -> Unit,
     val onHeightChange: (Float) -> Unit,
     val onShapeSelected: (String) -> Unit,
+    val onBack: () -> Unit,
+    val onNavigateHome: () -> Unit,
+    val onNavigateToSettings: () -> Unit,
     val onStartClick: () -> Unit
 )
 
@@ -152,7 +182,7 @@ private fun GenerateScaffoldContent(state: GenerateScaffoldState) {
                 title = { Text(stringResource(R.string.custom_gen_title), color = White) },
                 navigationIcon = {
                     IconButton(
-                        onClick = { (state.context as? Activity)?.finish() },
+                        onClick = state.onBack,
                         colors = IconButtonDefaults.iconButtonColors(contentColor = White)
                     ) {
                         Icon(
@@ -172,7 +202,10 @@ private fun GenerateScaffoldContent(state: GenerateScaffoldState) {
                 AppNavigationBar(
                     selectedDestination = NavigationDestination.GENERATOR,
                     levelNumber = state.levelNumber,
-                    themeColors = state.themeColors
+                    themeColors = state.themeColors,
+                    onNavigateHome = state.onNavigateHome,
+                    onNavigateToGenerate = {},
+                    onNavigateToSettings = state.onNavigateToSettings
                 )
             }
         },
@@ -190,22 +223,22 @@ private fun GenerateScaffoldContent(state: GenerateScaffoldState) {
     }
 }
 
-private fun startCustomGame(
-    context: android.content.Context,
+private fun startCustomGameNavigation(
     viewModel: AppViewModel,
+    onStartCustomGame: (NavTarget.Game) -> Unit,
     width: Float,
     selectedShape: String,
     height: Float
 ) {
     viewModel.regenerateCurrentLevel()
-    val intent = Intent(context, GameActivity::class.java).apply {
-        putExtra("IS_CUSTOM", true)
-        putExtra("CUSTOM_WIDTH", width.toInt())
-        putExtra("CUSTOM_HEIGHT", height.toInt())
-        val shapeName = if (selectedShape == GameConstants.SHAPE_TYPE_RECTANGULAR) null else selectedShape
-        putExtra("CUSTOM_SHAPE", shapeName)
-    }
-    context.startActivity(intent)
+    val shapeName = if (selectedShape == GameConstants.SHAPE_TYPE_RECTANGULAR) null else selectedShape
+    val gameTarget = NavTarget.Game(
+        isCustom = true,
+        customWidth = width.toInt(),
+        customHeight = height.toInt(),
+        customShape = shapeName
+    )
+    onStartCustomGame(gameTarget)
 }
 
 @Composable

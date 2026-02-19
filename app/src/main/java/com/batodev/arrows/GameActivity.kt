@@ -64,8 +64,8 @@ import com.batodev.arrows.ui.game.GameTopBarCallbacks
 import com.batodev.arrows.ui.game.GameTopBarState
 import com.batodev.arrows.ui.game.HintButtonState
 import com.batodev.arrows.ui.game.IntroOverlay
-import com.batodev.arrows.ui.game.rememberIntroState
 import com.batodev.arrows.ui.game.WinCelebrationScreen
+import com.batodev.arrows.ui.game.rememberIntroState
 import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.HeartRed
 import com.batodev.arrows.ui.theme.LocalThemeColors
@@ -100,6 +100,7 @@ class GameActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val application = applicationContext as ArrowsApplication
+        val customParams = extractCustomGameParams(intent)
         setContent {
             val viewModel: AppViewModel = viewModel(
                 factory = AppViewModel.Factory(application.userPreferencesRepository, application.gameStateDao)
@@ -114,7 +115,13 @@ class GameActivity : ComponentActivity() {
                     containerColor = themeColors.background
                 ) { innerPadding ->
                     Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-                        ArrowsGameView(viewModel, isAdFree, application.rewardAdManager)
+                        ArrowsGameView(
+                            appViewModel = viewModel,
+                            isAdFree = isAdFree,
+                            rewardAdManager = application.rewardAdManager,
+                            customParams = customParams,
+                            onBack = { finish() }
+                        )
                     }
                 }
             }
@@ -126,7 +133,9 @@ class GameActivity : ComponentActivity() {
 fun ArrowsGameView(
     appViewModel: AppViewModel,
     isAdFree: Boolean,
-    rewardAdManager: RewardAdManager
+    rewardAdManager: RewardAdManager,
+    customParams: CustomGameParams = CustomGameParams(false, null, null, null),
+    onBack: () -> Unit = {}
 ) {
     val coroutineScope = rememberCoroutineScope()
     val view = LocalView.current
@@ -134,7 +143,6 @@ fun ArrowsGameView(
     val activity = context as? Activity
     val application = context.applicationContext as ArrowsApplication
     val repository = application.userPreferencesRepository
-    val customParams = extractCustomGameParams(activity?.intent)
     val isAdLoaded by rewardAdManager.isAdLoaded.collectAsState()
     val isAdLoading by rewardAdManager.isAdLoading.collectAsState()
     val engine: GameEngine = viewModel(
@@ -153,16 +161,20 @@ fun ArrowsGameView(
     val tapAnimations = remember { androidx.compose.runtime.mutableStateListOf<TapAnimationState>() }
     val themeColors = LocalThemeColors.current
     val gameWonParams = remember(activity, application, isAdFree) {
-        GameWonStateParams(engine, appViewModel, activity, application, isAdFree)
+        GameWonStateParams(engine, appViewModel, activity ?: return@remember null, application, isAdFree, onFinish = onBack)
     }
-    HandleGameWonState(gameWonParams, isWinVideosEnabled) { showCelebrationVideo = true }
+    if (gameWonParams != null) {
+        HandleGameWonState(gameWonParams, isWinVideosEnabled) { showCelebrationVideo = true }
+    }
     confettiState = updateConfettiState(engine, confettiState)
     val handleHint = buildHintHandler(
         HintHandlerParams(isAdFree, isAdLoading, isAdLoaded, engine, activity, rewardAdManager)
     )
     val onCelebrationComplete: () -> Unit = {
         coroutineScope.launch {
-            finishGameAfterCelebration(gameWonParams, waitForConfetti = false)
+            if (gameWonParams != null) {
+                finishGameAfterCelebration(gameWonParams, waitForConfetti = false)
+            }
         }
     }
     val celebrationParams = CelebrationParams(
@@ -175,7 +187,7 @@ fun ArrowsGameView(
                 engine, activity, context, tapAnimations, guidanceAlpha, showGuidanceLines, themeColors,
                 rewardAdManager, isAdFree, isAdLoaded, isAdLoading, handleHint,
                 { showGuidanceLines = !showGuidanceLines }, showCelebrationVideo, onCelebrationComplete,
-                introState.showIntro, introState.onDismiss
+                introState.showIntro, introState.onDismiss, onBack
             )
         )
     }
@@ -281,7 +293,7 @@ private fun GameScreenContent(params: GameScreenContentParams) {
             callbacks = GameTopBarCallbacks(
                 onRestart = { params.engine.restartLevel() },
                 onHint = params.handleHint,
-                onBack = { (params.context as? Activity)?.finish() }
+                onBack = params.onBack
             )
         )
         GameProgressBar(

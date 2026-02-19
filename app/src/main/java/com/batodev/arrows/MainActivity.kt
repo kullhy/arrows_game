@@ -1,6 +1,5 @@
 package com.batodev.arrows
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -26,12 +25,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.ViewModelProvider
+import com.batodev.arrows.navigation.RootNode
 import com.batodev.arrows.ui.AppNavigationBar
 import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.NavigationDestination
@@ -40,35 +39,54 @@ import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
+import com.bumble.appyx.core.integration.NodeHost
+import com.bumble.appyx.core.integrationpoint.ActivityIntegrationPoint
+import com.bumble.appyx.core.integrationpoint.IntegrationPointProvider
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), IntegrationPointProvider {
+
+    override lateinit var appyxV1IntegrationPoint: ActivityIntegrationPoint
+        private set
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        appyxV1IntegrationPoint = ActivityIntegrationPoint(this, savedInstanceState)
         enableEdgeToEdge()
         val application = applicationContext as ArrowsApplication
+        val appViewModel = ViewModelProvider(
+            this,
+            AppViewModel.Factory(application.userPreferencesRepository, application.gameStateDao)
+        )[AppViewModel::class.java]
         setContent {
-            val viewModel: AppViewModel = viewModel(
-                factory = AppViewModel.Factory(application.userPreferencesRepository, application.gameStateDao)
-            )
-            val currentTheme by viewModel.theme.collectAsState()
-
+            val currentTheme by appViewModel.theme.collectAsState()
             ArrowsTheme(themeName = currentTheme) {
-                MainScreen()
+                NodeHost(integrationPoint = appyxV1IntegrationPoint) { buildContext ->
+                    RootNode(
+                        buildContext = buildContext,
+                        appViewModel = appViewModel,
+                        application = application
+                    )
+                }
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        appyxV1IntegrationPoint.onSaveInstanceState(outState)
     }
 }
 
 @Composable
-fun MainScreen() {
-    val context = LocalContext.current
-    val application = context.applicationContext as ArrowsApplication
-    val viewModel: AppViewModel = viewModel(
-        factory = AppViewModel.Factory(application.userPreferencesRepository, application.gameStateDao)
-    )
-    val hasSavedLevel by viewModel.hasSavedLevel.collectAsState()
-    val levelNumber by viewModel.levelNumber.collectAsState()
-    val isAdFree by viewModel.isAdFree.collectAsState()
+fun MainScreen(
+    appViewModel: AppViewModel,
+    onPlay: () -> Unit,
+    onNavigateToGenerate: () -> Unit = {},
+    onNavigateToSettings: () -> Unit = {}
+) {
+    val hasSavedLevel by appViewModel.hasSavedLevel.collectAsState()
+    val levelNumber by appViewModel.levelNumber.collectAsState()
+    val isAdFree by appViewModel.isAdFree.collectAsState()
     val themeColors = LocalThemeColors.current
 
     Scaffold(
@@ -81,7 +99,10 @@ fun MainScreen() {
                 AppNavigationBar(
                     selectedDestination = NavigationDestination.HOME,
                     levelNumber = levelNumber,
-                    themeColors = themeColors
+                    themeColors = themeColors,
+                    onNavigateHome = {},
+                    onNavigateToGenerate = onNavigateToGenerate,
+                    onNavigateToSettings = onNavigateToSettings
                 )
             }
         }
@@ -97,7 +118,7 @@ fun MainScreen() {
             Spacer(modifier = Modifier.weight(1f))
             LogoSection(levelNumber, themeColors)
             Spacer(modifier = Modifier.weight(1f))
-            PlayButton(hasSavedLevel, themeColors)
+            PlayButton(hasSavedLevel, themeColors, onPlay)
             Spacer(modifier = Modifier.height(48.dp))
         }
     }
@@ -125,13 +146,9 @@ private fun LogoSection(levelNumber: Int, themeColors: ThemeColors) {
 }
 
 @Composable
-private fun PlayButton(isContinue: Boolean, themeColors: ThemeColors) {
-    val context = LocalContext.current
+private fun PlayButton(isContinue: Boolean, themeColors: ThemeColors, onClick: () -> Unit) {
     Button(
-        onClick = {
-            val intent = Intent(context, GameActivity::class.java)
-            context.startActivity(intent)
-        },
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth().height(56.dp),
         colors = ButtonDefaults.buttonColors(containerColor = themeColors.accent),
         shape = RoundedCornerShape(28.dp)

@@ -1,5 +1,6 @@
 package com.batodev.arrows
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -42,6 +43,7 @@ import com.batodev.arrows.ui.ads.BannerAdView
 import com.batodev.arrows.ui.theme.ArrowsTheme
 import com.batodev.arrows.ui.theme.LocalThemeColors
 
+
 class SettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +59,16 @@ class SettingsActivity : ComponentActivity() {
             ArrowsTheme(themeName = currentTheme) {
                 SettingsScreen(
                     viewModel = viewModel,
-                    rewardAdManager = application.rewardAdManager
+                    rewardAdManager = application.rewardAdManager,
+                    onNavigateHome = {
+                        val intent = Intent(this@SettingsActivity, MainActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                        startActivity(intent)
+                    },
+                    onNavigateToGenerate = {
+                        val intent = Intent(this@SettingsActivity, GenerateActivity::class.java)
+                        startActivity(intent)
+                    }
                 )
             }
         }
@@ -65,7 +76,12 @@ class SettingsActivity : ComponentActivity() {
 }
 
 @Composable
-fun SettingsScreen(viewModel: AppViewModel, rewardAdManager: RewardAdManager) {
+fun SettingsScreen(
+    viewModel: AppViewModel,
+    rewardAdManager: RewardAdManager,
+    onNavigateHome: () -> Unit = {},
+    onNavigateToGenerate: () -> Unit = {}
+) {
     val context = LocalContext.current
     val levelNumber by viewModel.levelNumber.collectAsState()
     val isAdFree by viewModel.isAdFree.collectAsState()
@@ -90,7 +106,8 @@ fun SettingsScreen(viewModel: AppViewModel, rewardAdManager: RewardAdManager) {
         SettingsScaffoldParams(
             viewModel, rewardAdManager, context, themeColors,
             levelNumber, isAdFree, currentTheme, currentSpeed,
-            { showThemeDialog = true }, { showSpeedDialog = true }, { showLicensesDialog = true }
+            { showThemeDialog = true }, { showSpeedDialog = true }, { showLicensesDialog = true },
+            onNavigateHome, onNavigateToGenerate
         )
     )
 }
@@ -106,7 +123,9 @@ private data class SettingsScaffoldParams(
     val currentSpeed: String,
     val onThemeClick: () -> Unit,
     val onSpeedClick: () -> Unit,
-    val onLicensesClick: () -> Unit
+    val onLicensesClick: () -> Unit,
+    val onNavigateHome: () -> Unit,
+    val onNavigateToGenerate: () -> Unit
 )
 
 @Composable
@@ -121,7 +140,10 @@ private fun SettingsScaffold(params: SettingsScaffoldParams) {
                 AppNavigationBar(
                     selectedDestination = NavigationDestination.SETTINGS,
                     levelNumber = params.levelNumber,
-                    themeColors = params.themeColors
+                    themeColors = params.themeColors,
+                    onNavigateHome = params.onNavigateHome,
+                    onNavigateToGenerate = params.onNavigateToGenerate,
+                    onNavigateToSettings = {}
                 )
             }
         }

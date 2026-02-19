@@ -1,0 +1,72 @@
+package com.batodev.arrows.navigation
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import com.batodev.arrows.ArrowsApplication
+import com.batodev.arrows.ui.AppViewModel
+import com.bumble.appyx.core.composable.Children
+import com.bumble.appyx.core.modality.BuildContext
+import com.bumble.appyx.core.node.Node
+import com.bumble.appyx.core.node.ParentNode
+import com.bumble.appyx.navmodel.backstack.BackStack
+import com.bumble.appyx.navmodel.backstack.operation.newRoot
+import com.bumble.appyx.navmodel.backstack.operation.pop
+import com.bumble.appyx.navmodel.backstack.operation.push
+import com.bumble.appyx.navmodel.backstack.operation.replace
+import com.bumble.appyx.navmodel.backstack.transitionhandler.rememberBackstackFader
+
+class RootNode(
+    buildContext: BuildContext,
+    private val appViewModel: AppViewModel,
+    private val application: ArrowsApplication,
+    private val backStack: BackStack<NavTarget> = BackStack(
+        initialElement = NavTarget.Home,
+        savedStateMap = buildContext.savedStateMap
+    )
+) : ParentNode<NavTarget>(
+    navModel = backStack,
+    buildContext = buildContext
+) {
+
+    override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node = when (navTarget) {
+        NavTarget.Home -> HomeNode(
+            buildContext = buildContext,
+            appViewModel = appViewModel,
+            onPlay = { backStack.push(NavTarget.Game()) },
+            onNavigateToGenerate = { backStack.push(NavTarget.Generate) },
+            onNavigateToSettings = { backStack.push(NavTarget.Settings) }
+        )
+        is NavTarget.Game -> GameNode(
+            buildContext = buildContext,
+            appViewModel = appViewModel,
+            application = application,
+            customParams = navTarget.toCustomGameParams(),
+            onBack = { backStack.pop() }
+        )
+        NavTarget.Generate -> GenerateNode(
+            buildContext = buildContext,
+            appViewModel = appViewModel,
+            application = application,
+            onStartCustomGame = { gameTarget -> backStack.push(gameTarget) },
+            onBack = { backStack.pop() },
+            onNavigateHome = { backStack.newRoot(NavTarget.Home) },
+            onNavigateToSettings = { backStack.replace(NavTarget.Settings) }
+        )
+        NavTarget.Settings -> SettingsNode(
+            buildContext = buildContext,
+            appViewModel = appViewModel,
+            application = application,
+            onNavigateHome = { backStack.newRoot(NavTarget.Home) },
+            onNavigateToGenerate = { backStack.replace(NavTarget.Generate) }
+        )
+    }
+
+    @Composable
+    override fun View(modifier: Modifier) {
+        Children(
+            navModel = backStack,
+            modifier = modifier,
+            transitionHandler = rememberBackstackFader()
+        )
+    }
+}

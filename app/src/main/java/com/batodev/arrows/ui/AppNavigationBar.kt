@@ -1,6 +1,5 @@
 package com.batodev.arrows.ui
 
-import android.content.Intent
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
@@ -13,13 +12,9 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.batodev.arrows.GameConstants
-import com.batodev.arrows.GenerateActivity
-import com.batodev.arrows.MainActivity
 import com.batodev.arrows.R
-import com.batodev.arrows.SettingsActivity
 import com.batodev.arrows.ui.theme.InactiveIcon
 import com.batodev.arrows.ui.theme.NavigationIndicator
 import com.batodev.arrows.ui.theme.ThemeColors
@@ -29,10 +24,12 @@ import com.batodev.arrows.ui.theme.White
 fun AppNavigationBar(
     selectedDestination: NavigationDestination,
     levelNumber: Int,
-    themeColors: ThemeColors
+    themeColors: ThemeColors,
+    onNavigateHome: () -> Unit = {},
+    onNavigateToGenerate: () -> Unit = {},
+    onNavigateToSettings: () -> Unit = {}
 ) {
     val isGeneratorUnlocked = levelNumber >= GameConstants.GENERATOR_UNLOCK_LEVEL
-    val context = LocalContext.current
 
     NavigationBar(
         containerColor = themeColors.bottomBar,
@@ -41,21 +38,21 @@ fun AppNavigationBar(
         GeneratorNavigationItem(
             isUnlocked = isGeneratorUnlocked,
             selected = selectedDestination == NavigationDestination.GENERATOR,
-            context = context
+            onNavigate = onNavigateToGenerate
         )
         HomeNavigationItem(
             selected = selectedDestination == NavigationDestination.HOME,
-            context = context
+            onNavigate = onNavigateHome
         )
         SettingsNavigationItem(
             selected = selectedDestination == NavigationDestination.SETTINGS,
-            context = context
+            onNavigate = onNavigateToSettings
         )
     }
 }
 
 @Composable
-fun RowScope.HomeNavigationItem(selected: Boolean, context: android.content.Context) {
+fun RowScope.HomeNavigationItem(selected: Boolean, onNavigate: () -> Unit) {
     NavigationBarItem(
         icon = {
             Icon(
@@ -67,9 +64,7 @@ fun RowScope.HomeNavigationItem(selected: Boolean, context: android.content.Cont
         selected = selected,
         onClick = {
             if (!selected) {
-                val intent = Intent(context, MainActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                context.startActivity(intent)
+                onNavigate()
             }
         },
         colors = NavigationBarItemDefaults.colors(
@@ -83,7 +78,7 @@ fun RowScope.HomeNavigationItem(selected: Boolean, context: android.content.Cont
 }
 
 @Composable
-fun RowScope.SettingsNavigationItem(selected: Boolean, context: android.content.Context) {
+fun RowScope.SettingsNavigationItem(selected: Boolean, onNavigate: () -> Unit) {
     NavigationBarItem(
         icon = {
             Icon(
@@ -95,9 +90,7 @@ fun RowScope.SettingsNavigationItem(selected: Boolean, context: android.content.
         selected = selected,
         onClick = {
             if (!selected) {
-                val intent = Intent(context, SettingsActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                context.startActivity(intent)
+                onNavigate()
             }
         },
         colors = NavigationBarItemDefaults.colors(
@@ -111,7 +104,7 @@ fun RowScope.SettingsNavigationItem(selected: Boolean, context: android.content.
 }
 
 @Composable
-fun RowScope.GeneratorNavigationItem(isUnlocked: Boolean, selected: Boolean = false, context: android.content.Context) {
+fun RowScope.GeneratorNavigationItem(isUnlocked: Boolean, selected: Boolean = false, onNavigate: () -> Unit) {
     val icon = if (isUnlocked) Icons.Default.AutoAwesome else Icons.Default.Lock
     val label = if (isUnlocked) stringResource(R.string.custom_gen_title)
     else stringResource(R.string.level_label, GameConstants.GENERATOR_UNLOCK_LEVEL)
@@ -121,9 +114,8 @@ fun RowScope.GeneratorNavigationItem(isUnlocked: Boolean, selected: Boolean = fa
         label = { Text(label) },
         selected = selected,
         onClick = {
-            if (isUnlocked) {
-                val intent = Intent(context, GenerateActivity::class.java)
-                context.startActivity(intent)
+            if (isUnlocked && !selected) {
+                onNavigate()
             }
         },
         colors = NavigationBarItemDefaults.colors(
