@@ -1,28 +1,27 @@
 [versions]
 aboutlibraries = "14.0.0-b02"
-appyx = "2.0.1"
 activityCompose = "1.12.4"
 agp = "9.0.1"
+appyx = "2.0.1"
 composeBom = "2026.02.00"
 coreKtx = "1.17.0"
 coroutinesTest = "1.10.2"
 detekt = "2.0.0-alpha.2"
 espressoCore = "3.7.0"
-
 jacocoVersion = "0.8.13"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 konfetti = "2.0.5"
-ksp = "2.3.6"
 kotlin = "2.3.10"
 kotlinReflect = "2.3.10"
+ksp = "2.3.6"
 lifecycleRuntimeKtx = "2.10.0"
 lifecycleViewmodelCompose = "2.10.0"
 mockito = "5.21.0"
 mockitoKotlin = "6.2.3"
 playReview = "2.0.2"
-room = "2.8.4"
 playServicesAds = "25.0.0"
+room = "2.8.4"
 
 [libraries]
 aboutlibraries-compose-m3 = { group = "com.mikepenz", name = "aboutlibraries-compose-m3", version.ref = "aboutlibraries" }
@@ -37,13 +36,13 @@ androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
-androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
-androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 konfetti-compose = { group = "nl.dionsegijn", name = "konfetti-compose", version.ref = "konfetti" }
@@ -54,9 +53,9 @@ mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", versio
 play-review-ktx = { group = "com.google.android.play", name = "review-ktx", version.ref = "playReview" }
 play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "playServicesAds" }
 
-appyx-navigation = { group = "com.bumble.appyx", name = "appyx-navigation-android", version.ref = "appyx" }
-appyx-interactions = { group = "com.bumble.appyx", name = "appyx-interactions-android", version.ref = "appyx" }
 appyx-backstack = { group = "com.bumble.appyx", name = "backstack-android", version.ref = "appyx" }
+appyx-interactions = { group = "com.bumble.appyx", name = "appyx-interactions-android", version.ref = "appyx" }
+appyx-navigation = { group = "com.bumble.appyx", name = "appyx-navigation-android", version.ref = "appyx" }
 appyx-spotlight = { group = "com.bumble.appyx", name = "spotlight-android", version.ref = "appyx" }
 appyx-utils-material3 = { group = "com.bumble.appyx", name = "utils-material3-android", version.ref = "appyx" }
 appyx-utils-testing-junit4 = { group = "com.bumble.appyx", name = "utils-testing-junit4", version.ref = "appyx" }
@@ -65,5 +64,5 @@ appyx-utils-testing-junit4 = { group = "com.bumble.appyx", name = "utils-testing
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin.android", version.ref = "aboutlibraries" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 detekt = { id = "dev.detekt", version.ref = "detekt" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
