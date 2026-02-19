@@ -57,7 +57,7 @@ appyx-core = { group = "com.bumble.appyx", name = "core", version.ref = "appyx" 
 appyx-testing-ui-activity = { group = "com.bumble.appyx", name = "testing-ui-activity", version.ref = "appyx" }
 appyx-testing-ui = { group = "com.bumble.appyx", name = "testing-ui", version.ref = "appyx" }
 appyx-testing-unit-common = { group = "com.bumble.appyx", name = "testing-unit-common", version.ref = "appyx" }
-appyx-testing-junit4 = { group = "com.bumble.appyx", name = "testing-junit4", version.ref = "appyx" }
+#appyx-testing-junit4 = { group = "com.bumble.appyx", name = "testing-junit4", version.ref = "appyx" }
 appyx-testing-junit5 = { group = "com.bumble.appyx", name = "testing-junit5", version.ref = "appyx" }
 
 [plugins]
