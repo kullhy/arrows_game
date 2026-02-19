@@ -2,7 +2,7 @@
 aboutlibraries = "14.0.0-b02"
 activityCompose = "1.12.4"
 agp = "9.0.1"
-appyx = "2.0.1"
+appyx = "1.7.1"
 composeBom = "2026.02.00"
 coreKtx = "1.17.0"
 coroutinesTest = "1.10.2"
@@ -53,12 +53,12 @@ mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", versio
 play-review-ktx = { group = "com.google.android.play", name = "review-ktx", version.ref = "playReview" }
 play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "playServicesAds" }
 
-appyx-backstack = { group = "com.bumble.appyx", name = "backstack-android", version.ref = "appyx" }
-appyx-interactions = { group = "com.bumble.appyx", name = "appyx-interactions-android", version.ref = "appyx" }
-appyx-navigation = { group = "com.bumble.appyx", name = "appyx-navigation-android", version.ref = "appyx" }
-appyx-spotlight = { group = "com.bumble.appyx", name = "spotlight-android", version.ref = "appyx" }
-appyx-utils-material3 = { group = "com.bumble.appyx", name = "utils-material3-android", version.ref = "appyx" }
-appyx-utils-testing-junit4 = { group = "com.bumble.appyx", name = "utils-testing-junit4", version.ref = "appyx" }
+appyx-core = { group = "com.bumble.appyx", name = "core", version.ref = "appyx" }
+appyx-testing-ui-activity = { group = "com.bumble.appyx", name = "testing-ui-activity", version.ref = "appyx" }
+appyx-testing-ui = { group = "com.bumble.appyx", name = "testing-ui", version.ref = "appyx" }
+appyx-testing-unit-common = { group = "com.bumble.appyx", name = "testing-unit-common", version.ref = "appyx" }
+appyx-testing-junit4 = { group = "com.bumble.appyx", name = "testing-junit4", version.ref = "appyx" }
+appyx-testing-junit5 = { group = "com.bumble.appyx", name = "testing-junit5", version.ref = "appyx" }
 
 [plugins]
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin.android", version.ref = "aboutlibraries" }
