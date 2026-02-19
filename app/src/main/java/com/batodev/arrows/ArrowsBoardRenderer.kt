@@ -281,16 +281,44 @@ object ArrowsBoardRenderer {
     ) {
         val path = Path()
         val body = snake.body
-        val segmentsToDraw = ((body.size - 1) * (1f - p)).toInt().coerceAtLeast(0)
-        val lastSegmentIndex = (1 + segmentsToDraw).coerceAtMost(body.size - 1)
 
-        val last = body[lastSegmentIndex]
-        path.moveTo(
-            last.x * metrics.cellWidth + metrics.cellWidth / 2,
-            last.y * metrics.cellHeight + metrics.cellHeight / 2
-        )
+        // Float position of the tail tip along the body:
+        //   p=0 → tailPosition = body.size-1 (full tail rendered)
+        //   p=1 → tailPosition = 0 (tail shrunk all the way to head)
+        val tailPosition = (body.size - 1).toFloat() * (1f - p)
+        val tailFullIndex = tailPosition.toInt().coerceIn(0, body.size - 1)
+        val tailFraction = tailPosition - tailFullIndex
 
-        for (i in lastSegmentIndex - 1 downTo 1) {
+        // Pixel position of the tail tip — linearly interpolated between the two adjacent
+        // cell centres so the tail end moves sub-cell each frame instead of jumping.
+        val tailTipX: Float
+        val tailTipY: Float
+        if (tailFraction < 0.001f || tailFullIndex >= body.size - 1) {
+            val cell = body[tailFullIndex]
+            tailTipX = cell.x * metrics.cellWidth + metrics.cellWidth / 2
+            tailTipY = cell.y * metrics.cellHeight + metrics.cellHeight / 2
+        } else {
+            val fromCell = body[tailFullIndex]
+            val toCell = body[tailFullIndex + 1]
+            val fromCx = fromCell.x * metrics.cellWidth + metrics.cellWidth / 2
+            val fromCy = fromCell.y * metrics.cellHeight + metrics.cellHeight / 2
+            val toCx = toCell.x * metrics.cellWidth + metrics.cellWidth / 2
+            val toCy = toCell.y * metrics.cellHeight + metrics.cellHeight / 2
+            tailTipX = fromCx + (toCx - fromCx) * tailFraction
+            tailTipY = fromCy + (toCy - fromCy) * tailFraction
+        }
+
+        path.moveTo(tailTipX, tailTipY)
+
+        // When the tail tip sits within an interior segment (fractional offset), include
+        // body[tailFullIndex] in the curve loop so the path bends correctly through it.
+        val loopStart = if (tailFraction > 0.001f && tailFullIndex in 1 until body.size - 1) {
+            tailFullIndex
+        } else {
+            tailFullIndex - 1
+        }
+
+        for (i in loopStart downTo 1) {
             val prev = body[i + 1]
             val current = body[i]
             val next = body[i - 1]
