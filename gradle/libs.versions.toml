@@ -1,5 +1,6 @@
 [versions]
 aboutlibraries = "14.0.0-b02"
+appyx = "2.0.1"
 activityCompose = "1.12.4"
 agp = "9.0.1"
 composeBom = "2026.02.00"
@@ -52,6 +53,13 @@ mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mo
 mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
 play-review-ktx = { group = "com.google.android.play", name = "review-ktx", version.ref = "playReview" }
 play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "playServicesAds" }
+
+appyx-navigation = { group = "com.bumble.appyx", name = "appyx-navigation-android", version.ref = "appyx" }
+appyx-interactions = { group = "com.bumble.appyx", name = "appyx-interactions-android", version.ref = "appyx" }
+appyx-backstack = { group = "com.bumble.appyx", name = "backstack-android", version.ref = "appyx" }
+appyx-spotlight = { group = "com.bumble.appyx", name = "spotlight-android", version.ref = "appyx" }
+appyx-utils-material3 = { group = "com.bumble.appyx", name = "utils-material3-android", version.ref = "appyx" }
+appyx-utils-testing-junit4 = { group = "com.bumble.appyx", name = "utils-testing-junit4", version.ref = "appyx" }
 
 [plugins]
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin.android", version.ref = "aboutlibraries" }
