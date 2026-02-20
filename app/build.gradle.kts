@@ -149,6 +149,7 @@ dependencies {
     androidTestImplementation(libs.appyx.testing.ui)
     testImplementation(libs.appyx.testing.unit.common)
     testImplementation(libs.appyx.testing.junit5)
+
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockito.core)

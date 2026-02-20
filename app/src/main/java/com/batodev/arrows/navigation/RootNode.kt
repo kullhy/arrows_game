@@ -1,9 +1,11 @@
 package com.batodev.arrows.navigation
 
+import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.batodev.arrows.ArrowsApplication
 import com.batodev.arrows.ui.AppViewModel
+import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.bumble.appyx.core.composable.Children
 import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
@@ -63,9 +65,10 @@ class RootNode(
 
     @Composable
     override fun View(modifier: Modifier) {
+        val themeColors = LocalThemeColors.current
         Children(
             navModel = backStack,
-            modifier = modifier,
+            modifier = modifier.background(themeColors.background),
             transitionHandler = rememberBackstackFader()
         )
     }
