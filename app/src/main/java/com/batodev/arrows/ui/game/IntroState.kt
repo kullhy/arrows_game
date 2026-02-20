@@ -21,7 +21,7 @@ fun rememberIntroState(
     val introCompleted by viewModel.introCompleted.collectAsState()
     var showIntro by remember { mutableStateOf(false) }
     LaunchedEffect(introCompleted, isLoading) {
-        if (!introCompleted && !isLoading) showIntro = true
+        if (introCompleted == false && !isLoading) showIntro = true
     }
     val onDismiss: () -> Unit = {
         showIntro = false

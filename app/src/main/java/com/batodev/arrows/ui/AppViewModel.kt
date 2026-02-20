@@ -112,10 +112,10 @@ class AppViewModel(
         initialValue = 0
     )
 
-    val introCompleted: StateFlow<Boolean> = userPreferencesRepository.introCompleted.stateIn(
+    val introCompleted: StateFlow<Boolean?> = userPreferencesRepository.introCompleted.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(GameConstants.STOP_TIMEOUT_MILLIS),
-        initialValue = false
+        initialValue = null
     )
 
     fun saveTheme(theme: String) {
