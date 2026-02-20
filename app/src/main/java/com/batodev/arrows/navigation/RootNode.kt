@@ -15,7 +15,7 @@ import com.bumble.appyx.navmodel.backstack.operation.newRoot
 import com.bumble.appyx.navmodel.backstack.operation.pop
 import com.bumble.appyx.navmodel.backstack.operation.push
 import com.bumble.appyx.navmodel.backstack.operation.replace
-import com.bumble.appyx.navmodel.backstack.transitionhandler.rememberBackstackFader
+import com.batodev.arrows.navigation.transitions.rememberRandomTransitionHandler
 
 class RootNode(
     buildContext: BuildContext,
@@ -69,7 +69,7 @@ class RootNode(
         Children(
             navModel = backStack,
             modifier = modifier.background(themeColors.background),
-            transitionHandler = rememberBackstackFader()
+            transitionHandler = rememberRandomTransitionHandler()
         )
     }
 }
