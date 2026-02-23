@@ -4,8 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,8 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AutoAwesome
@@ -37,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -83,12 +82,18 @@ fun GenerateScreen(
     var height by remember { mutableFloatStateOf(GameConstants.GENERATOR_DEFAULT_SIZE) }
     var selectedShape by remember { mutableStateOf(GameConstants.SHAPE_TYPE_RECTANGULAR) }
     var showWarning by remember { mutableStateOf(false) }
+    var contentReady by remember { mutableStateOf(false) }
     if (width > maxSize) width = maxSize
     if (height > maxSize) height = maxSize
     val shapeProvider = remember { AndroidResourceBoardShapeProvider(context) }
     val shapes = remember {
         listOf(GameConstants.SHAPE_TYPE_RECTANGULAR) + shapeProvider.getAllShapeNames()
     }
+
+    // Defer heavy content (shape grid + sliders) to the frame after Scaffold skeleton renders.
+    // This lets the navigation transition start on the first frame and the body load on frame 2.
+    LaunchedEffect(Unit) { contentReady = true }
+
     if (showWarning) {
         WarningDialog(
             themeColors = themeColors,
@@ -98,6 +103,7 @@ fun GenerateScreen(
     }
     val scaffoldState = GenerateScaffoldState(
         context, themeColors, levelNumber, width, height, maxSize, shapes, selectedShape, isAdFree,
+        contentReady,
         { width = it }, { height = it }, { selectedShape = it }, onBack, onNavigateHome, onNavigateToSettings
     ) {
         if (hasSavedLevel) showWarning = true
@@ -116,6 +122,7 @@ private data class GenerateScaffoldState(
     val shapes: List<String>,
     val selectedShape: String,
     val isAdFree: Boolean,
+    val contentReady: Boolean,
     val onWidthChange: (Float) -> Unit,
     val onHeightChange: (Float) -> Unit,
     val onShapeSelected: (String) -> Unit,
@@ -163,15 +170,19 @@ private fun GenerateScaffoldContent(state: GenerateScaffoldState) {
         },
         containerColor = state.themeColors.background
     ) { innerPadding ->
-        val contentState = GenerateContentState(
-            innerPadding = innerPadding, width = state.width, height = state.height,
-            maxSize = state.maxSize, shapes = state.shapes, selectedShape = state.selectedShape,
-            themeColors = state.themeColors,
-            onWidthChange = state.onWidthChange, onHeightChange = state.onHeightChange,
-            onShapeSelected = state.onShapeSelected,
-            onStartClick = state.onStartClick
-        )
-        GenerateContent(contentState)
+        if (state.contentReady) {
+            val contentState = GenerateContentState(
+                innerPadding = innerPadding, width = state.width, height = state.height,
+                maxSize = state.maxSize, shapes = state.shapes, selectedShape = state.selectedShape,
+                themeColors = state.themeColors,
+                onWidthChange = state.onWidthChange, onHeightChange = state.onHeightChange,
+                onShapeSelected = state.onShapeSelected,
+                onStartClick = state.onStartClick
+            )
+            GenerateContent(contentState)
+        } else {
+            Box(modifier = Modifier.fillMaxSize().padding(innerPadding))
+        }
     }
 }
 
@@ -227,67 +238,74 @@ private data class GenerateContentState(
     val onStartClick: () -> Unit
 )
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun GenerateContent(state: GenerateContentState) {
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(state.innerPadding)
-            .padding(24.dp)
-            .verticalScroll(rememberScrollState()),
+            .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        SizeSlider(
-            label = stringResource(R.string.width_label),
-            value = state.width,
-            maxSize = state.maxSize,
-            onValueChange = state.onWidthChange,
-            themeColors = state.themeColors
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        SizeSlider(
-            label = stringResource(R.string.height_label),
-            value = state.height,
-            maxSize = state.maxSize,
-            onValueChange = state.onHeightChange,
-            themeColors = state.themeColors
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        ShapeSelectionSection(state.shapes, state.selectedShape, state.themeColors, state.onShapeSelected)
-
-        Spacer(modifier = Modifier.weight(1f))
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Button(
-            onClick = state.onStartClick,
-            modifier = Modifier.fillMaxWidth().height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = state.themeColors.accent),
-            shape = MaterialTheme.shapes.extraLarge
-        ) {
-            Icon(Icons.Default.AutoAwesome, contentDescription = null)
-            Spacer(modifier = Modifier. width(12.dp))
-            Text(
-                text = stringResource(R.string.generate_start_label),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
+        item {
+            Spacer(modifier = Modifier.height(24.dp))
+            SizeSlider(
+                label = stringResource(R.string.width_label),
+                value = state.width,
+                maxSize = state.maxSize,
+                onValueChange = state.onWidthChange,
+                themeColors = state.themeColors
             )
+            Spacer(modifier = Modifier.height(24.dp))
+            SizeSlider(
+                label = stringResource(R.string.height_label),
+                value = state.height,
+                maxSize = state.maxSize,
+                onValueChange = state.onHeightChange,
+                themeColors = state.themeColors
+            )
+            Spacer(modifier = Modifier.height(32.dp))
+            ShapeSectionHeader()
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
+        // Shape items — composed lazily, one row pair at a time
+        val shapeRows = state.shapes.chunked(SHAPES_PER_ROW)
+        items(shapeRows, key = { row -> row.first() }) { row ->
+            ShapeRow(
+                shapes = row,
+                selectedShape = state.selectedShape,
+                themeColors = state.themeColors,
+                onShapeSelected = state.onShapeSelected
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(32.dp))
+            Button(
+                onClick = state.onStartClick,
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = state.themeColors.accent),
+                shape = MaterialTheme.shapes.extraLarge
+            ) {
+                Icon(Icons.Default.AutoAwesome, contentDescription = null)
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = stringResource(R.string.generate_start_label),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+private const val SHAPES_PER_ROW = 4
+
 @Composable
-private fun ShapeSelectionSection(
-    shapes: List<String>,
-    selectedShape: String,
-    themeColors: ThemeColors,
-    onShapeSelected: (String) -> Unit
-) {
+private fun ShapeSectionHeader() {
     Text(
         text = stringResource(R.string.shape_label),
         color = White,
@@ -295,13 +313,18 @@ private fun ShapeSelectionSection(
         fontWeight = FontWeight.Bold,
         modifier = Modifier.fillMaxWidth()
     )
+}
 
-    Spacer(modifier = Modifier.height(12.dp))
-
-    FlowRow(
+@Composable
+private fun ShapeRow(
+    shapes: List<String>,
+    selectedShape: String,
+    themeColors: ThemeColors,
+    onShapeSelected: (String) -> Unit
+) {
+    Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally)
     ) {
         shapes.forEach { shape ->
             ShapeItem(
@@ -355,8 +378,7 @@ private fun ShapeItem(
     themeColors: ThemeColors
 ) {
     Card(
-        modifier = Modifier
-            .clickable { onClick() },
+        modifier = Modifier.clickable { onClick() },
         colors = CardDefaults.cardColors(
             containerColor = if (isSelected) themeColors.accent else themeColors.topBarButton,
             contentColor = White
@@ -394,7 +416,4 @@ private fun ShapeIcon(name: String) {
     }
 }
 
-
-private fun getShapeResourceId(name: String): Int? {
-    return ShapeRegistry.shapes[name]
-}
+private fun getShapeResourceId(name: String): Int? = ShapeRegistry.shapes[name]
