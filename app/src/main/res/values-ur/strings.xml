@@ -58,6 +58,7 @@
     <string name="lives_auto_label">زندگیاں (0 آٹو کے لیے)</string>
     <string name="loading_ad">اشتہار لوڈ ہو رہا ہے…</string>
     <string name="loading_label">لوڈ ہو رہا ہے..</string>
+    <string name="manage_consent_label">GDPR رضامندی کا نظم کریں۔</string>
     <string name="more_games_label">مزید گیمز</string>
     <string name="none_auto_label">کوئی نہیں (خودکار)</string>
     <string name="none_label">کوئی نہیں۔</string>

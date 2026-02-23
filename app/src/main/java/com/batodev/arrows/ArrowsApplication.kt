@@ -2,6 +2,7 @@ package com.batodev.arrows
 
 import android.app.Application
 import androidx.room.Room
+import com.batodev.arrows.ads.ConsentManager
 import com.batodev.arrows.ads.InterstitialAdManager
 import com.batodev.arrows.ads.RewardAdManager
 import com.batodev.arrows.data.AppDatabase
@@ -25,6 +26,10 @@ class ArrowsApplication : Application() {
         private set
     lateinit var database: AppDatabase
         private set
+    lateinit var consentManager: ConsentManager
+        private set
+
+    private var isAdsInitialized = false
 
     override fun onCreate() {
         super.onCreate()
@@ -44,11 +49,15 @@ class ArrowsApplication : Application() {
         userPreferencesRepository = UserPreferencesRepository(dao)
         rewardAdManager = RewardAdManager(this)
         interstitialAdManager = InterstitialAdManager(this)
+        consentManager = ConsentManager(this)
+    }
 
-        // Initialize AdMob SDK on main thread (required for ad loading)
+    fun initializeAds() {
+        if (isAdsInitialized) return
+        isAdsInitialized = true
+
         CoroutineScope(Dispatchers.Main).launch {
             MobileAds.initialize(this@ArrowsApplication)
-            // Preload first ads
             rewardAdManager.loadRewardAd()
             interstitialAdManager.loadInterstitialAd()
         }

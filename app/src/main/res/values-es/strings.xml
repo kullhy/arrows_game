@@ -58,6 +58,7 @@
     <string name="lives_auto_label">Vidas (0 para Auto)</string>
     <string name="loading_ad">Cargando anuncio…</string>
     <string name="loading_label">Cargando..</string>
+    <string name="manage_consent_label">Gestionar el consentimiento del RGPD</string>
     <string name="more_games_label">Más juegos</string>
     <string name="none_auto_label">Ninguno (Automático)</string>
     <string name="none_label">Ninguno</string>

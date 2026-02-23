@@ -58,6 +58,7 @@
     <string name="lives_auto_label">Nyawa (0 untuk Otomatis)</string>
     <string name="loading_ad">Sedang memuat iklan…</string>
     <string name="loading_label">Memuat..</string>
+    <string name="manage_consent_label">Kelola persetujuan GDPR</string>
     <string name="more_games_label">Lebih banyak game</string>
     <string name="none_auto_label">Tidak ada (Otomatis)</string>
     <string name="none_label">Tidak ada</string>

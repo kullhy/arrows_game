@@ -58,6 +58,7 @@
     <string name="lives_auto_label">ライフ（自動の場合は0）</string>
     <string name="loading_ad">広告を読み込んでいます…</string>
     <string name="loading_label">読み込み中…</string>
+    <string name="manage_consent_label">GDPR同意の管理</string>
     <string name="more_games_label">その他のゲーム</string>
     <string name="none_auto_label">なし（自動）</string>
     <string name="none_label">なし</string>

@@ -25,6 +25,7 @@ import com.batodev.arrows.ui.AppNavigationBar
 import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.DebugMenu
 import com.batodev.arrows.ui.FeedbackSection
+import android.app.Activity
 import com.batodev.arrows.ui.LegalSection
 import com.batodev.arrows.ui.NavigationDestination
 import com.batodev.arrows.ui.PreferencesParams
@@ -129,7 +130,18 @@ private fun SettingsScaffold(params: SettingsScaffoldParams) {
                 rewardAdManager = params.rewardAdManager,
                 themeColors = params.themeColors
             )
-            LegalSection(params.context, params.themeColors, params.onLicensesClick)
+            val consentManager = (params.context.applicationContext as ArrowsApplication).consentManager
+            LegalSection(
+                params.context,
+                params.themeColors,
+                params.onLicensesClick,
+                showPrivacyOptions = consentManager.isPrivacyOptionsRequired,
+                onPrivacyOptionsClick = {
+                    (params.context as? Activity)?.let { activity ->
+                        consentManager.showPrivacyOptionsForm(activity) { }
+                    }
+                }
+            )
             if (BuildConfig.DRAW_DEBUG_STUFF) DebugMenu(params.viewModel)
         }
     }

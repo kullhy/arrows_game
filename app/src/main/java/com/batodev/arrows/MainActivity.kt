@@ -57,6 +57,13 @@ class MainActivity : ComponentActivity(), IntegrationPointProvider {
             this,
             AppViewModel.Factory(application.userPreferencesRepository, application.gameStateDao)
         )[AppViewModel::class.java]
+
+        application.consentManager.gatherConsent(this) {
+            if (application.consentManager.canRequestAds) {
+                application.initializeAds()
+            }
+        }
+
         setContent {
             val currentTheme by appViewModel.theme.collectAsState()
             ArrowsTheme(themeName = currentTheme) {

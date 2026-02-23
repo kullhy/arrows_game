@@ -41,7 +41,7 @@ android {
         debug {
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
-            buildConfigField("Boolean", "DRAW_DEBUG_STUFF", "false")
+            buildConfigField("Boolean", "DRAW_DEBUG_STUFF", "true")
             // Test Ad IDs for development
             manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
             buildConfigField("String", "BANNER_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/6300978111\"")
@@ -138,6 +138,7 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.play.review.ktx)
     implementation(libs.play.services.ads)
+    implementation(libs.google.ump)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)

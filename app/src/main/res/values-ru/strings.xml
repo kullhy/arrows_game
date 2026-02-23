@@ -58,6 +58,7 @@
     <string name="lives_auto_label">Жизни (0 для автоматического режима)</string>
     <string name="loading_ad">Загрузка рекламы…</string>
     <string name="loading_label">Загрузка…</string>
+    <string name="manage_consent_label">Управление согласием в соответствии с GDPR</string>
     <string name="more_games_label">Больше игр</string>
     <string name="none_auto_label">Нет (Авто)</string>
     <string name="none_label">Никто</string>

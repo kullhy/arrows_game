@@ -75,6 +75,7 @@
     <string name="hash_af7231a4adda37f2ab373dce8ff8c2e00cbf5f1a9b217ee655d48fce83979a4b" translatable="false">congratulations_brilliant</string>
     <string name="hash_78744b2aee1124e55eefd94ca9f22d505234d6648190c18266b222afd7b526c5" translatable="false">restart_board_label</string>
     <string name="hash_dd8af26c0c8bbe51204590c522933461ce6385fde1c7dc3aa2bbb19bb5631015" translatable="false">custom_gen_warning_message</string>
+    <string name="hash_995689aa2cb91307443ef1c999aed76d49b6b908ebb4503ceeb4fdba2b0ad393" translatable="false">manage_consent_label</string>
     <string name="hash_74a883a037bc227f91891ab654a753d3a99f31ab06ae5b5d2b6e594a692b41f8" translatable="false">settings_label</string>
     <string name="hash_41c07ba1903dbd1d553a12a1a27da680449f82f97b48c06ef85f97c68f83b786" translatable="false">loading_label</string>
     <string name="hash_3a78695388b38b5cceefaf6796b0137877514593543b91af2752d5a17e3d736c" translatable="false">home_label</string>

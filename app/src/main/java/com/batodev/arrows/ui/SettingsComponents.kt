@@ -153,10 +153,24 @@ fun PurchasesSection(
 
 
 @Composable
-fun LegalSection(context: Context, themeColors: ThemeColors, onLicensesClick: () -> Unit) {
+fun LegalSection(
+    context: Context,
+    themeColors: ThemeColors,
+    onLicensesClick: () -> Unit,
+    showPrivacyOptions: Boolean = false,
+    onPrivacyOptionsClick: () -> Unit = {}
+) {
     SettingsGroup(themeColors.topBarButton) {
         SettingsClickableItem(Icons.Default.Description, stringResource(R.string.privacy_label)) {
             SettingsUtils.launchBrowser(context, "https://robmat.github.io/privacy_policy.html")
+        }
+        if (showPrivacyOptions) {
+            SettingsClickableItem(
+                Icons.Default.Description,
+                stringResource(R.string.manage_consent_label)
+            ) {
+                onPrivacyOptionsClick()
+            }
         }
         SettingsClickableItem(Icons.Default.Description, stringResource(R.string.third_party_licenses_label)) {
             onLicensesClick()
