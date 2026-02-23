@@ -2,6 +2,8 @@ package com.batodev.arrows.ads
 
 import android.app.Activity
 import android.content.Context
+import com.batodev.arrows.BuildConfig
+import com.google.android.ump.ConsentDebugSettings
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.FormError
@@ -20,7 +22,7 @@ class ConsentManager(context: Context) {
             ConsentInformation.PrivacyOptionsRequirementStatus.REQUIRED
 
     fun gatherConsent(activity: Activity, onConsentResult: (FormError?) -> Unit) {
-        val params = ConsentRequestParameters.Builder().build()
+        val params = buildConsentRequestParameters(activity)
 
         consentInformation.requestConsentInfoUpdate(
             activity,
@@ -38,5 +40,19 @@ class ConsentManager(context: Context) {
 
     fun showPrivacyOptionsForm(activity: Activity, onDismiss: (FormError?) -> Unit) {
         UserMessagingPlatform.showPrivacyOptionsForm(activity, onDismiss)
+    }
+
+    companion object {
+        private fun buildConsentRequestParameters(activity: Activity): ConsentRequestParameters {
+            if (!BuildConfig.DRAW_DEBUG_STUFF) {
+                return ConsentRequestParameters.Builder().build()
+            }
+            val debugSettings = ConsentDebugSettings.Builder(activity)
+                .setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA)
+                .build()
+            return ConsentRequestParameters.Builder()
+                .setConsentDebugSettings(debugSettings)
+                .build()
+        }
     }
 }

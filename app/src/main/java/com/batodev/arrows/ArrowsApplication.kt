@@ -12,6 +12,7 @@ import com.batodev.arrows.data.UserPreferencesEntity
 import com.batodev.arrows.data.UserPreferencesRepository
 import com.batodev.arrows.data.migrateFromDataStoreIfNeeded
 import com.google.android.gms.ads.MobileAds
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,7 +30,7 @@ class ArrowsApplication : Application() {
     lateinit var consentManager: ConsentManager
         private set
 
-    private var isAdsInitialized = false
+    private val isAdsInitialized = AtomicBoolean(false)
 
     override fun onCreate() {
         super.onCreate()
@@ -53,8 +54,7 @@ class ArrowsApplication : Application() {
     }
 
     fun initializeAds() {
-        if (isAdsInitialized) return
-        isAdsInitialized = true
+        if (!isAdsInitialized.compareAndSet(false, true)) return
 
         CoroutineScope(Dispatchers.Main).launch {
             MobileAds.initialize(this@ArrowsApplication)

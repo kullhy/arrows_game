@@ -64,6 +64,11 @@ class MainActivity : ComponentActivity(), IntegrationPointProvider {
             }
         }
 
+        // Fast-path: use consent obtained in a previous session
+        if (application.consentManager.canRequestAds) {
+            application.initializeAds()
+        }
+
         setContent {
             val currentTheme by appViewModel.theme.collectAsState()
             ArrowsTheme(themeName = currentTheme) {
