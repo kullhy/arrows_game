@@ -138,6 +138,7 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.play.review.ktx)
     implementation(libs.play.services.ads)
+    implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)

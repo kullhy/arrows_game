@@ -9,6 +9,7 @@ import com.batodev.arrows.data.GameStateDao
 import com.batodev.arrows.data.MIGRATION_1_2
 import com.batodev.arrows.data.UserPreferencesEntity
 import com.batodev.arrows.data.UserPreferencesRepository
+import com.batodev.arrows.data.migrateFromDataStoreIfNeeded
 import com.google.android.gms.ads.MobileAds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,12 +30,14 @@ class ArrowsApplication : Application() {
         super.onCreate()
         database = Room.databaseBuilder(this, AppDatabase::class.java, "arrows_db")
             .addMigrations(MIGRATION_1_2)
+            .fallbackToDestructiveMigrationOnDowngrade(dropAllTables = true)
             .build()
         val dao = database.userPreferencesDao()
         gameStateDao = database.gameStateDao()
 
-        // Seed the default row if it doesn't exist
+        // Migrate old DataStore data if present, then seed defaults
         CoroutineScope(Dispatchers.IO).launch {
+            migrateFromDataStoreIfNeeded(this@ArrowsApplication, dao)
             dao.insertDefault(UserPreferencesEntity())
         }
 

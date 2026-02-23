@@ -13,6 +13,9 @@ interface UserPreferencesDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertDefault(entity: UserPreferencesEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(entity: UserPreferencesEntity)
+
     // Flow queries
     @Query("SELECT theme FROM user_preferences WHERE id = 1")
     fun getTheme(): Flow<String>
