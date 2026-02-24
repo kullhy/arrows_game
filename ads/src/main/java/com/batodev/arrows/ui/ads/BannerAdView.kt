@@ -1,6 +1,5 @@
 package com.batodev.arrows.ui.ads
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -10,7 +9,6 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 
-@SuppressLint("MissingPermission") // INTERNET permission declared in app manifest
 @Composable
 fun BannerAdView(modifier: Modifier = Modifier) {
     AndroidView(

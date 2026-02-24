@@ -212,6 +212,8 @@ class AppViewModel(
         private val userPreferencesRepository: IUserPreferencesRepository,
         private val gameStateDao: GameStateDao
     ) : ViewModelProvider.Factory {
+        // Cast is safe: guarded by isAssignableFrom check above.
+        // Required boilerplate for manual ViewModelProvider.Factory without a DI framework.
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(AppViewModel::class.java)) {

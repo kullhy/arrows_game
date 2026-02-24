@@ -246,6 +246,8 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
         private val config: GameEngineConfig,
         private val features: GameEngineFeatures = GameEngineFeatures()
     ) : ViewModelProvider.Factory {
+        // Cast is safe: guarded by isAssignableFrom check above.
+        // Required boilerplate for manual ViewModelProvider.Factory without a DI framework.
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(GameEngine::class.java)) {

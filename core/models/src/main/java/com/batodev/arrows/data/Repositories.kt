@@ -9,6 +9,9 @@ interface IGameStateRepository {
     suspend fun clearAllSavedLevels()
 }
 
+// Room DAOs and preference repositories mirror a single DB table's columns;
+// splitting them across multiple classes would add coordination overhead
+// with no architectural benefit for a single-row preferences entity.
 @Suppress("TooManyFunctions")
 interface IUserPreferencesRepository {
     val theme: Flow<String>

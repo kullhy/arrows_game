@@ -6,6 +6,9 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
+// Room DAOs and preference repositories mirror a single DB table's columns;
+// splitting them across multiple classes would add coordination overhead
+// with no architectural benefit for a single-row preferences entity.
 @Suppress("TooManyFunctions")
 @Dao
 interface UserPreferencesDao {

@@ -14,6 +14,9 @@ class RandomTransitionHandler<T>(
     private val picker: TransitionPicker = TransitionPicker(),
 ) : ModifierTransitionHandler<T, BackStack.State>() {
 
+    // Lint recommends Modifier factory functions be extension functions, but this is an
+    // override of ModifierTransitionHandler.createModifier() from the Appyx library —
+    // the signature is fixed by the library contract and cannot be changed.
     @SuppressLint("ModifierFactoryExtensionFunction")
     override fun createModifier(
         modifier: Modifier,
