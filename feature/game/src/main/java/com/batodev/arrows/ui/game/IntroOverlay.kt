@@ -23,7 +23,7 @@ import com.batodev.arrows.GameConstants
 import com.batodev.arrows.engine.GameLevel
 import com.batodev.arrows.engine.SolvabilityChecker
 
-private val FINGER_SIZE: Dp = 40.dp
+private val FINGER_SIZE: Dp = 120.dp
 
 @Composable
 fun IntroFingerOverlay(level: GameLevel) {
