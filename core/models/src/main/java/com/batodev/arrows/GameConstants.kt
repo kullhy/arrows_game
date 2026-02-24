@@ -24,6 +24,20 @@ object GameConstants {
     const val SHAPE_ICON_SIZE = 32
 
     // ====================
+    // GENERATOR SCREEN ANIMATIONS
+    // ====================
+    const val GENERATOR_ENTER_ANIM_DURATION = 350
+    const val GENERATOR_STAGGER_DELAY_MS = 80
+    const val GENERATOR_ENTER_OFFSET_DP = 40f
+    const val GENERATOR_BUTTON_PULSE_DURATION = 1200
+    const val GENERATOR_BUTTON_PULSE_SCALE = 1.04f
+    const val GENERATOR_VALUE_SCALE_TARGET = 1.3f
+    const val GENERATOR_VALUE_SCALE_HOLD_MS = 80L
+    const val GENERATOR_COLOR_ANIM_DURATION = 200
+    const val GENERATOR_SHAPE_SELECTED_SCALE = 1.08f
+    const val GENERATOR_SHAPE_POP_IN_STAGGER_MS = 40L
+
+    // ====================
     // BOARD IMAGE PROCESSING
     // ====================
     const val COLOR_THRESHOLD = 128
@@ -150,16 +164,6 @@ object GameConstants {
     // ADS
     // ====================
     const val REQUIRED_AD_COUNT_FOR_AD_FREE = 30
-
-    // ====================
-    // INTRO OVERLAY
-    // ====================
-    const val INTRO_OVERLAY_ALPHA = 0.85f
-    const val INTRO_INSTRUCTION_FONT_SIZE = 22
-    const val INTRO_BUTTON_FONT_SIZE = 18
-    const val INTRO_CARD_CORNER_RADIUS = 16
-    const val INTRO_CARD_PADDING = 32
-    const val INTRO_SPACING = 24
 
     // ====================
     // EXTERNAL LINKS

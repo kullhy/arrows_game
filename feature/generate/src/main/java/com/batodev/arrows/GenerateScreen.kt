@@ -1,5 +1,15 @@
 package com.batodev.arrows
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,11 +20,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AutoAwesome
@@ -44,6 +55,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -60,6 +72,7 @@ import com.batodev.arrows.ui.ads.BannerAdView
 import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,8 +89,7 @@ fun GenerateScreen(
     val levelNumber by appViewModel.levelNumber.collectAsState()
     val isAdFree by appViewModel.isAdFree.collectAsState()
     val themeColors = LocalThemeColors.current
-    val maxSize = if (isFillBoardEnabled) GameConstants.GENERATOR_MAX_SIZE_FILL_BOARD
-                  else GameConstants.GENERATOR_MAX_SIZE
+    val maxSize = GenerateScreenLogic.resolveMaxSize(isFillBoardEnabled)
     var width by remember { mutableFloatStateOf(GameConstants.GENERATOR_DEFAULT_SIZE) }
     var height by remember { mutableFloatStateOf(GameConstants.GENERATOR_DEFAULT_SIZE) }
     var selectedShape by remember { mutableStateOf(GameConstants.SHAPE_TYPE_RECTANGULAR) }
@@ -86,9 +98,7 @@ fun GenerateScreen(
     if (width > maxSize) width = maxSize
     if (height > maxSize) height = maxSize
     val shapeProvider = remember { AndroidResourceBoardShapeProvider(context) }
-    val shapes = remember {
-        listOf(GameConstants.SHAPE_TYPE_RECTANGULAR) + shapeProvider.getAllShapeNames()
-    }
+    val shapes = remember { GenerateScreenLogic.buildShapeList(shapeProvider.getAllShapeNames()) }
 
     LaunchedEffect(Unit) { contentReady = true }
 
@@ -192,13 +202,7 @@ private fun startCustomGameNavigation(
     height: Float
 ) {
     viewModel.regenerateCurrentLevel()
-    val shapeName = if (selectedShape == GameConstants.SHAPE_TYPE_RECTANGULAR) null else selectedShape
-    onStartCustomGame(CustomGameParams(
-        isCustom = true,
-        customWidth = width.toInt(),
-        customHeight = height.toInt(),
-        customShape = shapeName
-    ))
+    onStartCustomGame(GenerateScreenLogic.buildCustomGameParams(width, height, selectedShape))
 }
 
 @Composable
@@ -237,6 +241,40 @@ private data class GenerateContentState(
 
 @Composable
 private fun GenerateContent(state: GenerateContentState) {
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { visible = true }
+
+    val widthSliderMod = Modifier.staggeredEntryModifier(visible, staggerIndex = 0)
+    val heightSliderMod = Modifier.staggeredEntryModifier(visible, staggerIndex = 1)
+    val shapeSectionMod = Modifier.staggeredEntryModifier(visible, staggerIndex = 2)
+
+    val buttonEntryAlpha by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = tween(
+            durationMillis = GameConstants.GENERATOR_ENTER_ANIM_DURATION,
+            delayMillis = BUTTON_STAGGER_INDEX * GameConstants.GENERATOR_STAGGER_DELAY_MS
+        ),
+        label = "button_entry_alpha"
+    )
+    val buttonEntryOffset by animateFloatAsState(
+        targetValue = if (visible) 0f else GameConstants.GENERATOR_ENTER_OFFSET_DP,
+        animationSpec = tween(
+            durationMillis = GameConstants.GENERATOR_ENTER_ANIM_DURATION,
+            delayMillis = BUTTON_STAGGER_INDEX * GameConstants.GENERATOR_STAGGER_DELAY_MS
+        ),
+        label = "button_entry_offset"
+    )
+    val infiniteTransition = rememberInfiniteTransition(label = "button_pulse")
+    val buttonPulseScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = GameConstants.GENERATOR_BUTTON_PULSE_SCALE,
+        animationSpec = infiniteRepeatable(
+            animation = tween(GameConstants.GENERATOR_BUTTON_PULSE_DURATION, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "button_pulse_scale"
+    )
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -251,7 +289,8 @@ private fun GenerateContent(state: GenerateContentState) {
                 value = state.width,
                 maxSize = state.maxSize,
                 onValueChange = state.onWidthChange,
-                themeColors = state.themeColors
+                themeColors = state.themeColors,
+                modifier = widthSliderMod
             )
             Spacer(modifier = Modifier.height(24.dp))
             SizeSlider(
@@ -259,29 +298,42 @@ private fun GenerateContent(state: GenerateContentState) {
                 value = state.height,
                 maxSize = state.maxSize,
                 onValueChange = state.onHeightChange,
-                themeColors = state.themeColors
+                themeColors = state.themeColors,
+                modifier = heightSliderMod
             )
             Spacer(modifier = Modifier.height(32.dp))
-            ShapeSectionHeader()
-            Spacer(modifier = Modifier.height(12.dp))
         }
 
-        val shapeRows = state.shapes.chunked(SHAPES_PER_ROW)
-        items(shapeRows, key = { row -> row.first() }) { row ->
-            ShapeRow(
-                shapes = row,
-                selectedShape = state.selectedShape,
-                themeColors = state.themeColors,
-                onShapeSelected = state.onShapeSelected
-            )
-            Spacer(modifier = Modifier.height(12.dp))
+        item {
+            Column(modifier = shapeSectionMod.fillMaxWidth()) {
+                ShapeSectionHeader()
+                Spacer(modifier = Modifier.height(12.dp))
+                state.shapes.chunked(SHAPES_PER_ROW).forEachIndexed { rowIndex, row ->
+                    ShapeRow(
+                        shapes = row,
+                        rowIndex = rowIndex,
+                        selectedShape = state.selectedShape,
+                        themeColors = state.themeColors,
+                        onShapeSelected = state.onShapeSelected
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+            }
         }
 
         item {
             Spacer(modifier = Modifier.height(32.dp))
             Button(
                 onClick = state.onStartClick,
-                modifier = Modifier.fillMaxWidth().height(56.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .offset { IntOffset(0, buttonEntryOffset.dp.roundToPx()) }
+                    .graphicsLayer {
+                        alpha = buttonEntryAlpha
+                        scaleX = buttonPulseScale
+                        scaleY = buttonPulseScale
+                    },
                 colors = ButtonDefaults.buttonColors(containerColor = state.themeColors.accent),
                 shape = MaterialTheme.shapes.extraLarge
             ) {
@@ -299,6 +351,30 @@ private fun GenerateContent(state: GenerateContentState) {
 }
 
 private const val SHAPES_PER_ROW = 4
+private const val BUTTON_STAGGER_INDEX = 3
+
+@Composable
+private fun Modifier.staggeredEntryModifier(visible: Boolean, staggerIndex: Int): Modifier {
+    val alpha by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = tween(
+            durationMillis = GameConstants.GENERATOR_ENTER_ANIM_DURATION,
+            delayMillis = staggerIndex * GameConstants.GENERATOR_STAGGER_DELAY_MS
+        ),
+        label = "entry_alpha_$staggerIndex"
+    )
+    val offsetDp by animateFloatAsState(
+        targetValue = if (visible) 0f else GameConstants.GENERATOR_ENTER_OFFSET_DP,
+        animationSpec = tween(
+            durationMillis = GameConstants.GENERATOR_ENTER_ANIM_DURATION,
+            delayMillis = staggerIndex * GameConstants.GENERATOR_STAGGER_DELAY_MS
+        ),
+        label = "entry_offset_$staggerIndex"
+    )
+    return this
+        .offset { IntOffset(0, offsetDp.dp.roundToPx()) }
+        .graphicsLayer { this.alpha = alpha }
+}
 
 @Composable
 private fun ShapeSectionHeader() {
@@ -314,6 +390,7 @@ private fun ShapeSectionHeader() {
 @Composable
 private fun ShapeRow(
     shapes: List<String>,
+    rowIndex: Int,
     selectedShape: String,
     themeColors: ThemeColors,
     onShapeSelected: (String) -> Unit
@@ -322,9 +399,10 @@ private fun ShapeRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally)
     ) {
-        shapes.forEach { shape ->
+        shapes.forEachIndexed { indexInRow, shape ->
             ShapeItem(
                 name = shape,
+                globalIndex = GenerateScreenLogic.shapeFlatIndex(rowIndex, indexInRow, SHAPES_PER_ROW),
                 isSelected = selectedShape == shape,
                 onClick = { onShapeSelected(shape) },
                 themeColors = themeColors
@@ -339,17 +417,37 @@ private fun SizeSlider(
     value: Float,
     maxSize: Float,
     onValueChange: (Float) -> Unit,
-    themeColors: ThemeColors
+    themeColors: ThemeColors,
+    modifier: Modifier = Modifier
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    val intValue = value.toInt()
+    var scaleUp by remember { mutableStateOf(false) }
+    LaunchedEffect(intValue) {
+        scaleUp = true
+        delay(GameConstants.GENERATOR_VALUE_SCALE_HOLD_MS)
+        scaleUp = false
+    }
+    val valueTextScale by animateFloatAsState(
+        targetValue = if (scaleUp) GameConstants.GENERATOR_VALUE_SCALE_TARGET else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessHigh
+        ),
+        label = "value_scale"
+    )
+    Column(modifier = modifier.fillMaxWidth()) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(text = label, color = White, fontSize = 16.sp)
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = value.toInt().toString(),
+                text = intValue.toString(),
                 color = themeColors.accent,
                 fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
+                fontSize = 18.sp,
+                modifier = Modifier.graphicsLayer {
+                    scaleX = valueTextScale
+                    scaleY = valueTextScale
+                }
             )
         }
         Slider(
@@ -369,14 +467,47 @@ private fun SizeSlider(
 @Composable
 private fun ShapeItem(
     name: String,
+    globalIndex: Int,
     isSelected: Boolean,
     onClick: () -> Unit,
     themeColors: ThemeColors
 ) {
+    val containerColor by animateColorAsState(
+        targetValue = if (isSelected) themeColors.accent else themeColors.topBarButton,
+        animationSpec = tween(durationMillis = GameConstants.GENERATOR_COLOR_ANIM_DURATION),
+        label = "shape_color"
+    )
+    val selectionScale by animateFloatAsState(
+        targetValue = if (isSelected) GameConstants.GENERATOR_SHAPE_SELECTED_SCALE else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        ),
+        label = "shape_selection_scale"
+    )
+    var hasPopped by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(GenerateScreenLogic.shapePopInDelayMs(globalIndex))
+        hasPopped = true
+    }
+    val popInScale by animateFloatAsState(
+        targetValue = if (hasPopped) 1f else 0f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "shape_pop_in_scale"
+    )
     Card(
-        modifier = Modifier.clickable { onClick() },
+        modifier = Modifier
+            .graphicsLayer {
+                val combined = popInScale * selectionScale
+                scaleX = combined
+                scaleY = combined
+            }
+            .clickable { onClick() },
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) themeColors.accent else themeColors.topBarButton,
+            containerColor = containerColor,
             contentColor = White
         ),
         shape = MaterialTheme.shapes.medium

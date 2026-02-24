@@ -28,4 +28,5 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":core:ui"))
     implementation(project(":core:resources"))
+    testImplementation(libs.junit)
 }
