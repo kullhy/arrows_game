@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.detekt)
     id("jacoco")
 }
 
@@ -44,10 +43,6 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
-}
-
-detekt {
-    // Use default detekt 2.0 config; old 1.x config removed due to rule renames
 }
 
 tasks.withType<Test> {
