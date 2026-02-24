@@ -34,11 +34,9 @@ androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", versi
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
-androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
-androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -64,7 +62,6 @@ appyx-core = { group = "com.bumble.appyx", name = "core", version.ref = "appyx" 
 appyx-testing-ui-activity = { group = "com.bumble.appyx", name = "testing-ui-activity", version.ref = "appyx" }
 appyx-testing-ui = { group = "com.bumble.appyx", name = "testing-ui", version.ref = "appyx" }
 appyx-testing-unit-common = { group = "com.bumble.appyx", name = "testing-unit-common", version.ref = "appyx" }
-#appyx-testing-junit4 = { group = "com.bumble.appyx", name = "testing-junit4", version.ref = "appyx" }
 appyx-testing-junit5 = { group = "com.bumble.appyx", name = "testing-junit5", version.ref = "appyx" }
 
 [plugins]
