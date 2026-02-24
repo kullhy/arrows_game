@@ -1,6 +1,10 @@
 package com.batodev.arrows
 
+import android.app.Activity
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,12 +15,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.batodev.arrows.ads.ConsentManager
@@ -27,7 +33,6 @@ import com.batodev.arrows.ui.AppNavigationBar
 import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.DebugMenu
 import com.batodev.arrows.ui.FeedbackSection
-import android.app.Activity
 import com.batodev.arrows.ui.LegalSection
 import com.batodev.arrows.ui.NavigationDestination
 import com.batodev.arrows.ui.PreferencesParams
@@ -94,7 +99,34 @@ private data class SettingsScaffoldParams(
 )
 
 @Composable
+private fun Modifier.settingsEntryModifier(visible: Boolean, sectionIndex: Int): Modifier {
+    val translationX by animateFloatAsState(
+        targetValue = if (visible) 0f else GameConstants.SETTINGS_ENTER_OFFSET_DP,
+        animationSpec = tween(
+            durationMillis = GameConstants.SETTINGS_ENTER_ANIM_DURATION,
+            delayMillis = SettingsScreenLogic.sectionEntryDelayMs(sectionIndex)
+        ),
+        label = "settingsEntryTransX$sectionIndex"
+    )
+    val alpha by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = tween(
+            durationMillis = GameConstants.SETTINGS_ENTER_ANIM_DURATION,
+            delayMillis = SettingsScreenLogic.sectionEntryDelayMs(sectionIndex)
+        ),
+        label = "settingsEntryAlpha$sectionIndex"
+    )
+    return graphicsLayer {
+        this.translationX = translationX * density
+        this.alpha = alpha
+    }
+}
+
+@Composable
 private fun SettingsScaffold(params: SettingsScaffoldParams) {
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { visible = true }
+
     Scaffold(
         containerColor = params.themeColors.background,
         bottomBar = {
@@ -122,29 +154,37 @@ private fun SettingsScaffold(params: SettingsScaffoldParams) {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-            PreferencesSection(
-                PreferencesParams(
-                    params.viewModel, params.themeColors, params.currentTheme, params.currentSpeed,
-                    params.onThemeClick, params.onSpeedClick
+            Box(modifier = Modifier.settingsEntryModifier(visible, sectionIndex = 0)) {
+                PreferencesSection(
+                    PreferencesParams(
+                        params.viewModel, params.themeColors, params.currentTheme, params.currentSpeed,
+                        params.onThemeClick, params.onSpeedClick
+                    )
                 )
-            )
-            FeedbackSection(params.context, params.themeColors)
-            PurchasesSection(
-                viewModel = params.viewModel,
-                rewardAdManager = params.rewardAdManager,
-                themeColors = params.themeColors
-            )
-            LegalSection(
-                params.context,
-                params.themeColors,
-                params.onLicensesClick,
-                showPrivacyOptions = params.consentManager.isPrivacyOptionsRequired,
-                onPrivacyOptionsClick = {
-                    (params.context as? Activity)?.let { activity ->
-                        params.consentManager.showPrivacyOptionsForm(activity) { }
+            }
+            Box(modifier = Modifier.settingsEntryModifier(visible, sectionIndex = 1)) {
+                FeedbackSection(params.context, params.themeColors)
+            }
+            Box(modifier = Modifier.settingsEntryModifier(visible, sectionIndex = 2)) {
+                PurchasesSection(
+                    viewModel = params.viewModel,
+                    rewardAdManager = params.rewardAdManager,
+                    themeColors = params.themeColors
+                )
+            }
+            Box(modifier = Modifier.settingsEntryModifier(visible, sectionIndex = 3)) {
+                LegalSection(
+                    params.context,
+                    params.themeColors,
+                    params.onLicensesClick,
+                    showPrivacyOptions = params.consentManager.isPrivacyOptionsRequired,
+                    onPrivacyOptionsClick = {
+                        (params.context as? Activity)?.let { activity ->
+                            params.consentManager.showPrivacyOptionsForm(activity) { }
+                        }
                     }
-                }
-            )
+                )
+            }
             if (BuildConfig.DRAW_DEBUG_STUFF) DebugMenu(params.viewModel)
         }
     }

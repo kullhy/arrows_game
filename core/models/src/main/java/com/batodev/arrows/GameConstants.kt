@@ -24,6 +24,25 @@ object GameConstants {
     const val SHAPE_ICON_SIZE = 32
 
     // ====================
+    // HOME SCREEN ANIMATIONS
+    // ====================
+    const val HOME_ENTER_ANIM_DURATION = 400
+    const val HOME_STAGGER_DELAY_MS = 120
+    const val HOME_ENTER_OFFSET_DP = 60f
+    const val HOME_TRIANGLE_ROTATE_DURATION = 8000
+    const val HOME_TRIANGLE_PULSE_DURATION = 1800
+    const val HOME_TRIANGLE_PULSE_SCALE = 1.12f
+    const val HOME_BUTTON_PULSE_DURATION = 1400
+    const val HOME_BUTTON_PULSE_SCALE = 1.03f
+
+    // ====================
+    // SETTINGS SCREEN ANIMATIONS
+    // ====================
+    const val SETTINGS_ENTER_ANIM_DURATION = 350
+    const val SETTINGS_STAGGER_DELAY_MS = 100
+    const val SETTINGS_ENTER_OFFSET_DP = 80f
+
+    // ====================
     // GENERATOR SCREEN ANIMATIONS
     // ====================
     const val GENERATOR_ENTER_ANIM_DURATION = 350
