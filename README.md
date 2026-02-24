@@ -1,11 +1,16 @@
-# Arrows game
+# Arrows Game (Android)
 
-**Arrows Game** is an Android puzzle game inspired by "Arrows – Puzzle Escape".
+**Arrows Game** is a modular Android puzzle game inspired by *Arrows – Puzzle Escape*.
 
-Google play link to the game: https://play.google.com/store/apps/details?id=com.batodev.arrows
+Google Play: https://play.google.com/store/apps/details?id=com.batodev.arrows
+
+---
 
 ## Project Rationale
+
 This project is an experiment in board generation: the main goal is to create a robust board generator for puzzle games, focusing on solvability and variety. The generator logic attempts to fill the board with "snakes" (arrow paths) while ensuring each level is solvable and interesting.
+
+---
 
 ## Features
 
@@ -35,7 +40,6 @@ This project is an experiment in board generation: the main goal is to create a 
 - 6 color themes: Dark, Green, Red, Yellow, Orange, Black and White
 - 3 animation speed levels: High, Medium, Low
 - Vibration and sound toggles
-- Fill board toggle
 
 ### Monetization
 - Banner, rewarded, and interstitial ads
@@ -51,70 +55,275 @@ This project is an experiment in board generation: the main goal is to create a 
 ### Debug
 - Debug menu to force board dimensions, lives, and shapes
 
-## Board Generator
-The board generator (`GameGenerator`) is the heart of the project. It:
-- Builds levels by placing snakes (arrow paths) on the board
-- Fills the board while respecting shape boundaries and walls
-- Ensures each board is solvable
-- Supports custom shapes and fill-the-board modes
+---
 
 ## Screenshots
+
 ![Screenshot 1](Screenshot_20260206_114049.png) ![Screenshot 2](Screenshot_20260206_114104.png) ![Screenshot 3](Screenshot_20260206_114121.png) ![Screenshot 4](Screenshot_20260206_114249.png)
 
-## Navigation with Appyx
+---
 
-The app uses [Appyx](https://bumble-tech.github.io/appyx/) (v1.7.1) for navigation instead of the standard Compose Navigation library.
+## Architecture
 
-### Why Appyx
-
-Appyx is a **model-driven navigation** library for Jetpack Compose. Rather than routing between destinations with string routes or `NavController`, navigation state is a first-class Kotlin object — a typed, observable model that can be tested like any other class.
-
-Key reasons for choosing it here:
-
-- **Type-safe destinations** — `NavTarget` is a sealed class; the compiler catches invalid routes.
-- **Testable navigation logic** — Back-stack operations (`push`, `pop`, `replace`, `newRoot`) are pure state changes that can be asserted in unit tests without a UI (see `BackStackNavigationTest`).
-- **Custom transitions in one place** — The `transitionHandler` parameter of `Children` makes it trivial to plug in arbitrary Compose `Modifier` animations; the random transition system was built without touching any screen composable.
-- **Structured concurrency-friendly** — Each screen lives in a `Node` that has its own lifecycle and coroutine scope, so background work (ads, game engine) is automatically cancelled when the screen leaves the stack.
-
-### How it is structured
+The project follows **Clean Architecture** with **feature-based modularization** — 11 Gradle modules split across four layers.
 
 ```
-RootNode                    ← ParentNode, owns the BackStack<NavTarget>
- ├── HomeNode               ← leaf Node, renders HomeScreen
- ├── GameNode               ← leaf Node, renders GameScreen
- ├── GenerateNode           ← leaf Node, renders GenerateScreen
- └── SettingsNode           ← leaf Node, renders SettingsScreen
+┌─────────────────────────────────────────────────────┐
+│                      :app                           │  Entry point
+├─────────────────────────────────────────────────────┤
+│                  :navigation                        │  Navigation layer (Appyx)
+├──────────────┬──────────────┬──────────────┬────────┤
+│ :feature:home│ :feature:game│:feature:gen..│:feat.. │  Feature layer
+├──────────────┴──────────────┴──────────────┴────────┤
+│          :core:ui              :ads                 │  Presentation / shared
+├─────────────────────────────────────────────────────┤
+│                    :domain                          │  Business logic (pure Kotlin)
+├──────────────────────────┬──────────────────────────┤
+│           :data          │      :core:models        │  Data / models
+├──────────────────────────┴──────────────────────────┤
+│                  :core:resources                    │  Android resources
+└─────────────────────────────────────────────────────┘
 ```
 
-`RootNode` resolves each `NavTarget` value into the appropriate `Node` and renders all active children through the Appyx `Children` composable. The `BackStack` nav model handles the history so hardware back automatically pops the stack.
-
-### Navigation destinations (`NavTarget`)
-
-| Target                | Description                                     |
-|-----------------------|-------------------------------------------------|
-| `NavTarget.Home`      | Landing screen                                  |
-| `NavTarget.Game(...)` | Gameplay — carries optional custom board params |
-| `NavTarget.Generate`  | Custom level builder (unlocked at level 20)     |
-| `NavTarget.Settings`  | Theme, sound, ad preferences                    |
-
-### Random view transitions
-
-Navigation changes play one of five `Modifier`-based transitions chosen at random:
-
-| Type               | Effect                      |
-|--------------------|-----------------------------|
-| `FADE`             | Alpha 0 → 1                 |
-| `SLIDE_HORIZONTAL` | Slides in from the right    |
-| `SLIDE_VERTICAL`   | Slides in from the bottom   |
-| `SCALE_FADE`       | Scales 0.85 → 1 with fade   |
-| `ROTATE_FADE`      | Slight Z-rotation with fade |
-
-`rememberRandomTransitionHandler()` (in `navigation/transitions/`) wires this into `RootNode`. Each screen entering the composition picks its own type via `remember { picker.pick() }`, keeping the Compose runtime in full control of animation state.
-
-## File Structure
-- `app/src/main/java/com/batodev/arrows/engine/GameGenerator.kt` – Board generator logic
-- `app/src/main/java/com/batodev/arrows/engine/BoardShapeProvider.kt` – Shape management
-- `app/src/main/java/com/batodev/arrows/engine/GameEngine.kt` – Game state and mechanics
+**Dependency rule:** inner layers know nothing about outer layers. `:domain` and `:core:models` have zero Android dependencies.
 
 ---
-This project is a playground for board generation algorithms. Feedback and contributions are welcome!
+
+## Modules
+
+### `:app`
+**Entry point.** Single `Activity` + `Application` class.
+
+| File | Purpose |
+|------|---------|
+| `MainActivity.kt` | Hosts the Appyx `RootNode`, applies the theme |
+| `ArrowsApplication.kt` | Initializes Room DB, repositories, ad managers, consent manager |
+
+Dependency injection is **manual**: `ArrowsApplication` creates all singletons and passes them down via constructors and ViewModel factories.
+
+---
+
+### `:navigation`
+**Navigation layer** built on [Appyx](https://bumble-tech.github.io/appyx/) 1.7.1.
+
+| File | Purpose |
+|------|---------|
+| `NavTarget.kt` | Sealed class of all navigation destinations |
+| `RootNode.kt` | `ParentNode` that owns `BackStack<NavTarget>` and resolves each target to a child `Node` |
+| `transitions/NavTransitions.kt` | Defines 5 transition types (FADE, SLIDE_H, SLIDE_V, SCALE_FADE, ROTATE_FADE) |
+| `transitions/RandomTransitionHandler.kt` | Picks a random transition on each navigation event |
+
+Navigation state is a typed Kotlin object — fully testable without a UI (`BackStackNavigationTest`).
+
+```
+RootNode                    ← ParentNode, owns BackStack<NavTarget>
+ ├── HomeNode               ← renders HomeScreen
+ ├── GameNode               ← renders GameScreen
+ ├── GenerateNode           ← renders GenerateScreen
+ └── SettingsNode           ← renders SettingsScreen
+```
+
+#### Navigation destinations
+
+| Target | Description |
+|--------|-------------|
+| `NavTarget.Home` | Landing screen |
+| `NavTarget.Game(...)` | Gameplay — carries optional custom board params |
+| `NavTarget.Generate` | Custom level builder (unlocked at level 20) |
+| `NavTarget.Settings` | Theme, sound, ad preferences |
+
+#### Random view transitions
+
+| Type | Effect |
+|------|--------|
+| `FADE` | Alpha 0 → 1 |
+| `SLIDE_HORIZONTAL` | Slides in from the right |
+| `SLIDE_VERTICAL` | Slides in from the bottom |
+| `SCALE_FADE` | Scales 0.85 → 1 with fade |
+| `ROTATE_FADE` | Slight Z-rotation with fade |
+
+---
+
+### `:feature:home`
+**Landing screen.** Displays the current level, lives, and the Play button.
+
+| File | Purpose |
+|------|---------|
+| `HomeScreen.kt` | Main UI composable |
+| `HomeNode.kt` | Appyx `Node` wrapping the screen |
+| `AppViewModel.kt` | App-wide `StateFlow` state: theme, sounds, vibration, level, lives, debug flags |
+
+`AppViewModel` is shared across features — it acts as the single source of truth for user preferences during a session.
+
+---
+
+### `:feature:game`
+**Core gameplay.** The largest and most complex module.
+
+| File | Purpose |
+|------|---------|
+| `GameScreen.kt` | Root game composable |
+| `GameNode.kt` | Appyx `Node` for the game screen |
+| `engine/GameEngine.kt` | ViewModel: board state, lives, level progression, input routing |
+| `engine/LevelManager.kt` | Level generation, difficulty scaling, shape selection |
+| `engine/InputHandler.kt` | Maps touch coordinates to board cells |
+| `engine/TapHandler.kt` | Tap animations, snake flash, removal feedback |
+| `engine/TransformationState.kt` | Zoom/pan state (scale + offset) |
+| `engine/RemovalAnimator.kt` | Timing for snake removal animation sequences |
+| `ArrowsBoardRenderer.kt` | Canvas-based composable rendering snakes, arrows, guidance lines |
+| `ui/game/WinCelebrationScreen.kt` | Video playback + confetti + message on win |
+| `ui/game/IntroOverlay.kt` | First-run tutorial overlay |
+| `SoundManager.kt` | Plays tap / win audio |
+
+Test coverage: `GameEngineTapTest`, `GameEngineShapeLogicTest`, `CustomGameShapeTest`, and more.
+
+---
+
+### `:feature:generate`
+**Custom level builder.** Unlocked at level 20. Lets players configure and play their own boards.
+
+| File | Purpose |
+|------|---------|
+| `GenerateScreen.kt` | UI: width/height sliders, shape picker, fill-board toggle |
+| `GenerateNode.kt` | Appyx `Node` wrapping the screen |
+
+---
+
+### `:feature:settings`
+**Settings screen.** User preferences, monetization controls, debug tools.
+
+| File | Purpose |
+|------|---------|
+| `SettingsScreen.kt` | Theme, animation speed, sound/vibration toggles |
+| `SettingsNode.kt` | Appyx `Node` wrapping the screen |
+| `AdSettingsSection.kt` | Ad-free unlock UI (progress bar, "watch 30 ads") |
+| `ThirdPartyLicensesDialog.kt` | Open-source license browser (aboutlibraries) |
+| `DebugComponents.kt` | Debug menu: force dimensions, lives, shapes |
+
+---
+
+### `:core:ui`
+**Shared UI.** Theme, components, and styling consumed by all feature modules.
+
+| File | Purpose |
+|------|---------|
+| `theme/ThemeColors.kt` | 6 named color themes |
+| `theme/Type.kt` | Typography definitions |
+| `AppNavigationBar.kt` | Bottom navigation bar composable |
+| `SettingsBaseComponents.kt` | Reusable settings-row components |
+
+---
+
+### `:core:models`
+**Pure Kotlin models.** No Android dependencies — can run on the JVM alone.
+
+| File | Purpose |
+|------|---------|
+| `GameConstants.kt` | 160+ constants covering mechanics, animations, UI sizes, progression, ads |
+| `CustomGameParams.kt` | Parameters for a custom game (width, height, shape, fill mode) |
+| `engine/GameModels.kt` | `Point`, `Direction`, `Snake`, `GameLevel` data classes |
+| `engine/BoardShapeProvider.kt` | Interface for retrieving board shapes |
+| `engine/ParameterObjects.kt` | `GenerationParams`, `GenerationContext`, and related value objects |
+
+---
+
+### `:core:resources`
+**Android resources only.** No Kotlin/Java code — just strings, colors, drawables, and dimensions shared across all modules.
+
+---
+
+### `:domain`
+**Business logic.** Pure Kotlin, no Android dependencies — fully unit-testable.
+
+| File | Purpose |
+|------|---------|
+| `GameGenerator.kt` | Frontier-based snake placement algorithm — the heart of the project |
+| `SnakeBuilder.kt` | Builds snake paths on the board |
+| `SolvabilityChecker.kt` | Validates that a generated board is completable |
+| `LevelProgression.kt` | Maps level number to difficulty parameters |
+| `GenerationUtils.kt` | Line-of-sight checks, cell validation helpers |
+| `BoardImageProcessor.kt` | Reads custom board shapes from image pixel data |
+
+#### Board Generator
+
+`GameGenerator` builds each level by:
+1. Placing snakes (sequences of directional arrows) on the board
+2. Filling the board while respecting shape boundaries and walls
+3. Running `SolvabilityChecker` to confirm the board can be completed
+4. Retrying with adjusted parameters if generation fails
+
+---
+
+### `:data`
+**Data layer.** Room database, repositories, and persistence utilities.
+
+| File | Purpose |
+|------|---------|
+| `AppDatabase.kt` | Room DB (schema v2), single source of truth for all persistence |
+| `UserPreferencesEntity.kt` | Wide preferences table (theme, sounds, level, lives, ad-free, etc.) |
+| `UserPreferencesDao.kt` | 17 targeted update methods + `Flow` observables |
+| `UserPreferencesRepository.kt` | Repository wrapping the DAO; implements `IUserPreferencesRepository` |
+| `GameBoardEntity.kt` / `SnakeEntity.kt` / `SnakeBodyPointEntity.kt` | Normalized game board persistence |
+| `GameStateDao.kt` | DAO for saving/loading the last board (resume support) |
+| `ShapeRegistry.kt` | Custom shape storage |
+| `AndroidResourceBoardShapeProvider.kt` | `BoardShapeProvider` backed by Android resources |
+| `DataStoreMigration.kt` | One-time migration from DataStore preferences to Room |
+
+**Schema migrations:** v1 → v2 added game board persistence tables.
+
+---
+
+### `:ads`
+**Monetization.** Google Mobile Ads integration and GDPR consent.
+
+| File | Purpose |
+|------|---------|
+| `RewardAdManager.kt` | Rewarded ad lifecycle: load, show, callbacks |
+| `InterstitialAdManager.kt` | Interstitial lifecycle (shown every 5 games) |
+| `ConsentManager.kt` | Google UMP consent flow (GDPR / regional) |
+| `BannerAdView.kt` | Composable banner ad |
+
+| Ad type | Debug unit ID | Release unit ID |
+|---------|--------------|----------------|
+| Banner | Google test ID | `ca-app-pub-9667420067790140/3105779401` |
+| Rewarded | Google test ID | `ca-app-pub-9667420067790140/6849583291` |
+| Interstitial | Google test ID | `ca-app-pub-9667420067790140/3415454308` |
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Language | Kotlin 2.3.10 (JVM 11) |
+| UI | Jetpack Compose (BOM 2026.02.00), Material 3 |
+| Navigation | Appyx 1.7.1 |
+| Database | Room 2.8.4 |
+| Ads | Google Mobile Ads 25.0.0, UMP 4.0.0 |
+| Concurrency | kotlinx-coroutines 1.10.2 |
+| Testing | JUnit 4, Mockito 5, Appyx testing |
+| Static analysis | Detekt 2.0.0-alpha.2 |
+| Code coverage | Jacoco 0.8.13 |
+| Code generation | KSP 2.3.6 (Room compiler) |
+| Celebrations | Konfetti 2.0.5 (confetti) |
+| Licenses UI | AboutLibraries 14.0.0-b02 |
+
+**Android SDK:** minSdk 29 (Android 10) · compileSdk 36 (Android 15)
+**App version:** 1.7 (version code 8)
+**Application ID:** `com.batodev.arrows`
+
+---
+
+## Build
+
+```bash
+# Run tests, lint, and static analysis
+./gradlew test lint detekt
+
+# Generate Jacoco coverage report
+./gradlew testDebugUnitTestCoverage
+```
+
+---
+
+*This project is a playground for board generation algorithms. Feedback and contributions are welcome!*
