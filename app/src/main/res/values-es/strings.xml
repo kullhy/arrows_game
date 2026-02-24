@@ -50,10 +50,7 @@
     <string name="height_auto_label">Altura (0 para Automático)</string>
     <string name="height_label">Altura</string>
     <string name="hint_label">Pista</string>
-    <string name="home_label">Hogar</string>
-    <string name="intro_got_it">¡Entiendo!</string>
-    <string name="intro_instruction">Toque la punta de flecha para eliminar la flecha.</string>
-    <string name="level_dialog_title">Nivel</string>
+    <string name="home_label">Hogar</string>    <string name="level_dialog_title">Nivel</string>
     <string name="level_label">Nivel %1$d</string>
     <string name="lives_auto_label">Vidas (0 para Auto)</string>
     <string name="loading_ad">Cargando anuncio…</string>

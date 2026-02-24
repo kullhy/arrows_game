@@ -50,10 +50,7 @@
     <string name="height_auto_label">Высота (0 для автоматического режима)</string>
     <string name="height_label">Высота</string>
     <string name="hint_label">Намекать</string>
-    <string name="home_label">Дом</string>
-    <string name="intro_got_it">Понятно!</string>
-    <string name="intro_instruction">Нажмите на наконечник стрелы, чтобы убрать стрелу.</string>
-    <string name="level_dialog_title">Уровень</string>
+    <string name="home_label">Дом</string>    <string name="level_dialog_title">Уровень</string>
     <string name="level_label">Уровень %1$d</string>
     <string name="lives_auto_label">Жизни (0 для автоматического режима)</string>
     <string name="loading_ad">Загрузка рекламы…</string>

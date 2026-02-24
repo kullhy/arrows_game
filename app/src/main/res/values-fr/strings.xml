@@ -50,10 +50,7 @@
     <string name="height_auto_label">Hauteur (0 pour Auto)</string>
     <string name="height_label">Hauteur</string>
     <string name="hint_label">Indice</string>
-    <string name="home_label">Maison</string>
-    <string name="intro_got_it">J\'ai compris!</string>
-    <string name="intro_instruction">Appuyez sur la pointe de la flèche pour supprimer la flèche</string>
-    <string name="level_dialog_title">Niveau</string>
+    <string name="home_label">Maison</string>    <string name="level_dialog_title">Niveau</string>
     <string name="level_label">Niveau %1$d</string>
     <string name="lives_auto_label">Vies (0 pour Auto)</string>
     <string name="loading_ad">Chargement de l\'annonce…</string>

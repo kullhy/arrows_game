@@ -50,10 +50,7 @@
     <string name="height_auto_label">高さ（自動の場合は0）</string>
     <string name="height_label">身長</string>
     <string name="hint_label">ヒント</string>
-    <string name="home_label">家</string>
-    <string name="intro_got_it">わかった！</string>
-    <string name="intro_instruction">矢印を削除するには矢印をタップします</string>
-    <string name="level_dialog_title">レベル</string>
+    <string name="home_label">家</string>    <string name="level_dialog_title">レベル</string>
     <string name="level_label">レベル %1$d</string>
     <string name="lives_auto_label">ライフ（自動の場合は0）</string>
     <string name="loading_ad">広告を読み込んでいます…</string>
