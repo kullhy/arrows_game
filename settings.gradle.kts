@@ -22,4 +22,14 @@ dependencyResolutionManagement {
 
 rootProject.name = "Arrows"
 include(":app")
- 
+include(":core:models")
+include(":core:resources")
+include(":core:ui")
+include(":domain")
+include(":data")
+include(":ads")
+include(":feature:home")
+include(":feature:game")
+include(":feature:generate")
+include(":feature:settings")
+include(":navigation")

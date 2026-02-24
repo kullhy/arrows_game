@@ -1,0 +1,285 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "24cbd50ed72f7d9a416e22049df0a5d3",
+    "entities": [
+      {
+        "tableName": "user_preferences",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `theme` TEXT NOT NULL, `animationSpeed` TEXT NOT NULL, `isVibrationEnabled` INTEGER NOT NULL, `isSoundsEnabled` INTEGER NOT NULL, `isFillBoardEnabled` INTEGER NOT NULL, `levelNumber` INTEGER NOT NULL, `currentLives` INTEGER NOT NULL, `debugForcedWidth` INTEGER, `debugForcedHeight` INTEGER, `debugForcedLives` INTEGER, `debugForcedShape` TEXT, `isAdFree` INTEGER NOT NULL, `rewardAdCount` INTEGER NOT NULL, `gamesCompleted` INTEGER NOT NULL, `introCompleted` INTEGER NOT NULL, `isWinVideosEnabled` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "theme",
+            "columnName": "theme",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "animationSpeed",
+            "columnName": "animationSpeed",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isVibrationEnabled",
+            "columnName": "isVibrationEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isSoundsEnabled",
+            "columnName": "isSoundsEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isFillBoardEnabled",
+            "columnName": "isFillBoardEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "levelNumber",
+            "columnName": "levelNumber",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currentLives",
+            "columnName": "currentLives",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "debugForcedWidth",
+            "columnName": "debugForcedWidth",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "debugForcedHeight",
+            "columnName": "debugForcedHeight",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "debugForcedLives",
+            "columnName": "debugForcedLives",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "debugForcedShape",
+            "columnName": "debugForcedShape",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isAdFree",
+            "columnName": "isAdFree",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rewardAdCount",
+            "columnName": "rewardAdCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gamesCompleted",
+            "columnName": "gamesCompleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "introCompleted",
+            "columnName": "introCompleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isWinVideosEnabled",
+            "columnName": "isWinVideosEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "game_boards",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`boardId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `stateType` TEXT NOT NULL, `width` INTEGER NOT NULL, `height` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "boardId",
+            "columnName": "boardId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stateType",
+            "columnName": "stateType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "width",
+            "columnName": "width",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "height",
+            "columnName": "height",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "boardId"
+          ]
+        }
+      },
+      {
+        "tableName": "snakes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`snakeRowId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `boardId` INTEGER NOT NULL, `snakeId` INTEGER NOT NULL, `headDirection` TEXT NOT NULL, FOREIGN KEY(`boardId`) REFERENCES `game_boards`(`boardId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "snakeRowId",
+            "columnName": "snakeRowId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "boardId",
+            "columnName": "boardId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "snakeId",
+            "columnName": "snakeId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "headDirection",
+            "columnName": "headDirection",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "snakeRowId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_snakes_boardId",
+            "unique": false,
+            "columnNames": [
+              "boardId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_snakes_boardId` ON `${TABLE_NAME}` (`boardId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "game_boards",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "boardId"
+            ],
+            "referencedColumns": [
+              "boardId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "snake_body_points",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pointId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `snakeRowId` INTEGER NOT NULL, `orderIndex` INTEGER NOT NULL, `x` INTEGER NOT NULL, `y` INTEGER NOT NULL, FOREIGN KEY(`snakeRowId`) REFERENCES `snakes`(`snakeRowId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "pointId",
+            "columnName": "pointId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "snakeRowId",
+            "columnName": "snakeRowId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "orderIndex",
+            "columnName": "orderIndex",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "x",
+            "columnName": "x",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "y",
+            "columnName": "y",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "pointId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_snake_body_points_snakeRowId",
+            "unique": false,
+            "columnNames": [
+              "snakeRowId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_snake_body_points_snakeRowId` ON `${TABLE_NAME}` (`snakeRowId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "snakes",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "snakeRowId"
+            ],
+            "referencedColumns": [
+              "snakeRowId"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '24cbd50ed72f7d9a416e22049df0a5d3')"
+    ]
+  }
+}
