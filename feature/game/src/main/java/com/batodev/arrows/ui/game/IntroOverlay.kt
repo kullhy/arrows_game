@@ -49,8 +49,8 @@ fun IntroFingerOverlay(level: GameLevel) {
 
         val boardWidth = cellSize * level.width
         val boardHeight = cellSize * level.height
-        val leftOffset = (maxWidth - boardWidth) / 2
-        val topOffset = (maxHeight - boardHeight) / 2
+        val leftOffset = (maxWidth - boardWidth) / 2 + 4.dp
+        val topOffset = (maxHeight - boardHeight) / 2 + 25.dp
 
         // Arrowhead center, matching TAP_AREA_OFFSET_FACTOR used by the renderer
         val arrowHeadX: Dp = leftOffset + cellSize * head.x + cellSize / 2 +
