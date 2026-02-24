@@ -58,7 +58,7 @@ import com.batodev.arrows.ui.game.GameTopBar
 import com.batodev.arrows.ui.game.GameTopBarCallbacks
 import com.batodev.arrows.ui.game.GameTopBarState
 import com.batodev.arrows.ui.game.HintButtonState
-import com.batodev.arrows.ui.game.IntroOverlay
+import com.batodev.arrows.ui.game.IntroFingerOverlay
 import com.batodev.arrows.ui.game.WinCelebrationScreen
 import com.batodev.arrows.ui.game.rememberIntroState
 import com.batodev.arrows.ui.theme.HeartRed
@@ -108,7 +108,7 @@ fun ArrowsGameView(
     val engine: GameEngine = viewModel(
         factory = createGameEngineFactory(view, context, repository, application.gameStateDao, customParams)
     )
-    val introState = rememberIntroState(appViewModel, engine.isLoading, coroutineScope)
+    val introState = rememberIntroState(appViewModel, engine.isLoading, engine.level.snakes.size)
     val isWinVideosEnabled by appViewModel.isWinVideosEnabled.collectAsState()
     var confettiState by remember { mutableStateOf<List<Party>>(emptyList()) }
     var showGuidanceLines by remember { mutableStateOf(false) }
@@ -227,7 +227,7 @@ private fun ColumnScope.GameArea(params: GameAreaParams) {
             )
         }
         if (params.showIntro) {
-            IntroOverlay(onDismiss = params.onDismissIntro)
+            IntroFingerOverlay(level = params.engine.level)
         }
         if (params.engine.lives <= 0) {
             GameOverDialog(

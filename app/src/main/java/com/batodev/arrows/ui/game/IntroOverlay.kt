@@ -1,76 +1,71 @@
 package com.batodev.arrows.ui.game
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.TouchApp
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.batodev.arrows.GameConstants
-import com.batodev.arrows.R
-import com.batodev.arrows.ui.theme.LocalThemeColors
-import com.batodev.arrows.ui.theme.White
+import com.batodev.arrows.engine.GameLevel
+import com.batodev.arrows.engine.SolvabilityChecker
+
+private val FINGER_SIZE: Dp = 40.dp
 
 @Composable
-fun IntroOverlay(onDismiss: () -> Unit) {
-    val themeColors = LocalThemeColors.current
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = GameConstants.INTRO_OVERLAY_ALPHA))
-            .clickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            ) { /* consume taps */ },
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
+fun IntroFingerOverlay(level: GameLevel) {
+    val removableId = SolvabilityChecker.findRemovableSnake(level) ?: return
+    val snake = level.snakes.firstOrNull { it.id == removableId } ?: return
+    val head = snake.body.firstOrNull() ?: return
+
+    val transition = rememberInfiniteTransition(label = "introFlash")
+    val alpha by transition.animateFloat(
+        initialValue = 1f,
+        targetValue = 0.2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 600),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "fingerAlpha"
+    )
+
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val cellSizeW = maxWidth / level.width
+        val cellSizeH = maxHeight / level.height
+        val cellSize: Dp = if (cellSizeW < cellSizeH) cellSizeW else cellSizeH
+
+        val boardWidth = cellSize * level.width
+        val boardHeight = cellSize * level.height
+        val leftOffset = (maxWidth - boardWidth) / 2
+        val topOffset = (maxHeight - boardHeight) / 2
+
+        // Arrowhead center, matching TAP_AREA_OFFSET_FACTOR used by the renderer
+        val arrowHeadX: Dp = leftOffset + cellSize * head.x + cellSize / 2 +
+                cellSize * snake.headDirection.dx * GameConstants.TAP_AREA_OFFSET_FACTOR
+        val arrowHeadY: Dp = topOffset + cellSize * head.y + cellSize / 2 +
+                cellSize * snake.headDirection.dy * GameConstants.TAP_AREA_OFFSET_FACTOR
+
+        Icon(
+            imageVector = Icons.Filled.TouchApp,
+            contentDescription = null,
+            tint = Color.White,
             modifier = Modifier
-                .background(
-                    color = themeColors.bottomBar,
-                    shape = RoundedCornerShape(GameConstants.INTRO_CARD_CORNER_RADIUS.dp)
-                )
-                .padding(GameConstants.INTRO_CARD_PADDING.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = stringResource(R.string.intro_instruction),
-                color = White,
-                fontSize = GameConstants.INTRO_INSTRUCTION_FONT_SIZE.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-            Spacer(modifier = Modifier.height(GameConstants.INTRO_SPACING.dp))
-            Button(
-                onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(containerColor = themeColors.accent)
-            ) {
-                Text(
-                    text = stringResource(R.string.intro_got_it),
-                    color = White,
-                    fontSize = GameConstants.INTRO_BUTTON_FONT_SIZE.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
+                .size(FINGER_SIZE)
+                .offset(x = arrowHeadX - FINGER_SIZE / 2, y = arrowHeadY - FINGER_SIZE / 2)
+                .graphicsLayer { this.alpha = alpha }
+        )
     }
 }

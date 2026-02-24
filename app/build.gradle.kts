@@ -10,9 +10,7 @@ plugins {
 
 android {
     namespace = "com.batodev.arrows"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.batodev.arrows"
@@ -41,7 +39,7 @@ android {
         debug {
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
-            buildConfigField("Boolean", "DRAW_DEBUG_STUFF", "true")
+            buildConfigField("Boolean", "DRAW_DEBUG_STUFF", "false")
             // Test Ad IDs for development
             manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
             buildConfigField("String", "BANNER_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/6300978111\"")
@@ -123,6 +121,12 @@ tasks.register<JacocoReport>("testDebugUnitTestCoverage") {
     executionData.setFrom(fileTree("${project.layout.buildDirectory.get().asFile}/outputs/unit_test_code_coverage/debugUnitTest") {
         include("*.exec")
     })
+}
+
+configurations.all {
+    resolutionStrategy {
+        force(libs.androidx.annotation.experimental)
+    }
 }
 
 dependencies {
