@@ -327,3 +327,9 @@ Test coverage: `GameEngineTapTest`, `GameEngineShapeLogicTest`, `CustomGameShape
 ---
 
 *This project is a playground for board generation algorithms. Feedback and contributions are welcome!*
+
+YourKit supports open source projects with innovative and intelligent tools
+for monitoring and profiling Java and .NET applications.
+YourKit is the creator of <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a>,
+<a href="https://www.yourkit.com/dotnet-profiler/">YourKit .NET Profiler</a>,
+and <a href="https://www.yourkit.com/youmonitor/">YourKit YouMonitor</a>.
