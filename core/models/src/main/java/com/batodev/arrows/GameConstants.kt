@@ -140,6 +140,13 @@ object GameConstants {
     const val REMOVAL_DURATION_LOW = 900L
 
     // ====================
+    // BOARD ENTRY ANIMATIONS
+    // ====================
+    const val BOARD_ENTRY_SCALE_FROM = 0.92f
+    const val SNAKE_ENTRY_DURATION_MS = 450L
+    const val SNAKE_ENTRY_STAGGER_MS = 50L
+
+    // ====================
     // BOARD RENDERING & VISUALS
     // ====================
     const val BOARD_BORDER_WIDTH = 2f

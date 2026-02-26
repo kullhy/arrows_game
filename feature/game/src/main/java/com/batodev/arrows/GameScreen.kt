@@ -1,7 +1,9 @@
 package com.batodev.arrows
 
 import android.app.Activity
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -280,16 +282,31 @@ private fun GameScreenContent(params: GameScreenContentParams) {
 
 @Composable
 private fun BoardLayer(engine: GameEngine, guidanceAlpha: Float) {
+    val boardAlpha by animateFloatAsState(
+        targetValue = if (engine.isLoading) 0f else 1f,
+        animationSpec = spring(dampingRatio = 0.75f, stiffness = Spring.StiffnessLow),
+        label = "boardAlpha"
+    )
+    val boardScaleTransition by animateFloatAsState(
+        targetValue = if (engine.isLoading) GameConstants.BOARD_ENTRY_SCALE_FROM else 1f,
+        animationSpec = spring(dampingRatio = 0.75f, stiffness = Spring.StiffnessLow),
+        label = "boardScale"
+    )
+
     Box(modifier = Modifier
         .fillMaxSize()
         .graphicsLayer(
-            scaleX = engine.scale, scaleY = engine.scale,
-            translationX = engine.offsetX, translationY = engine.offsetY
+            scaleX = engine.scale * boardScaleTransition,
+            scaleY = engine.scale * boardScaleTransition,
+            translationX = engine.offsetX,
+            translationY = engine.offsetY,
+            alpha = boardAlpha
         )) {
         ArrowsBoardRenderer.Board(
             level = engine.level,
             flashingSnakeId = engine.flashingSnakeId,
             removalProgress = engine.removalProgress,
+            entryProgress = engine.entryProgress,
             guidanceAlpha = guidanceAlpha,
             modifier = Modifier.fillMaxSize()
         )

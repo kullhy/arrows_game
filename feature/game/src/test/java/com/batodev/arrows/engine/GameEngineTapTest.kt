@@ -61,6 +61,8 @@ class GameEngineTapTest {
         // Load level
         engine.loadOrRegenerateLevel()
         runCurrent()
+        testScheduler.advanceTimeBy(1000)
+        runCurrent()
 
         // Ensure level loaded
         assertEquals(2, engine.level.snakes.size)
@@ -77,6 +79,8 @@ class GameEngineTapTest {
 
                 // Reset flashing
                 engine.restartLevel()
+                runCurrent()
+                testScheduler.advanceTimeBy(1000)
                 runCurrent()
 
                 val tapOffset2 = Offset(2.6f * cellWidth, 1.5f * cellWidth)
@@ -115,6 +119,8 @@ class GameEngineTapTest {
 
         engine.loadOrRegenerateLevel()
         runCurrent()
+        testScheduler.advanceTimeBy(1000)
+        runCurrent()
 
         assertEquals("Engine should not be loading", false, engine.isLoading)
         assertEquals("Level should have 2 snakes", 2, engine.level.snakes.size)
@@ -129,6 +135,8 @@ class GameEngineTapTest {
 
         assertEquals("S1 should flash when obstructed", 1, engine.flashingSnakeId)
         engine.restartLevel()
+        runCurrent()
+        testScheduler.advanceTimeBy(1000)
         runCurrent()
 
         // Tap S2 (not obstructed)

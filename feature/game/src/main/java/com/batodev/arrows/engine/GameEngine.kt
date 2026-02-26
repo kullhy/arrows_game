@@ -48,6 +48,7 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
     )
     internal val transformationState = TransformationState()
     private val removalAnimator = RemovalAnimator(coroutineScope)
+    private val entryAnimator = EntryAnimator(coroutineScope)
     private val tapHandler = TapHandler(coroutineScope, soundManager, features.onVibrate)
 
     private var initialLevel: GameLevel? = null
@@ -79,6 +80,8 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
     val offsetX get() = transformationState.offsetX
     val offsetY get() = transformationState.offsetY
     val removalProgress get() = removalAnimator.removalProgress
+    val entryProgress get() = entryAnimator.entryProgress
+    val isEntryAnimating get() = entryAnimator.isEntryAnimating
     val flashingSnakeId get() = tapHandler.flashingSnakeId
 
     init {
@@ -123,6 +126,7 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
                     initial.snakes.size
                     isGameWon = level.snakes.isEmpty(); maxLives = maxL; lives =
                     currentL; isLoading = false
+                    animateEntry()
                 },
                 onFailure = { regenerateLevel() }
             )
@@ -132,7 +136,8 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
     fun restartLevel() {
         initialLevel?.let {
             level = it; totalSnakesInLevel = it.snakes.size; isGameWon = false; lives = maxLives
-            transformationState.reset(); tapHandler.clearFlash(); removalAnimator.clear(); saveState()
+            transformationState.reset(); tapHandler.clearFlash(); removalAnimator.clear(); entryAnimator.clear(); saveState()
+            animateEntry()
         }
     }
 
@@ -152,7 +157,7 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
     }
 
     fun onTap(tapOffset: Offset, containerWidthPx: Float, containerHeightPx: Float) {
-        if (isLoading || lives <= 0) return
+        if (isLoading || lives <= 0 || isEntryAnimating) return
         val gridCoords = inputHandler.transformTapToGrid(
             TapTransformationParams(
                 tapOffset,
@@ -227,8 +232,9 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
                         initialLevel = newLevel; level = newLevel; totalSnakesInLevel =
                         newLevel.snakes.size
                         isGameWon = false; maxLives = config.maxLives; lives = config.maxLives
-                        transformationState.reset(); tapHandler.clearFlash(); removalAnimator.clear()
+                        transformationState.reset(); tapHandler.clearFlash(); removalAnimator.clear(); entryAnimator.clear()
                         isLoading = false
+                        animateEntry()
                         coroutineScope.launch(backgroundDispatcher) {
                             levelManager.saveInitialState(newLevel, lives)
                         }
@@ -236,6 +242,10 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
                 )
             )
         }
+    }
+
+    private fun animateEntry() {
+        entryAnimator.animate(level.snakes, level.width, level.height)
     }
 
     private fun saveState() {

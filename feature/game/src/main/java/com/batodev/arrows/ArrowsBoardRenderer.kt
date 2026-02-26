@@ -55,6 +55,7 @@ object ArrowsBoardRenderer {
         modifier: Modifier = Modifier,
         flashingSnakeId: Int? = null,
         removalProgress: Map<Int, Float> = emptyMap(),
+        entryProgress: Map<Int, Float> = emptyMap(),
         guidanceAlpha: Float = 0f,
     ) {
         val themeColors = LocalThemeColors.current
@@ -93,7 +94,7 @@ object ArrowsBoardRenderer {
                     leftOffset = leftOffset,
                     topOffset = topOffset
                 )
-                drawGuidanceLines(level, metrics, removalProgress, guidanceConfig)
+                drawGuidanceLines(level, metrics, removalProgress, entryProgress, guidanceConfig)
             }
 
             if (BuildConfig.DRAW_DEBUG_STUFF) {
@@ -104,6 +105,7 @@ object ArrowsBoardRenderer {
                 level = level,
                 metrics = metrics,
                 removalProgress = removalProgress,
+                entryProgress = entryProgress,
                 flashingSnakeId = flashingSnakeId,
                 flashPulseAlpha = flashPulseAlpha,
                 themeColors = themeColors
@@ -151,10 +153,11 @@ object ArrowsBoardRenderer {
         level: GameLevel,
         metrics: BoardMetrics,
         removalProgress: Map<Int, Float>,
+        entryProgress: Map<Int, Float>,
         config: GuidanceLineConfig,
     ) {
         level.snakes.forEach { snake ->
-            if (removalProgress.containsKey(snake.id)) return@forEach
+            if (removalProgress.containsKey(snake.id) || entryProgress.containsKey(snake.id)) return@forEach
 
             val head = snake.body.first()
             val headCx = head.x * metrics.cellWidth + metrics.cellWidth / 2
@@ -219,9 +222,24 @@ object ArrowsBoardRenderer {
 
     private fun DrawScope.drawSnakes(params: SnakeDrawingParams) {
         params.level.snakes.forEach { snake ->
-            val p = (params.removalProgress[snake.id] ?: 0f).coerceIn(0f, 1f)
-            val shift = params.metrics.moveDist * p
-            val alpha = 1f - p
+            val removalP = (params.removalProgress[snake.id] ?: 0f).coerceIn(0f, 1f)
+            val entryP = params.entryProgress[snake.id]
+
+            val p: Float
+            val shift: Float
+            var alpha: Float
+
+            if (entryP != null) {
+                // Entry: body unfurls from head outward, head stays in place
+                p = 1f - entryP.coerceIn(0f, 1f)
+                shift = 0f
+                alpha = min(entryP * 2.5f, 1f) // Quick fade-in
+            } else {
+                // Normal / removal
+                p = removalP
+                shift = params.metrics.moveDist * p
+                alpha = 1f - p
+            }
 
             val isFlashing = snake.id == params.flashingSnakeId
             val baseColor = if (isFlashing) FlashingRed else params.themeColors.snake
@@ -258,18 +276,20 @@ object ArrowsBoardRenderer {
             }
 
             // Draw arrow head
-            val triangleCenterX = lineEndX + snake.headDirection.dx *
-                    (params.metrics.arrowHeadSize * GameConstants.ARROW_HEAD_CENTER_FACTOR)
-            val triangleCenterY = lineEndY + snake.headDirection.dy *
-                    (params.metrics.arrowHeadSize * GameConstants.ARROW_HEAD_CENTER_FACTOR)
+            if (entryP == null) {
+                val triangleCenterX = lineEndX + snake.headDirection.dx *
+                        (params.metrics.arrowHeadSize * GameConstants.ARROW_HEAD_CENTER_FACTOR)
+                val triangleCenterY = lineEndY + snake.headDirection.dy *
+                        (params.metrics.arrowHeadSize * GameConstants.ARROW_HEAD_CENTER_FACTOR)
 
-            drawArrowHead(
-                centerX = triangleCenterX,
-                centerY = triangleCenterY,
-                direction = snake.headDirection,
-                arrowHeadSize = params.metrics.arrowHeadSize,
-                color = snakeColor
-            )
+                drawArrowHead(
+                    centerX = triangleCenterX,
+                    centerY = triangleCenterY,
+                    direction = snake.headDirection,
+                    arrowHeadSize = params.metrics.arrowHeadSize,
+                    color = snakeColor
+                )
+            }
         }
     }
 
@@ -352,7 +372,8 @@ object ArrowsBoardRenderer {
             headCoords.baseLineEndY0
         )
 
-        if (p > 0f) {
+        // If removing (head is shifting), extend line to shifted head position
+        if (headCoords.lineEndX != headCoords.baseLineEndX0 || headCoords.lineEndY != headCoords.baseLineEndY0) {
             path.lineTo(headCoords.lineEndX, headCoords.lineEndY)
         }
 
@@ -402,6 +423,7 @@ object ArrowsBoardRenderer {
         val level: GameLevel,
         val metrics: BoardMetrics,
         val removalProgress: Map<Int, Float>,
+        val entryProgress: Map<Int, Float>,
         val flashingSnakeId: Int?,
         val flashPulseAlpha: Float,
         val themeColors: ThemeColors,
