@@ -1,5 +1,9 @@
 package com.batodev.arrows.engine
 
+import com.batodev.arrows.core.testing.FakeGameStateDao
+import com.batodev.arrows.core.testing.FakeUserPreferencesRepository
+import com.batodev.arrows.core.testing.MainDispatcherRule
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher

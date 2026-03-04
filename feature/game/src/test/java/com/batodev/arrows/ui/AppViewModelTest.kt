@@ -1,7 +1,7 @@
 package com.batodev.arrows.ui
 
-import com.batodev.arrows.engine.FakeGameStateDao
-import com.batodev.arrows.engine.FakeUserPreferencesRepository
+import com.batodev.arrows.core.testing.FakeGameStateDao
+import com.batodev.arrows.core.testing.FakeUserPreferencesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch

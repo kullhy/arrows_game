@@ -1,4 +1,4 @@
-package com.batodev.arrows.engine
+package com.batodev.arrows.core.testing
 
 import com.batodev.arrows.data.GameBoardEntity
 import com.batodev.arrows.data.GameStateDao
@@ -7,6 +7,10 @@ import com.batodev.arrows.data.SnakeEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
+/**
+ * Shared test double for [GameStateDao].
+ * Backed by in-memory maps — no database required in unit tests.
+ */
 class FakeGameStateDao : GameStateDao() {
 
     private val boards = mutableMapOf<Long, GameBoardEntity>()

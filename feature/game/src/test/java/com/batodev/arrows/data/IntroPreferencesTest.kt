@@ -1,6 +1,6 @@
 package com.batodev.arrows.data
 
-import com.batodev.arrows.engine.FakeUserPreferencesRepository
+import com.batodev.arrows.core.testing.FakeUserPreferencesRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest

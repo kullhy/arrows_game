@@ -15,6 +15,7 @@ dependencies {
     api(project(":ads"))
     api(project(":domain"))
     api(project(":core:resources"))
+    testImplementation(project(":core:testing"))
     testImplementation(libs.appyx.testing.unit.common)
     testImplementation(libs.appyx.testing.junit5)
 }

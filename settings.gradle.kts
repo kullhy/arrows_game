@@ -25,6 +25,7 @@ rootProject.name = "Arrows"
 include(":app")
 include(":core:models")
 include(":core:resources")
+include(":core:testing")
 include(":core:ui")
 include(":domain")
 include(":data")

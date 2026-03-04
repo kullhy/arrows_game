@@ -1,5 +1,8 @@
 package com.batodev.arrows.engine
 
+import com.batodev.arrows.core.testing.FakeGameStateDao
+import com.batodev.arrows.core.testing.FakeUserPreferencesRepository
+
 import androidx.compose.ui.geometry.Offset
 import com.batodev.arrows.data.PointData
 import com.batodev.arrows.data.SnakeSaveData
