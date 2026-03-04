@@ -1,11 +1,7 @@
 plugins {
-    alias(libs.plugins.android.library)
+    id("arrows.android.library")
 }
 
 android {
     namespace = "com.batodev.arrows.core.resources"
-    compileSdk = 36
-    defaultConfig {
-        minSdk = 29
-    }
 }

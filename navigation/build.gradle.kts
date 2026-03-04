@@ -1,31 +1,16 @@
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.compose)
+    id("arrows.android.library.compose")
     id("kotlin-parcelize")
 }
 
 android {
     namespace = "com.batodev.arrows.navigation"
-    compileSdk = 36
-    defaultConfig {
-        minSdk = 29
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    buildFeatures {
-        compose = true
-    }
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
 }
 
 dependencies {
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.material3)
     implementation(libs.appyx.core)
     implementation(project(":feature:home"))
     implementation(project(":feature:game"))

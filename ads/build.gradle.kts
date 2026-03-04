@@ -1,20 +1,10 @@
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.compose)
+    id("arrows.android.library.compose")
 }
 
 android {
     namespace = "com.batodev.arrows.ads"
-    compileSdk = 36
-    defaultConfig {
-        minSdk = 29
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
     buildFeatures {
-        compose = true
         buildConfig = true
     }
     buildTypes {
@@ -36,7 +26,4 @@ android {
 dependencies {
     api(libs.play.services.ads)
     api(libs.google.ump)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.material3)
 }
