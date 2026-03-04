@@ -15,7 +15,6 @@ detekt {
     source.setFrom(
         subprojects.map { "${it.projectDir}/src" }
     )
-    baseline = file("detekt-baseline.xml")
 }
 
 subprojects {

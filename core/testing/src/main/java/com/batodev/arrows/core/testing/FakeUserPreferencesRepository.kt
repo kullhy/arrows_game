@@ -1,5 +1,6 @@
 package com.batodev.arrows.core.testing
 
+import com.batodev.arrows.GameConstants
 import com.batodev.arrows.data.IUserPreferencesRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +28,7 @@ class FakeUserPreferencesRepository : IUserPreferencesRepository {
     val levelNumberFlow = MutableStateFlow(1)
     override val levelNumber: Flow<Int> = levelNumberFlow
 
-    val currentLivesFlow = MutableStateFlow(5)
+    val currentLivesFlow = MutableStateFlow(GameConstants.DEFAULT_LIVES)
     override val currentLives: Flow<Int> = currentLivesFlow
 
     val debugForcedWidthFlow = MutableStateFlow<Int?>(null)

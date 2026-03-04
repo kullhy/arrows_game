@@ -5,6 +5,7 @@ naming:
 complexity:
   LongMethod:
     active: true
+    ignoreAnnotated: ['Composable']
   LongParameterList:
     active: true
     ignoreAnnotated: ['Composable']
@@ -18,6 +19,7 @@ style:
     ignoreCompanionObjectPropertyDeclaration: true
     ignoreEnums: true
     ignoreRanges: true
+    excludes: ['**/test/**', '**/androidTest/**']
   MaxLineLength:
     active: true
     maxLineLength: 160

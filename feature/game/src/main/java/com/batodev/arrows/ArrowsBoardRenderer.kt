@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import com.batodev.arrows.engine.Direction
 import com.batodev.arrows.engine.GameLevel
+import com.batodev.arrows.engine.Point
 import com.batodev.arrows.engine.Snake
 import com.batodev.arrows.ui.theme.FlashingRed
 import com.batodev.arrows.ui.theme.LightGray
@@ -34,6 +35,9 @@ import kotlin.math.min
 import kotlin.math.sin
 
 object ArrowsBoardRenderer {
+    private const val TAIL_FRACTION_EPSILON = 0.001f
+    private const val ENTRY_FADE_IN_MULTIPLIER = 2.5f
+
     /**
      * Renders the game board with all snakes, arrows, and interactive elements.
      *
@@ -233,7 +237,7 @@ object ArrowsBoardRenderer {
                 // Entry: body unfurls from head outward, head stays in place
                 p = 1f - entryP.coerceIn(0f, 1f)
                 shift = 0f
-                alpha = min(entryP * 2.5f, 1f) // Quick fade-in
+                alpha = min(entryP * ENTRY_FADE_IN_MULTIPLIER, 1f) // Quick fade-in
             } else {
                 // Normal / removal
                 p = removalP
@@ -312,50 +316,18 @@ object ArrowsBoardRenderer {
 
         // Pixel position of the tail tip — linearly interpolated between the two adjacent
         // cell centres so the tail end moves sub-cell each frame instead of jumping.
-        val tailTipX: Float
-        val tailTipY: Float
-        if (tailFraction < 0.001f || tailFullIndex >= body.size - 1) {
-            val cell = body[tailFullIndex]
-            tailTipX = cell.x * metrics.cellWidth + metrics.cellWidth / 2
-            tailTipY = cell.y * metrics.cellHeight + metrics.cellHeight / 2
-        } else {
-            val fromCell = body[tailFullIndex]
-            val toCell = body[tailFullIndex + 1]
-            val fromCx = fromCell.x * metrics.cellWidth + metrics.cellWidth / 2
-            val fromCy = fromCell.y * metrics.cellHeight + metrics.cellHeight / 2
-            val toCx = toCell.x * metrics.cellWidth + metrics.cellWidth / 2
-            val toCy = toCell.y * metrics.cellHeight + metrics.cellHeight / 2
-            tailTipX = fromCx + (toCx - fromCx) * tailFraction
-            tailTipY = fromCy + (toCy - fromCy) * tailFraction
-        }
-
-        path.moveTo(tailTipX, tailTipY)
+        val tailTip = calculateTailTipOffset(body, tailFullIndex, tailFraction, metrics)
+        path.moveTo(tailTip.x, tailTip.y)
 
         // When the tail tip sits within an interior segment (fractional offset), include
         // body[tailFullIndex] in the curve loop so the path bends correctly through it.
-        val loopStart = if (tailFraction > 0.001f && tailFullIndex in 1 until body.size - 1) {
+        val loopStart = if (tailFraction > TAIL_FRACTION_EPSILON && tailFullIndex in 1 until body.size - 1) {
             tailFullIndex
         } else {
             tailFullIndex - 1
         }
 
-        for (i in loopStart downTo 1) {
-            val prev = body[i + 1]
-            val current = body[i]
-            val next = body[i - 1]
-
-            val currX = current.x * metrics.cellWidth + metrics.cellWidth / 2
-            val currY = current.y * metrics.cellHeight + metrics.cellHeight / 2
-
-            val entryX = currX + (prev.x - current.x).coerceIn(-1, 1) * metrics.cornerRadius
-            val entryY = currY + (prev.y - current.y).coerceIn(-1, 1) * metrics.cornerRadius
-
-            val exitX = currX + (next.x - current.x).coerceIn(-1, 1) * metrics.cornerRadius
-            val exitY = currY + (next.y - current.y).coerceIn(-1, 1) * metrics.cornerRadius
-
-            path.lineTo(entryX, entryY)
-            path.quadraticTo(currX, currY, exitX, exitY)
-        }
+        path.appendBodyCurves(body, loopStart, metrics)
 
         val head = body[0]
         val prev = body[1]
@@ -386,6 +358,52 @@ object ArrowsBoardRenderer {
                 join = StrokeJoin.Round
             )
         )
+    }
+
+    private fun calculateTailTipOffset(
+        body: List<Point>,
+        tailFullIndex: Int,
+        tailFraction: Float,
+        metrics: BoardMetrics,
+    ): Offset {
+        return if (tailFraction < TAIL_FRACTION_EPSILON || tailFullIndex >= body.size - 1) {
+            val cell = body[tailFullIndex]
+            Offset(
+                cell.x * metrics.cellWidth + metrics.cellWidth / 2,
+                cell.y * metrics.cellHeight + metrics.cellHeight / 2
+            )
+        } else {
+            val fromCell = body[tailFullIndex]
+            val toCell = body[tailFullIndex + 1]
+            val fromCx = fromCell.x * metrics.cellWidth + metrics.cellWidth / 2
+            val fromCy = fromCell.y * metrics.cellHeight + metrics.cellHeight / 2
+            val toCx = toCell.x * metrics.cellWidth + metrics.cellWidth / 2
+            val toCy = toCell.y * metrics.cellHeight + metrics.cellHeight / 2
+            Offset(
+                fromCx + (toCx - fromCx) * tailFraction,
+                fromCy + (toCy - fromCy) * tailFraction
+            )
+        }
+    }
+
+    private fun Path.appendBodyCurves(body: List<Point>, loopStart: Int, metrics: BoardMetrics) {
+        for (i in loopStart downTo 1) {
+            val prev = body[i + 1]
+            val current = body[i]
+            val next = body[i - 1]
+
+            val currX = current.x * metrics.cellWidth + metrics.cellWidth / 2
+            val currY = current.y * metrics.cellHeight + metrics.cellHeight / 2
+
+            val entryX = currX + (prev.x - current.x).coerceIn(-1, 1) * metrics.cornerRadius
+            val entryY = currY + (prev.y - current.y).coerceIn(-1, 1) * metrics.cornerRadius
+
+            val exitX = currX + (next.x - current.x).coerceIn(-1, 1) * metrics.cornerRadius
+            val exitY = currY + (next.y - current.y).coerceIn(-1, 1) * metrics.cornerRadius
+
+            lineTo(entryX, entryY)
+            quadraticTo(currX, currY, exitX, exitY)
+        }
     }
 
     private fun DrawScope.drawSingleBlockSnakeTail(

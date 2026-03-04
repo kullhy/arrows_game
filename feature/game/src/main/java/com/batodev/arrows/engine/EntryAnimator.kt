@@ -12,6 +12,11 @@ import kotlinx.coroutines.launch
 import kotlin.math.pow
 
 class EntryAnimator(private val coroutineScope: CoroutineScope) {
+    companion object {
+        private const val CUBIC_EASING_POWER = 3
+        private const val COMPLETION_BUFFER_MS = 50L
+    }
+
     var entryProgress by mutableStateOf<Map<Int, Float>>(emptyMap())
         private set
     var isEntryAnimating by mutableStateOf(false)
@@ -56,7 +61,7 @@ class EntryAnimator(private val coroutineScope: CoroutineScope) {
                     val elapsed = System.currentTimeMillis() - startTime
                     val progress = (elapsed.toFloat() / duration).coerceIn(0f, 1f)
                     // Ease-out cubic for smooth deceleration: 1 - (1 - x)^3
-                    val eased = 1f - (1f - progress).pow(3)
+                    val eased = 1f - (1f - progress).pow(CUBIC_EASING_POWER)
                     
                     entryProgress = entryProgress.toMutableMap().apply { put(snakeId, eased) }
 
@@ -71,7 +76,7 @@ class EntryAnimator(private val coroutineScope: CoroutineScope) {
         }
 
         // Clear isEntryAnimating after all snakes finish
-        val totalDuration = stagger * (sortedSnakes.size - 1) + duration + 50
+        val totalDuration = stagger * (sortedSnakes.size - 1) + duration + COMPLETION_BUFFER_MS
         val completionJob = coroutineScope.launch {
             delay(totalDuration)
             if (isActive) {
