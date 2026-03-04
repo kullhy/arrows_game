@@ -1,3 +1,24 @@
 naming:
   FunctionNaming:
     ignoreAnnotated: ['Composable']
+
+complexity:
+  LongMethod:
+    active: true
+  LongParameterList:
+    active: true
+    ignoreAnnotated: ['Composable']
+
+style:
+  MagicNumber:
+    active: true
+    ignoreNumbers: ['-1', '0', '1', '2', '100']
+    ignoreAnnotated: ['Composable', 'Preview']
+    ignoreConstantDeclaration: true
+    ignoreCompanionObjectPropertyDeclaration: true
+    ignoreEnums: true
+    ignoreRanges: true
+  MaxLineLength:
+    active: true
+    maxLineLength: 160
+    excludeCommentStatements: true

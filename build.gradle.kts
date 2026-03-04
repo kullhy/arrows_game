@@ -15,4 +15,22 @@ detekt {
     source.setFrom(
         subprojects.map { "${it.projectDir}/src" }
     )
+    baseline = file("detekt-baseline.xml")
+}
+
+subprojects {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        compilerOptions {
+            if (project.findProperty("enableComposeCompilerMetrics") == "true") {
+                freeCompilerArgs.addAll(
+                    "-P",
+                    "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" +
+                        layout.buildDirectory.dir("compose-metrics").get().asFile.absolutePath,
+                    "-P",
+                    "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" +
+                        layout.buildDirectory.dir("compose-reports").get().asFile.absolutePath,
+                )
+            }
+        }
+    }
 }
