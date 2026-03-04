@@ -58,6 +58,7 @@ import com.batodev.arrows.feature.game.BuildConfig
 import com.batodev.arrows.data.GameStateDao
 import com.batodev.arrows.data.UserPreferencesRepository
 import com.batodev.arrows.engine.GameEngine
+import com.batodev.arrows.engine.GameUiState
 import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.ads.BannerAdView
 import com.batodev.arrows.ui.game.GameProgressBar
@@ -116,7 +117,8 @@ fun ArrowsGameView(
     val engine: GameEngine = viewModel(
         factory = createGameEngineFactory(view, context, userPreferencesRepository, gameStateDao, customParams)
     )
-    val introState = rememberIntroState(appViewModel, engine.isLoading, engine.level.snakes.size)
+    val uiState = engine.uiState
+    val introState = rememberIntroState(appViewModel, uiState is GameUiState.Loading, engine.level.snakes.size)
     val isWinVideosEnabled by appViewModel.isWinVideosEnabled.collectAsState()
     var confettiState by remember { mutableStateOf<List<Party>>(emptyList()) }
     var showGuidanceLines by remember { mutableStateOf(false) }
@@ -132,9 +134,9 @@ fun ArrowsGameView(
         GameWonStateParams(engine, appViewModel, activity ?: return@remember null, interstitialAdManager, isAdFree, onFinish = onBack)
     }
     if (gameWonParams != null) {
-        HandleGameWonState(gameWonParams, isWinVideosEnabled) { showCelebrationVideo = true }
+        HandleGameWonState(uiState, gameWonParams, isWinVideosEnabled) { showCelebrationVideo = true }
     }
-    confettiState = updateConfettiState(engine, confettiState)
+    confettiState = updateConfettiState(uiState, confettiState)
     val handleHint = buildHintHandler(
         HintHandlerParams(isAdFree, isAdLoading, isAdLoaded, engine, activity, rewardAdManager)
     )
@@ -146,14 +148,14 @@ fun ArrowsGameView(
         }
     }
     val celebrationParams = CelebrationParams(
-        showCelebration = showCelebrationVideo && engine.isGameWon,
+        showCelebration = showCelebrationVideo && uiState is GameUiState.Won,
         onCelebrationComplete = onCelebrationComplete
     )
     CompositionLocalProvider(LocalCelebrationParams provides celebrationParams) {
         GameScreenContent(
             GameScreenContentParams(
-                engine, activity, context, tapAnimations, guidanceAlpha, showGuidanceLines, themeColors,
-                rewardAdManager, isAdFree, isAdLoaded, isAdLoading, handleHint,
+                engine, uiState, activity, context, tapAnimations, guidanceAlpha, showGuidanceLines,
+                themeColors, rewardAdManager, isAdFree, isAdLoaded, isAdLoading, handleHint,
                 { showGuidanceLines = !showGuidanceLines }, showCelebrationVideo, onCelebrationComplete,
                 introState.showIntro, introState.onDismiss, onBack
             )
@@ -163,12 +165,14 @@ fun ArrowsGameView(
 
 @Composable
 private fun HandleGameWonState(
+    uiState: GameUiState,
     params: GameWonStateParams,
     isWinVideosEnabled: Boolean,
     onShowCelebration: () -> Unit
 ) {
-    LaunchedEffect(params.engine.isGameWon) {
-        if (params.engine.isGameWon) {
+    val isWon = uiState is GameUiState.Won
+    LaunchedEffect(isWon) {
+        if (isWon) {
             if (isWinVideosEnabled) {
                 onShowCelebration()
             } else {
@@ -179,8 +183,9 @@ private fun HandleGameWonState(
 }
 
 @Composable
-private fun updateConfettiState(engine: GameEngine, currentState: List<Party>): List<Party> {
-    return if (engine.isGameWon && currentState.isEmpty()) {
+private fun updateConfettiState(uiState: GameUiState, currentState: List<Party>): List<Party> {
+    val isWon = uiState is GameUiState.Won
+    return if (isWon && currentState.isEmpty()) {
         listOf(
             Party(
                 speed = 0f, maxSpeed = GameConstants.CONFETTI_MAX_SPEED, damping = GameConstants.CONFETTI_DAMPING,
@@ -192,7 +197,7 @@ private fun updateConfettiState(engine: GameEngine, currentState: List<Party>): 
                 ).max(GameConstants.CONFETTI_EMITTER_MAX)
             )
         )
-    } else if (!engine.isGameWon && currentState.isNotEmpty()) {
+    } else if (!isWon && currentState.isNotEmpty()) {
         emptyList()
     } else {
         currentState
@@ -217,44 +222,47 @@ private fun ColumnScope.GameArea(params: GameAreaParams) {
                 }
             }
     ) {
-        BoardLayer(params.engine, params.guidanceAlpha)
+        BoardLayer(params.engine, params.uiState, params.guidanceAlpha)
         ResetViewButton(params.themeColors) { params.engine.transformationState.reset() }
         GuidanceToggleButton(params.showGuidanceLines, params.themeColors, params.onToggleGuidance)
         if (BuildConfig.DRAW_DEBUG_STUFF) DebugOverlay(params.tapAnimations)
         TapAnimationsLayer(params.tapAnimations)
-        if (params.engine.isLoading) LoadingOverlay(params.engine.loadingProgress, params.themeColors)
-        val celebrationParams = LocalCelebrationParams.current
-        if (celebrationParams.showCelebration) {
-            WinCelebrationScreen(onCelebrationComplete = celebrationParams.onCelebrationComplete)
-        }
-        if (params.engine.isGameWon) {
-            KonfettiView(
-                modifier = Modifier.fillMaxSize(),
-                parties = updateConfettiState(params.engine, emptyList())
-            )
-        }
-        if (params.showIntro) {
-            IntroFingerOverlay(level = params.engine.level)
-        }
-        if (params.engine.lives <= 0) {
-            GameOverDialog(
+        when (val state = params.uiState) {
+            is GameUiState.Loading -> LoadingOverlay(state.progress, params.themeColors)
+            is GameUiState.Won -> {
+                val celebrationParams = LocalCelebrationParams.current
+                if (celebrationParams.showCelebration) {
+                    WinCelebrationScreen(onCelebrationComplete = celebrationParams.onCelebrationComplete)
+                }
+                KonfettiView(
+                    modifier = Modifier.fillMaxSize(),
+                    parties = updateConfettiState(params.uiState, emptyList())
+                )
+            }
+            is GameUiState.GameOver -> GameOverDialog(
                 rewardAdManager = params.rewardAdManager,
                 activity = params.activity,
                 isAdFree = params.isAdFree,
                 onRestart = { params.engine.restartLevel() },
                 onWatchAd = { params.engine.addLife() }
             )
+            is GameUiState.Playing -> {
+                if (params.showIntro) {
+                    IntroFingerOverlay(level = state.level)
+                }
+            }
         }
     }
 }
 
 @Composable
 private fun GameScreenContent(params: GameScreenContentParams) {
+    val playing = params.uiState as? GameUiState.Playing
     Column(modifier = Modifier.fillMaxSize()) {
         GameTopBar(
             state = GameTopBarState(
-                lives = params.engine.lives,
-                maxLives = params.engine.maxLives,
+                lives = playing?.lives ?: params.engine.lives,
+                maxLives = playing?.maxLives ?: params.engine.maxLives,
                 hintState = HintButtonState(params.isAdFree, params.isAdLoaded, params.isAdLoading)
             ),
             callbacks = GameTopBarCallbacks(
@@ -264,14 +272,14 @@ private fun GameScreenContent(params: GameScreenContentParams) {
             )
         )
         GameProgressBar(
-            totalSnakes = params.engine.totalSnakesInLevel,
-            currentSnakes = params.engine.level.snakes.size
+            totalSnakes = playing?.totalSnakes ?: params.engine.totalSnakesInLevel,
+            currentSnakes = (playing?.level ?: params.engine.level).snakes.size
         )
         GameArea(
             GameAreaParams(
-                params.engine, params.tapAnimations, params.guidanceAlpha, params.showGuidanceLines,
-                params.themeColors, params.rewardAdManager, params.activity, params.isAdFree,
-                params.onToggleGuidance, params.showIntro, params.onDismissIntro
+                params.engine, params.uiState, params.tapAnimations, params.guidanceAlpha,
+                params.showGuidanceLines, params.themeColors, params.rewardAdManager, params.activity,
+                params.isAdFree, params.onToggleGuidance, params.showIntro, params.onDismissIntro
             )
         )
         if (!params.isAdFree) {
@@ -281,14 +289,15 @@ private fun GameScreenContent(params: GameScreenContentParams) {
 }
 
 @Composable
-private fun BoardLayer(engine: GameEngine, guidanceAlpha: Float) {
+private fun BoardLayer(engine: GameEngine, uiState: GameUiState, guidanceAlpha: Float) {
+    val isLoading = uiState is GameUiState.Loading
     val boardAlpha by animateFloatAsState(
-        targetValue = if (engine.isLoading) 0f else 1f,
+        targetValue = if (isLoading) 0f else 1f,
         animationSpec = spring(dampingRatio = 0.75f, stiffness = Spring.StiffnessLow),
         label = "boardAlpha"
     )
     val boardScaleTransition by animateFloatAsState(
-        targetValue = if (engine.isLoading) GameConstants.BOARD_ENTRY_SCALE_FROM else 1f,
+        targetValue = if (isLoading) GameConstants.BOARD_ENTRY_SCALE_FROM else 1f,
         animationSpec = spring(dampingRatio = 0.75f, stiffness = Spring.StiffnessLow),
         label = "boardScale"
     )

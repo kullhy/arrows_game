@@ -27,6 +27,7 @@ import com.batodev.arrows.data.UserPreferencesRepository
 import com.batodev.arrows.engine.GameEngine
 import com.batodev.arrows.engine.GameEngineConfig
 import com.batodev.arrows.engine.GameEngineFeatures
+import com.batodev.arrows.engine.GameUiState
 import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.theme.ThemeColors
 import com.batodev.arrows.ui.theme.White
@@ -43,6 +44,7 @@ data class GameWonStateParams(
 
 data class GameAreaParams(
     val engine: GameEngine,
+    val uiState: GameUiState,
     val tapAnimations: SnapshotStateList<TapAnimationState>,
     val guidanceAlpha: Float,
     val showGuidanceLines: Boolean,
@@ -57,6 +59,7 @@ data class GameAreaParams(
 
 data class GameScreenContentParams(
     val engine: GameEngine,
+    val uiState: GameUiState,
     val activity: Activity?,
     val context: Context,
     val tapAnimations: SnapshotStateList<TapAnimationState>,

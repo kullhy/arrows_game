@@ -84,6 +84,26 @@ class GameEngine(config: GameEngineConfig, features: GameEngineFeatures = GameEn
     val isEntryAnimating get() = entryAnimator.isEntryAnimating
     val flashingSnakeId get() = tapHandler.flashingSnakeId
 
+    /**
+     * A single sealed state representing the current game phase.
+     * Mutually exclusive — the UI can switch on this type without reading
+     * multiple individual properties that might produce impossible combinations.
+     * Animation details (entryProgress, removalProgress, flashingSnakeId) are
+     * exposed separately since they change at frame rate and do not affect phase.
+     */
+    val uiState: GameUiState
+        get() = when {
+            isLoading -> GameUiState.Loading(loadingProgress)
+            isGameWon -> GameUiState.Won
+            lives <= 0 -> GameUiState.GameOver
+            else -> GameUiState.Playing(
+                level = level,
+                lives = lives,
+                maxLives = maxLives,
+                totalSnakes = totalSnakesInLevel,
+            )
+        }
+
     init {
         observePreferences()
         if (config.autoLoad) loadOrRegenerateLevel()
