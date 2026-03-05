@@ -10,15 +10,18 @@ import com.batodev.arrows.data.AndroidResourceBoardShapeProvider
 import com.batodev.arrows.ui.AppViewModel
 import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class SettingsNode(
     buildContext: BuildContext,
     private val appViewModel: AppViewModel,
-    private val rewardAdManager: RewardAdManager,
-    private val consentManager: ConsentManager,
     private val onNavigateHome: () -> Unit,
     private val onNavigateToGenerate: () -> Unit
-) : Node(buildContext) {
+) : Node(buildContext), KoinComponent {
+
+    private val rewardAdManager: RewardAdManager by inject()
+    private val consentManager: ConsentManager by inject()
 
     @Composable
     override fun View(modifier: Modifier) {

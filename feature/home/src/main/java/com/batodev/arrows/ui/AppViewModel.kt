@@ -1,12 +1,10 @@
 package com.batodev.arrows.ui
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.batodev.arrows.GameConstants
 import com.batodev.arrows.data.GameStateDao
 import com.batodev.arrows.data.IUserPreferencesRepository
-import com.batodev.arrows.data.UserPreferencesRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -208,18 +206,4 @@ class AppViewModel(
         }
     }
 
-    class Factory(
-        private val userPreferencesRepository: IUserPreferencesRepository,
-        private val gameStateDao: GameStateDao
-    ) : ViewModelProvider.Factory {
-        // Cast is safe: guarded by isAssignableFrom check above.
-        // Required boilerplate for manual ViewModelProvider.Factory without a DI framework.
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(AppViewModel::class.java)) {
-                return AppViewModel(userPreferencesRepository, gameStateDao) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel class")
-        }
-    }
 }

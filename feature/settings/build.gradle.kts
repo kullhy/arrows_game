@@ -26,6 +26,7 @@ aboutLibraries {
 }
 
 dependencies {
+    implementation(libs.koin.android)
     implementation(libs.aboutlibraries.compose.m3)
     implementation(libs.play.review.ktx)
     implementation(project(":feature:home"))

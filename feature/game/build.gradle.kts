@@ -21,6 +21,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.koin.android)
     implementation(libs.konfetti.compose)
     implementation(libs.androidx.core.ktx)
     implementation(project(":feature:home"))

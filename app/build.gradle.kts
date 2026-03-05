@@ -109,6 +109,8 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.appyx.core)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
     implementation(project(":navigation"))
     implementation(project(":feature:home"))
     implementation(project(":core:ui"))

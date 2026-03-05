@@ -10,6 +10,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.koin.android)
     api(project(":core:ui"))
     api(project(":data"))
     api(project(":ads"))

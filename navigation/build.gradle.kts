@@ -11,6 +11,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.koin.android)
     implementation(libs.appyx.core)
     implementation(project(":feature:home"))
     implementation(project(":feature:game"))

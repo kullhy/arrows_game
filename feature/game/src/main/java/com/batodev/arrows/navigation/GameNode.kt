@@ -24,17 +24,20 @@ import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
 import androidx.compose.runtime.CompositionLocalProvider
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class GameNode(
     buildContext: BuildContext,
     private val appViewModel: AppViewModel,
-    private val rewardAdManager: RewardAdManager,
-    private val interstitialAdManager: InterstitialAdManager,
-    private val userPreferencesRepository: UserPreferencesRepository,
-    private val gameStateDao: GameStateDao,
     private val customParams: CustomGameParams,
     private val onBack: () -> Unit
-) : Node(buildContext) {
+) : Node(buildContext), KoinComponent {
+
+    private val rewardAdManager: RewardAdManager by inject()
+    private val interstitialAdManager: InterstitialAdManager by inject()
+    private val userPreferencesRepository: UserPreferencesRepository by inject()
+    private val gameStateDao: GameStateDao by inject()
 
     private val nodeViewModelStore = ViewModelStore()
 

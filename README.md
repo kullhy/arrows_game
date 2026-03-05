@@ -89,6 +89,26 @@ The project follows **Clean Architecture** with **feature-based modularization**
 
 ---
 
+## Dependency Injection (Koin)
+
+The project uses **Koin** for dependency injection, allowing for a decoupled and testable architecture across its modular structure.
+
+### How it works
+1. **Centralized Initialization**: Koin is started in `ArrowsApplication` using `startKoin`, where the Android context is provided and all modules are loaded.
+2. **Modular Definitions**: Each layer/feature defines its own Koin module (e.g., `dataModule`, `adsModule`, `viewModelModule`), keeping dependencies close to where they are used.
+3. **Injection**:
+    - **Appyx Nodes**: Implement `KoinComponent` to use `by inject()` for retrieving dependencies that aren't passed via constructors.
+    - **ViewModels**: Defined using Koin's `viewModel` DSL and injected into Composables or Activities.
+    - **Singletons**: Used for repositories, database instances, and ad managers.
+
+### Dependencies
+| Library | Artifact | Version |
+|---------|----------|---------|
+| Koin Android | `io.insert-koin:koin-android` | 4.0.0 |
+| Koin Compose | `io.insert-koin:koin-androidx-compose` | 4.0.0 |
+
+---
+
 ## Modules
 
 ### `:app`
@@ -97,9 +117,7 @@ The project follows **Clean Architecture** with **feature-based modularization**
 | File | Purpose |
 |------|---------|
 | `MainActivity.kt` | Hosts the Appyx `RootNode`, applies the theme |
-| `ArrowsApplication.kt` | Initializes Room DB, repositories, ad managers, consent manager |
-
-Dependency injection is **manual**: `ArrowsApplication` creates all singletons and passes them down via constructors and ViewModel factories.
+| `ArrowsApplication.kt` | Initializes Koin, Room DB, repositories, and ad managers |
 
 ---
 
@@ -123,25 +141,6 @@ RootNode                    ← ParentNode, owns BackStack<NavTarget>
  └── SettingsNode           ← renders SettingsScreen
 ```
 
-#### Navigation destinations
-
-| Target | Description |
-|--------|-------------|
-| `NavTarget.Home` | Landing screen |
-| `NavTarget.Game(...)` | Gameplay — carries optional custom board params |
-| `NavTarget.Generate` | Custom level builder (unlocked at level 20) |
-| `NavTarget.Settings` | Theme, sound, ad preferences |
-
-#### Random view transitions
-
-| Type | Effect |
-|------|--------|
-| `FADE` | Alpha 0 → 1 |
-| `SLIDE_HORIZONTAL` | Slides in from the right |
-| `SLIDE_VERTICAL` | Slides in from the bottom |
-| `SCALE_FADE` | Scales 0.85 → 1 with fade |
-| `ROTATE_FADE` | Slight Z-rotation with fade |
-
 ---
 
 ### `:feature:home`
@@ -153,7 +152,7 @@ RootNode                    ← ParentNode, owns BackStack<NavTarget>
 | `HomeNode.kt` | Appyx `Node` wrapping the screen |
 | `AppViewModel.kt` | App-wide `StateFlow` state: theme, sounds, vibration, level, lives, debug flags |
 
-`AppViewModel` is shared across features — it acts as the single source of truth for user preferences during a session.
+`AppViewModel` is managed by Koin and acts as the single source of truth for user preferences.
 
 ---
 
@@ -163,7 +162,7 @@ RootNode                    ← ParentNode, owns BackStack<NavTarget>
 | File | Purpose |
 |------|---------|
 | `GameScreen.kt` | Root game composable |
-| `GameNode.kt` | Appyx `Node` for the game screen |
+| `GameNode.kt` | Appyx `Node` for the game screen (uses `KoinComponent` for injection) |
 | `engine/GameEngine.kt` | ViewModel: board state, lives, level progression, input routing |
 | `engine/LevelManager.kt` | Level generation, difficulty scaling, shape selection |
 | `engine/InputHandler.kt` | Maps touch coordinates to board cells |
@@ -195,7 +194,7 @@ Test coverage: `GameEngineTapTest`, `GameEngineShapeLogicTest`, `CustomGameShape
 | File | Purpose |
 |------|---------|
 | `SettingsScreen.kt` | Theme, animation speed, sound/vibration toggles |
-| `SettingsNode.kt` | Appyx `Node` wrapping the screen |
+| `SettingsNode.kt` | Appyx `Node` wrapping the screen (uses `KoinComponent` for injection) |
 | `AdSettingsSection.kt` | Ad-free unlock UI (progress bar, "watch 30 ads") |
 | `ThirdPartyLicensesDialog.kt` | Open-source license browser (aboutlibraries) |
 | `DebugComponents.kt` | Debug menu: force dimensions, lives, shapes |
@@ -244,14 +243,6 @@ Test coverage: `GameEngineTapTest`, `GameEngineShapeLogicTest`, `CustomGameShape
 | `GenerationUtils.kt` | Line-of-sight checks, cell validation helpers |
 | `BoardImageProcessor.kt` | Reads custom board shapes from image pixel data |
 
-#### Board Generator
-
-`GameGenerator` builds each level by:
-1. Placing snakes (sequences of directional arrows) on the board
-2. Filling the board while respecting shape boundaries and walls
-3. Running `SolvabilityChecker` to confirm the board can be completed
-4. Retrying with adjusted parameters if generation fails
-
 ---
 
 ### `:data`
@@ -269,8 +260,6 @@ Test coverage: `GameEngineTapTest`, `GameEngineShapeLogicTest`, `CustomGameShape
 | `AndroidResourceBoardShapeProvider.kt` | `BoardShapeProvider` backed by Android resources |
 | `DataStoreMigration.kt` | One-time migration from DataStore preferences to Room |
 
-**Schema migrations:** v1 → v2 added game board persistence tables.
-
 ---
 
 ### `:ads`
@@ -283,12 +272,6 @@ Test coverage: `GameEngineTapTest`, `GameEngineShapeLogicTest`, `CustomGameShape
 | `ConsentManager.kt` | Google UMP consent flow (GDPR / regional) |
 | `BannerAdView.kt` | Composable banner ad |
 
-| Ad type | Debug unit ID | Release unit ID |
-|---------|--------------|----------------|
-| Banner | Google test ID | `ca-app-pub-9667420067790140/3105779401` |
-| Rewarded | Google test ID | `ca-app-pub-9667420067790140/6849583291` |
-| Interstitial | Google test ID | `ca-app-pub-9667420067790140/3415454308` |
-
 ---
 
 ## Tech Stack
@@ -298,6 +281,7 @@ Test coverage: `GameEngineTapTest`, `GameEngineShapeLogicTest`, `CustomGameShape
 | Language | Kotlin 2.3.10 (JVM 11) |
 | UI | Jetpack Compose (BOM 2026.02.00), Material 3 |
 | Navigation | Appyx 1.7.1 |
+| Dependency Injection | Koin 4.0.0 |
 | Database | Room 2.8.4 |
 | Ads | Google Mobile Ads 25.0.0, UMP 4.0.0 |
 | Concurrency | kotlinx-coroutines 1.10.2 |

@@ -24,6 +24,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.koin.android)
     api(libs.play.services.ads)
     api(libs.google.ump)
 }

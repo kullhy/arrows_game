@@ -12,6 +12,7 @@ espressoCore = "3.7.0"
 jacocoVersion = "0.8.13"
 junit = "4.13.2"
 junitVersion = "1.3.0"
+koin = "4.0.0"
 konfetti = "2.0.5"
 kotlin = "2.3.10"
 kotlinReflect = "2.3.10"
@@ -48,6 +49,8 @@ androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = 
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
+koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
 konfetti-compose = { group = "nl.dionsegijn", name = "konfetti-compose", version.ref = "konfetti" }
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlinReflect" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutinesTest" }
