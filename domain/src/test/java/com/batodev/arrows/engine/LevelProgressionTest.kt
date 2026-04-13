@@ -18,11 +18,11 @@ class LevelProgressionTest {
         // Test L11: Base 10x10, Step 1. Reduction 3. Expected 7x7, 4 lives.
         verifyLevel(11, expectedW = 7, expectedH = 7, expectedLives = 4)
 
-        // Test L20: Base 15x14, Step 2. Reduction 6. Expected 9x8, 3 lives.
-        verifyLevel(20, expectedW = 9, expectedH = 8, expectedLives = 3)
+        // Test L20: Extra scaling after level 15 increases reduction and lowers lives.
+        verifyLevel(20, expectedW = 8, expectedH = 7, expectedLives = 2)
 
-        // Test L50: Lives should be at least 1.
-        verifyLevel(50, expectedW = 15, expectedH = 14, expectedLives = 1)
+        // Test L50: Lives clamp to 1 despite aggressive late-game scaling.
+        verifyLevel(50, expectedW = 12, expectedH = 11, expectedLives = 1)
     }
 
     private fun verifyLevel(levelNum: Int, expectedW: Int, expectedH: Int, expectedLives: Int) {
