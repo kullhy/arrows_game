@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -40,6 +41,7 @@ fun SettingsGroup(backgroundColor: Color, content: @Composable () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .shadow(4.dp, RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
             .background(backgroundColor)
             .padding(vertical = 8.dp)
@@ -75,7 +77,7 @@ fun SettingsSwitchItem(
             text = title,
             color = White,
             fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1f)
         )
         Switch(
@@ -119,7 +121,7 @@ fun SettingsClickableItem(
             text = title,
             color = White,
             fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1f)
         )
         if (valueText != null) {

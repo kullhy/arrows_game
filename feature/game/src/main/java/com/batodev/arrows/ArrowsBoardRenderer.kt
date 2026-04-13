@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.batodev.arrows.feature.game.BuildConfig
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -86,6 +87,8 @@ object ArrowsBoardRenderer {
                 drawDebugBorder(leftOffset, topOffset, metrics)
             }
 
+            drawBoardSurface(leftOffset, topOffset, metrics, themeColors)
+
             drawContext.canvas.save()
             drawContext.canvas.translate(leftOffset, topOffset)
 
@@ -150,6 +153,28 @@ object ArrowsBoardRenderer {
             topLeft = Offset(leftOffset, topOffset),
             size = Size(metrics.boardWidth, metrics.boardHeight),
             style = Stroke(width = GameConstants.BOARD_BORDER_WIDTH)
+        )
+    }
+
+    private fun DrawScope.drawBoardSurface(
+        leftOffset: Float,
+        topOffset: Float,
+        metrics: BoardMetrics,
+        themeColors: ThemeColors,
+    ) {
+        val padding = 12.dp.toPx()
+        val radius = 18.dp.toPx()
+        drawRoundRect(
+            color = themeColors.bottomBar.copy(alpha = 0.35f),
+            topLeft = Offset(leftOffset - padding + 4.dp.toPx(), topOffset - padding + 6.dp.toPx()),
+            size = Size(metrics.boardWidth + padding * 2, metrics.boardHeight + padding * 2),
+            cornerRadius = CornerRadius(radius, radius)
+        )
+        drawRoundRect(
+            color = themeColors.topBarButton.copy(alpha = 0.58f),
+            topLeft = Offset(leftOffset - padding, topOffset - padding),
+            size = Size(metrics.boardWidth + padding * 2, metrics.boardHeight + padding * 2),
+            cornerRadius = CornerRadius(radius, radius)
         )
     }
 

@@ -68,6 +68,7 @@ import com.batodev.arrows.ui.AppNavigationBar
 import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.core.resources.R
 import com.batodev.arrows.ui.NavigationDestination
+import com.batodev.arrows.ui.PuzzleBackground
 import com.batodev.arrows.ui.ads.BannerAdView
 import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.ThemeColors
@@ -146,7 +147,14 @@ private fun GenerateScaffoldContent(state: GenerateScaffoldState) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.custom_gen_title), color = White) },
+                title = {
+                    Text(
+                        stringResource(R.string.custom_gen_title).uppercase(),
+                        color = state.themeColors.accent,
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 1.sp
+                    )
+                },
                 navigationIcon = {
                     IconButton(
                         onClick = state.onBack,
@@ -158,7 +166,7 @@ private fun GenerateScaffoldContent(state: GenerateScaffoldState) {
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = state.themeColors.background)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = state.themeColors.topBarButton)
             )
         },
         bottomBar = {
@@ -189,7 +197,7 @@ private fun GenerateScaffoldContent(state: GenerateScaffoldState) {
             )
             GenerateContent(contentState)
         } else {
-            Box(modifier = Modifier.fillMaxSize().padding(innerPadding))
+            PuzzleBackground(modifier = Modifier.fillMaxSize().padding(innerPadding)) {}
         }
     }
 }
@@ -275,77 +283,80 @@ private fun GenerateContent(state: GenerateContentState) {
         label = "button_pulse_scale"
     )
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(state.innerPadding)
-            .padding(horizontal = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        item {
-            Spacer(modifier = Modifier.height(24.dp))
-            SizeSlider(
-                label = stringResource(R.string.width_label),
-                value = state.width,
-                maxSize = state.maxSize,
-                onValueChange = state.onWidthChange,
-                themeColors = state.themeColors,
-                modifier = widthSliderMod
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            SizeSlider(
-                label = stringResource(R.string.height_label),
-                value = state.height,
-                maxSize = state.maxSize,
-                onValueChange = state.onHeightChange,
-                themeColors = state.themeColors,
-                modifier = heightSliderMod
-            )
-            Spacer(modifier = Modifier.height(32.dp))
-        }
+    PuzzleBackground(modifier = Modifier.fillMaxSize().padding(state.innerPadding)) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+                SizeSlider(
+                    label = stringResource(R.string.width_label),
+                    value = state.width,
+                    maxSize = state.maxSize,
+                    onValueChange = state.onWidthChange,
+                    themeColors = state.themeColors,
+                    modifier = widthSliderMod
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                SizeSlider(
+                    label = stringResource(R.string.height_label),
+                    value = state.height,
+                    maxSize = state.maxSize,
+                    onValueChange = state.onHeightChange,
+                    themeColors = state.themeColors,
+                    modifier = heightSliderMod
+                )
+                Spacer(modifier = Modifier.height(32.dp))
+            }
 
-        item {
-            Column(modifier = shapeSectionMod.fillMaxWidth()) {
-                ShapeSectionHeader()
-                Spacer(modifier = Modifier.height(12.dp))
-                state.shapes.chunked(SHAPES_PER_ROW).forEachIndexed { rowIndex, row ->
-                    ShapeRow(
-                        shapes = row,
-                        rowIndex = rowIndex,
-                        selectedShape = state.selectedShape,
-                        themeColors = state.themeColors,
-                        onShapeSelected = state.onShapeSelected
-                    )
+            item {
+                Column(modifier = shapeSectionMod.fillMaxWidth()) {
+                    ShapeSectionHeader()
                     Spacer(modifier = Modifier.height(12.dp))
+                    state.shapes.chunked(SHAPES_PER_ROW).forEachIndexed { rowIndex, row ->
+                        ShapeRow(
+                            shapes = row,
+                            rowIndex = rowIndex,
+                            selectedShape = state.selectedShape,
+                            themeColors = state.themeColors,
+                            onShapeSelected = state.onShapeSelected
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
                 }
             }
-        }
 
-        item {
-            Spacer(modifier = Modifier.height(32.dp))
-            Button(
-                onClick = state.onStartClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .offset { IntOffset(0, buttonEntryOffset.dp.roundToPx()) }
-                    .graphicsLayer {
-                        alpha = buttonEntryAlpha
-                        scaleX = buttonPulseScale
-                        scaleY = buttonPulseScale
-                    },
-                colors = ButtonDefaults.buttonColors(containerColor = state.themeColors.accent),
-                shape = MaterialTheme.shapes.extraLarge
-            ) {
-                Icon(Icons.Default.AutoAwesome, contentDescription = null)
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(
-                    text = stringResource(R.string.generate_start_label),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
+            item {
+                Spacer(modifier = Modifier.height(32.dp))
+                Button(
+                    onClick = state.onStartClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .offset { IntOffset(0, buttonEntryOffset.dp.roundToPx()) }
+                        .graphicsLayer {
+                            alpha = buttonEntryAlpha
+                            scaleX = buttonPulseScale
+                            scaleY = buttonPulseScale
+                        },
+                    colors = ButtonDefaults.buttonColors(containerColor = state.themeColors.accent),
+                    shape = MaterialTheme.shapes.medium,
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp, pressedElevation = 2.dp)
+                ) {
+                    Icon(Icons.Default.AutoAwesome, contentDescription = null)
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = stringResource(R.string.generate_start_label).uppercase(),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 1.sp
+                    )
+                }
+                Spacer(modifier = Modifier.height(24.dp))
             }
-            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
@@ -382,7 +393,7 @@ private fun ShapeSectionHeader() {
         text = stringResource(R.string.shape_label),
         color = White,
         fontSize = 18.sp,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.Black,
         modifier = Modifier.fillMaxWidth()
     )
 }
@@ -437,7 +448,7 @@ private fun SizeSlider(
     )
     Column(modifier = modifier.fillMaxWidth()) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = label, color = White, fontSize = 16.sp)
+            Text(text = label.uppercase(), color = White, fontSize = 16.sp, fontWeight = FontWeight.Black)
             Spacer(modifier = Modifier.weight(1f))
             Text(
                 text = intValue.toString(),
@@ -510,7 +521,8 @@ private fun ShapeItem(
             containerColor = containerColor,
             contentColor = White
         ),
-        shape = MaterialTheme.shapes.medium
+        shape = MaterialTheme.shapes.small,
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isSelected) 8.dp else 3.dp)
     ) {
         Box(
             modifier = Modifier.padding(12.dp),

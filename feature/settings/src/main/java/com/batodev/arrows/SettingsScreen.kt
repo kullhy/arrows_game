@@ -38,6 +38,7 @@ import com.batodev.arrows.ui.NavigationDestination
 import com.batodev.arrows.ui.PreferencesParams
 import com.batodev.arrows.ui.PreferencesSection
 import com.batodev.arrows.ui.PurchasesSection
+import com.batodev.arrows.ui.PuzzleBackground
 import com.batodev.arrows.ui.ThemeSelectionDialog
 import com.batodev.arrows.ui.ThirdPartyLicensesDialog
 import com.batodev.arrows.ui.ads.BannerAdView
@@ -145,47 +146,52 @@ private fun SettingsScaffold(params: SettingsScaffoldParams) {
             }
         }
     ) {
-        Column(
+        PuzzleBackground(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-            Box(modifier = Modifier.settingsEntryModifier(visible, sectionIndex = 0)) {
-                PreferencesSection(
-                    PreferencesParams(
-                        params.viewModel, params.themeColors, params.currentTheme, params.currentSpeed,
-                        params.onThemeClick, params.onSpeedClick
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Box(modifier = Modifier.settingsEntryModifier(visible, sectionIndex = 0)) {
+                    PreferencesSection(
+                        PreferencesParams(
+                            params.viewModel, params.themeColors, params.currentTheme, params.currentSpeed,
+                            params.onThemeClick, params.onSpeedClick
+                        )
                     )
-                )
-            }
-            Box(modifier = Modifier.settingsEntryModifier(visible, sectionIndex = 1)) {
-                FeedbackSection(params.context, params.themeColors)
-            }
-            Box(modifier = Modifier.settingsEntryModifier(visible, sectionIndex = 2)) {
-                PurchasesSection(
-                    viewModel = params.viewModel,
-                    rewardAdManager = params.rewardAdManager,
-                    themeColors = params.themeColors
-                )
-            }
-            Box(modifier = Modifier.settingsEntryModifier(visible, sectionIndex = 3)) {
-                LegalSection(
-                    params.context,
-                    params.themeColors,
-                    params.onLicensesClick,
-                    showPrivacyOptions = params.consentManager.isPrivacyOptionsRequired,
-                    onPrivacyOptionsClick = {
-                        (params.context as? Activity)?.let { activity ->
-                            params.consentManager.showPrivacyOptionsForm(activity) { }
+                }
+                Box(modifier = Modifier.settingsEntryModifier(visible, sectionIndex = 1)) {
+                    FeedbackSection(params.context, params.themeColors)
+                }
+                Box(modifier = Modifier.settingsEntryModifier(visible, sectionIndex = 2)) {
+                    PurchasesSection(
+                        viewModel = params.viewModel,
+                        rewardAdManager = params.rewardAdManager,
+                        themeColors = params.themeColors
+                    )
+                }
+                Box(modifier = Modifier.settingsEntryModifier(visible, sectionIndex = 3)) {
+                    LegalSection(
+                        params.context,
+                        params.themeColors,
+                        params.onLicensesClick,
+                        showPrivacyOptions = params.consentManager.isPrivacyOptionsRequired,
+                        onPrivacyOptionsClick = {
+                            (params.context as? Activity)?.let { activity ->
+                                params.consentManager.showPrivacyOptionsForm(activity) { }
+                            }
                         }
-                    }
-                )
+                    )
+                }
+                if (BuildConfig.DRAW_DEBUG_STUFF) DebugMenu(params.viewModel)
             }
-            if (BuildConfig.DRAW_DEBUG_STUFF) DebugMenu(params.viewModel)
         }
     }
 }

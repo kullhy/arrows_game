@@ -1,5 +1,6 @@
 package com.batodev.arrows.ui
 
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
@@ -12,7 +13,11 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.batodev.arrows.GameConstants
 import com.batodev.arrows.core.resources.R
 import com.batodev.arrows.ui.theme.InactiveIcon
@@ -33,7 +38,10 @@ fun AppNavigationBar(
 
     NavigationBar(
         containerColor = themeColors.bottomBar,
-        contentColor = White
+        contentColor = White,
+        modifier = Modifier
+            .shadow(8.dp)
+            .height(72.dp)
     ) {
         GeneratorNavigationItem(
             isUnlocked = isGeneratorUnlocked,
@@ -60,7 +68,7 @@ fun RowScope.HomeNavigationItem(selected: Boolean, onNavigate: () -> Unit) {
                 contentDescription = stringResource(R.string.home_label)
             )
         },
-        label = { Text(stringResource(R.string.home_label)) },
+        label = { Text(stringResource(R.string.home_label), fontWeight = FontWeight.Black) },
         selected = selected,
         onClick = {
             if (!selected) {
@@ -86,7 +94,7 @@ fun RowScope.SettingsNavigationItem(selected: Boolean, onNavigate: () -> Unit) {
                 contentDescription = stringResource(R.string.settings_label)
             )
         },
-        label = { Text(stringResource(R.string.settings_label)) },
+        label = { Text(stringResource(R.string.settings_label), fontWeight = FontWeight.Black) },
         selected = selected,
         onClick = {
             if (!selected) {
@@ -111,7 +119,7 @@ fun RowScope.GeneratorNavigationItem(isUnlocked: Boolean, selected: Boolean = fa
 
     NavigationBarItem(
         icon = { Icon(icon, contentDescription = stringResource(R.string.content_description_generate)) },
-        label = { Text(label) },
+        label = { Text(label, fontWeight = FontWeight.Black) },
         selected = selected,
         onClick = {
             if (isUnlocked && !selected) {

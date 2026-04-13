@@ -31,7 +31,8 @@ class GameNode(
     buildContext: BuildContext,
     private val appViewModel: AppViewModel,
     private val customParams: CustomGameParams,
-    private val onBack: () -> Unit
+    private val onBack: () -> Unit,
+    private val onOpenDebugLevel: () -> Unit
 ) : Node(buildContext), KoinComponent {
 
     private val rewardAdManager: RewardAdManager by inject()
@@ -73,7 +74,8 @@ class GameNode(
                     userPreferencesRepository = userPreferencesRepository,
                     gameStateDao = gameStateDao,
                     customParams = customParams,
-                    onBack = onBack
+                    onBack = onBack,
+                    onOpenDebugLevel = onOpenDebugLevel
                 )
             }
         }

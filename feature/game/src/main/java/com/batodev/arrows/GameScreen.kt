@@ -60,6 +60,7 @@ import com.batodev.arrows.data.UserPreferencesRepository
 import com.batodev.arrows.engine.GameEngine
 import com.batodev.arrows.engine.GameUiState
 import com.batodev.arrows.ui.AppViewModel
+import com.batodev.arrows.ui.PuzzleBackground
 import com.batodev.arrows.ui.ads.BannerAdView
 import com.batodev.arrows.ui.game.GameProgressBar
 import com.batodev.arrows.ui.game.GameTopBar
@@ -106,7 +107,8 @@ fun ArrowsGameView(
     userPreferencesRepository: UserPreferencesRepository,
     gameStateDao: GameStateDao,
     customParams: CustomGameParams = CustomGameParams(false, null, null, null),
-    onBack: () -> Unit = {}
+    onBack: () -> Unit = {},
+    onOpenDebugLevel: () -> Unit = {}
 ) {
     val coroutineScope = rememberCoroutineScope()
     val view = LocalView.current
@@ -157,7 +159,7 @@ fun ArrowsGameView(
                 engine, uiState, activity, context, tapAnimations, guidanceAlpha, showGuidanceLines,
                 themeColors, rewardAdManager, isAdFree, isAdLoaded, isAdLoading, handleHint,
                 { showGuidanceLines = !showGuidanceLines }, showCelebrationVideo, onCelebrationComplete,
-                introState.showIntro, introState.onDismiss, onBack
+                introState.showIntro, introState.onDismiss, onBack, onOpenDebugLevel
             )
         )
     }
@@ -225,6 +227,9 @@ private fun ColumnScope.GameArea(params: GameAreaParams) {
         BoardLayer(params.engine, params.uiState, params.guidanceAlpha)
         ResetViewButton(params.themeColors) { params.engine.transformationState.reset() }
         GuidanceToggleButton(params.showGuidanceLines, params.themeColors, params.onToggleGuidance)
+        if (BuildConfig.DEBUG) {
+            DebugLevelButton(params.themeColors, params.onOpenDebugLevel)
+        }
         if (BuildConfig.DRAW_DEBUG_STUFF) DebugOverlay(params.tapAnimations)
         TapAnimationsLayer(params.tapAnimations)
         when (val state = params.uiState) {
@@ -258,32 +263,35 @@ private fun ColumnScope.GameArea(params: GameAreaParams) {
 @Composable
 private fun GameScreenContent(params: GameScreenContentParams) {
     val playing = params.uiState as? GameUiState.Playing
-    Column(modifier = Modifier.fillMaxSize()) {
-        GameTopBar(
-            state = GameTopBarState(
-                lives = playing?.lives ?: params.engine.lives,
-                maxLives = playing?.maxLives ?: params.engine.maxLives,
-                hintState = HintButtonState(params.isAdFree, params.isAdLoaded, params.isAdLoading)
-            ),
-            callbacks = GameTopBarCallbacks(
-                onRestart = { params.engine.restartLevel() },
-                onHint = params.handleHint,
-                onBack = params.onBack
+    PuzzleBackground(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            GameTopBar(
+                state = GameTopBarState(
+                    lives = playing?.lives ?: params.engine.lives,
+                    maxLives = playing?.maxLives ?: params.engine.maxLives,
+                    hintState = HintButtonState(params.isAdFree, params.isAdLoaded, params.isAdLoading)
+                ),
+                callbacks = GameTopBarCallbacks(
+                    onRestart = { params.engine.restartLevel() },
+                    onHint = params.handleHint,
+                    onBack = params.onBack
+                )
             )
-        )
-        GameProgressBar(
-            totalSnakes = playing?.totalSnakes ?: params.engine.totalSnakesInLevel,
-            currentSnakes = (playing?.level ?: params.engine.level).snakes.size
-        )
-        GameArea(
-            GameAreaParams(
-                params.engine, params.uiState, params.tapAnimations, params.guidanceAlpha,
-                params.showGuidanceLines, params.themeColors, params.rewardAdManager, params.activity,
-                params.isAdFree, params.onToggleGuidance, params.showIntro, params.onDismissIntro
+            GameProgressBar(
+                totalSnakes = playing?.totalSnakes ?: params.engine.totalSnakesInLevel,
+                currentSnakes = (playing?.level ?: params.engine.level).snakes.size
             )
-        )
-        if (!params.isAdFree) {
-            BannerAdView()
+            GameArea(
+                GameAreaParams(
+                    params.engine, params.uiState, params.tapAnimations, params.guidanceAlpha,
+                    params.showGuidanceLines, params.themeColors, params.rewardAdManager, params.activity,
+                    params.isAdFree, params.onToggleGuidance, params.showIntro, params.onDismissIntro,
+                    params.onOpenDebugLevel
+                )
+            )
+            if (!params.isAdFree) {
+                BannerAdView()
+            }
         }
     }
 }
@@ -356,6 +364,23 @@ private fun BoxScope.LoadingOverlay(progress: Float, themeColors: ThemeColors) {
             color = ProgressBarGreen,
             trackColor = themeColors.topBarButton
         )
+    }
+}
+
+@Composable
+private fun BoxScope.DebugLevelButton(themeColors: ThemeColors, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .padding(bottom = 8.dp)
+            .height(44.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = themeColors.accent,
+            contentColor = White
+        )
+    ) {
+        Text(text = "DEBUG LEVEL", fontWeight = FontWeight.Black)
     }
 }
 

@@ -9,9 +9,16 @@ java {
     targetCompatibility = JavaVersion.VERSION_11
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+    }
+}
+
 dependencies {
     compileOnly(libs.plugins.android.application.toDep())
     compileOnly(libs.plugins.android.library.toDep())
+    compileOnly(libs.plugins.kotlin.android.toDep())
     compileOnly(libs.plugins.kotlin.jvm.toDep())
     compileOnly(libs.plugins.kotlin.compose.toDep())
     compileOnly(libs.plugins.ksp.toDep())

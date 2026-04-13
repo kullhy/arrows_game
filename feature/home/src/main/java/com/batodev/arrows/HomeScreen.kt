@@ -41,6 +41,7 @@ import com.batodev.arrows.core.resources.R
 import com.batodev.arrows.ui.AppNavigationBar
 import com.batodev.arrows.ui.AppViewModel
 import com.batodev.arrows.ui.NavigationDestination
+import com.batodev.arrows.ui.PuzzleBackground
 import com.batodev.arrows.ui.ads.BannerAdView
 import com.batodev.arrows.ui.theme.LocalThemeColors
 import com.batodev.arrows.ui.theme.ThemeColors
@@ -78,19 +79,24 @@ fun MainScreen(
             }
         }
     ) { innerPadding ->
-        Column(
+        PuzzleBackground(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
         ) {
-            Spacer(modifier = Modifier.weight(1f))
-            LogoSection(levelNumber, themeColors, visible)
-            Spacer(modifier = Modifier.weight(1f))
-            PlayButton(hasSavedLevel, themeColors, visible, onPlay)
-            Spacer(modifier = Modifier.height(48.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
+                LogoSection(levelNumber, themeColors, visible)
+                Spacer(modifier = Modifier.weight(1f))
+                PlayButton(hasSavedLevel, themeColors, visible, onPlay)
+                Spacer(modifier = Modifier.height(48.dp))
+            }
         }
     }
 }
@@ -162,7 +168,7 @@ private fun LogoSection(levelNumber: Int, themeColors: ThemeColors, visible: Boo
             Text(
                 text = stringResource(R.string.logo_text),
                 fontSize = 40.sp,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.Black,
                 color = White
             )
         }
@@ -170,7 +176,7 @@ private fun LogoSection(levelNumber: Int, themeColors: ThemeColors, visible: Boo
         Text(
             text = stringResource(R.string.level_label, levelNumber),
             fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Black,
             color = themeColors.accent,
             modifier = Modifier.homeEntryModifier(visible, staggerIndex = 1)
         )
@@ -202,9 +208,10 @@ private fun PlayButton(isContinue: Boolean, themeColors: ThemeColors, visible: B
             .homeEntryModifier(visible, staggerIndex = 2)
             .graphicsLayer { scaleX = pulseScale; scaleY = pulseScale },
         colors = ButtonDefaults.buttonColors(containerColor = themeColors.accent),
-        shape = RoundedCornerShape(28.dp)
+        shape = RoundedCornerShape(14.dp),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp, pressedElevation = 2.dp)
     ) {
-        Text(text = text, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text(text = text.uppercase(), fontSize = 20.sp, fontWeight = FontWeight.Black, letterSpacing = 1.2.sp)
     }
 }
 

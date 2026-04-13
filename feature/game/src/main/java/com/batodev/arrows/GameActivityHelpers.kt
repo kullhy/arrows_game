@@ -54,7 +54,8 @@ data class GameAreaParams(
     val isAdFree: Boolean,
     val onToggleGuidance: () -> Unit,
     val showIntro: Boolean,
-    val onDismissIntro: () -> Unit
+    val onDismissIntro: () -> Unit,
+    val onOpenDebugLevel: () -> Unit
 )
 
 data class GameScreenContentParams(
@@ -76,7 +77,8 @@ data class GameScreenContentParams(
     val onCelebrationComplete: () -> Unit,
     val showIntro: Boolean,
     val onDismissIntro: () -> Unit,
-    val onBack: () -> Unit = {}
+    val onBack: () -> Unit = {},
+    val onOpenDebugLevel: () -> Unit = {}
 )
 
 data class HintHandlerParams(
@@ -140,7 +142,7 @@ fun BoxScope.GuidanceToggleButton(
         onClick = onToggleGuidance,
         modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp).size(48.dp),
         colors = IconButtonDefaults.iconButtonColors(
-            containerColor = if (showGuidanceLines) themeColors.accent else themeColors.topBarButton,
+            containerColor = if (showGuidanceLines) themeColors.accent else themeColors.bottomBar,
             contentColor = White
         )
     ) {
@@ -161,7 +163,7 @@ fun BoxScope.ResetViewButton(
         onClick = onResetView,
         modifier = Modifier.align(Alignment.BottomStart).padding(8.dp).size(48.dp),
         colors = IconButtonDefaults.iconButtonColors(
-            containerColor = themeColors.topBarButton,
+            containerColor = themeColors.bottomBar,
             contentColor = White
         )
     ) {

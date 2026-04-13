@@ -1,5 +1,6 @@
 package com.batodev.arrows.ui.game
 
+import androidx.compose.foundation.background
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
@@ -29,8 +30,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.batodev.arrows.GameConstants
@@ -64,7 +67,11 @@ fun GameTopBar(state: GameTopBarState, callbacks: GameTopBarCallbacks) {
     val themeColors = LocalThemeColors.current
 
     Row(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(4.dp)
+            .background(themeColors.topBarButton)
+            .padding(horizontal = 14.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -79,7 +86,7 @@ private fun GameControls(onBack: () -> Unit, onRestart: () -> Unit, themeColors:
     Row(verticalAlignment = Alignment.CenterVertically) {
         IconButton(
             onClick = onBack,
-            colors = IconButtonDefaults.iconButtonColors(containerColor = themeColors.topBarButton),
+            colors = IconButtonDefaults.iconButtonColors(containerColor = themeColors.bottomBar),
             modifier = Modifier.size(40.dp)
         ) {
             Icon(
@@ -91,7 +98,7 @@ private fun GameControls(onBack: () -> Unit, onRestart: () -> Unit, themeColors:
         Spacer(modifier = Modifier.width(8.dp))
         IconButton(
             onClick = onRestart,
-            colors = IconButtonDefaults.iconButtonColors(containerColor = themeColors.topBarButton),
+            colors = IconButtonDefaults.iconButtonColors(containerColor = themeColors.bottomBar),
             modifier = Modifier.size(40.dp)
         ) {
             Icon(
@@ -132,7 +139,7 @@ private fun HintButton(themeColors: ThemeColors, onClick: () -> Unit, state: Hin
     Button(
         onClick = onClick,
         enabled = buttonEnabled,
-        colors = ButtonDefaults.buttonColors(containerColor = themeColors.topBarButton, contentColor = White),
+        colors = ButtonDefaults.buttonColors(containerColor = themeColors.bottomBar, contentColor = White),
         shape = RoundedCornerShape(12.dp),
         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
         modifier = Modifier.height(40.dp)
@@ -143,7 +150,7 @@ private fun HintButton(themeColors: ThemeColors, onClick: () -> Unit, state: Hin
             modifier = Modifier.size(16.dp)
         )
         Spacer(modifier = Modifier.width(4.dp))
-        Text(text = buttonText, fontSize = 12.sp)
+        Text(text = buttonText.uppercase(), fontSize = 12.sp, fontWeight = FontWeight.Black, letterSpacing = 0.7.sp)
     }
 }
 

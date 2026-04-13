@@ -40,7 +40,8 @@ class RootNode(
             buildContext = buildContext,
             appViewModel = appViewModel,
             customParams = navTarget.toCustomGameParams(),
-            onBack = { backStack.pop() }
+            onBack = { backStack.pop() },
+            onOpenDebugLevel = { backStack.push(NavTarget.Generate) }
         )
         NavTarget.Generate -> GenerateNode(
             buildContext = buildContext,
