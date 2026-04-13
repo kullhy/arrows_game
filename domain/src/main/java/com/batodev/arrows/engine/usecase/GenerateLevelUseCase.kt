@@ -1,6 +1,5 @@
 package com.batodev.arrows.engine.usecase
 
-import com.batodev.arrows.GameConstants
 import com.batodev.arrows.engine.BoardShape
 import com.batodev.arrows.engine.BoardShapeProvider
 import com.batodev.arrows.engine.GameGenerator
@@ -8,6 +7,7 @@ import com.batodev.arrows.engine.GameLevel
 import com.batodev.arrows.engine.LevelConfiguration
 import com.batodev.arrows.engine.LevelProgression
 import com.batodev.arrows.engine.GenerationParams
+import com.batodev.arrows.engine.ShapeProgressionPolicy
 import kotlin.random.Random
 
 /**
@@ -41,7 +41,7 @@ class GenerateLevelUseCase(
         val config = LevelProgression.calculateLevelConfiguration(
             params.levelNumber, params.forcedWidth, params.forcedHeight, params.forcedLives
         )
-        val shape = selectShape(config, params.forcedShape, params.isCustomGame)
+        val shape = selectShape(config, params.levelNumber, params.forcedShape, params.isCustomGame)
         val level = gameGenerator.generateSolvableLevel(
             GenerationParams(
                 width = config.width,
@@ -57,26 +57,13 @@ class GenerateLevelUseCase(
 
     private fun selectShape(
         config: LevelConfiguration,
+        levelNumber: Int,
         forcedShape: String?,
         isCustomGame: Boolean,
     ): BoardShape? = when {
         forcedShape != null -> shapeProvider?.getShapeByName(forcedShape)
         isCustomGame -> null
-        shouldApplyShape(config) -> shapeProvider?.getRandomShape()
+        ShapeProgressionPolicy.shouldApplyShape(config, levelNumber, random) -> shapeProvider?.getRandomShape()
         else -> null
-    }
-
-    private fun shouldApplyShape(config: LevelConfiguration): Boolean {
-        val size = maxOf(config.width, config.height)
-        val probability = when {
-            size < GameConstants.MIN_BOARD_SIZE_FOR_SHAPES -> 0f
-            size >= GameConstants.MAX_BOARD_SIZE_FOR_ALWAYS_SHAPE -> 1f
-            else -> {
-                val ratio = (size - GameConstants.MIN_BOARD_SIZE_FOR_SHAPES).toFloat() /
-                    (GameConstants.MAX_BOARD_SIZE_FOR_ALWAYS_SHAPE - GameConstants.MIN_BOARD_SIZE_FOR_SHAPES)
-                GameConstants.BASE_SHAPE_PROBABILITY + (1f - GameConstants.BASE_SHAPE_PROBABILITY) * ratio
-            }
-        }
-        return random.nextFloat() < probability
     }
 }
