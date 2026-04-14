@@ -192,10 +192,18 @@ class SnakeBuilder {
 
   List<BoardPoint> _findBestRecursiveSnake(SnakeRecursiveParams params, List<Direction> possible) {
     final tail = params.body.last;
-    final ordered = GenerationUtils.getOrderedDirections(possible, params.prevDir, straightPreference, rnd);
     
+    // --- PRO ARCHITECTURAL LOGIC ---
+    // Instead of just straight/random, we prioritize 'contact' with existing snakes or walls.
+    // This creates 'interlocking' puzzles where snakes are tightly packed.
+    possible.sort((a, b) {
+      final scoreA = _calculateClusteringScore(params, tail + a);
+      final scoreB = _calculateClusteringScore(params, tail + b);
+      return scoreB.compareTo(scoreA); // Higher score first
+    });
+
     var best = params.body;
-    for (final direction in ordered) {
+    for (final direction in possible) {
       final nextParams = params.copyWith(
         body: [...params.body, tail + direction],
         prevDir: direction,
@@ -205,6 +213,24 @@ class SnakeBuilder {
       if (candidate.length > best.length) best = candidate;
     }
     return best;
+  }
+
+  int _calculateClusteringScore(SnakeRecursiveParams params, BoardPoint p) {
+    int score = 0;
+    // Check neighbors for existing snakes or walls
+    for (final dir in Direction.values) {
+      final neighbor = p + dir;
+      if (!GenerationUtils.isInside(neighbor, params.config.width, params.config.height)) {
+        score += 2; // Wall contact is good for architecture
+      } else if (params.occupied[neighbor.x][neighbor.y]) {
+        score += 3; // Snake contact creates tight interlocking
+      }
+    }
+    // High straight preference bonus to create 'blocking beams'
+    // if (params.prevDir != null && (p - params.body.last) == Direction.toPoint(params.prevDir)) {
+    //   score += 1;
+    // }
+    return score;
   }
 
   bool _canPlaceSegment(SnakeRecursiveParams params, BoardPoint next) {

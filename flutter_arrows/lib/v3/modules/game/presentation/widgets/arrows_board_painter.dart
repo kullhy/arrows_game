@@ -203,11 +203,18 @@ class ArrowsBoardPainter extends CustomPainter {
       final headCx = headCx0 + snake.headDirection.dx * shift;
       final headCy = headCy0 + snake.headDirection.dy * shift;
 
-      final lineEndX = headCx + snake.headDirection.dx * metrics.cornerRadius;
-      final lineEndY = headCy + snake.headDirection.dy * metrics.cornerRadius;
+      // ADJUSTMENT: Stop the line EARLIER to let the arrowhead TIP land at the corner position
+      // The tip will be at distance 'cornerRadius' from center.
+      // So the line base should be at distance 'cornerRadius - arrowHeadLength'.
+      final arrowLength = metrics.arrowHeadSize; // Length from base to tip
+      final tipX = headCx + snake.headDirection.dx * metrics.cellWidth * 0.42; 
+      final tipY = headCy + snake.headDirection.dy * metrics.cellHeight * 0.42;
 
-      final baseLineEndX0 = headCx0 + snake.headDirection.dx * metrics.cornerRadius;
-      final baseLineEndY0 = headCy0 + snake.headDirection.dy * metrics.cornerRadius;
+      final lineEndX = tipX - snake.headDirection.dx * (arrowLength * 0.6);
+      final lineEndY = tipY - snake.headDirection.dy * (arrowLength * 0.6);
+
+      final baseLineEndX0 = headCx0 + snake.headDirection.dx * (metrics.cellWidth * 0.42 - arrowLength * 0.6);
+      final baseLineEndY0 = headCy0 + snake.headDirection.dy * (metrics.cellHeight * 0.42 - arrowLength * 0.6);
 
       // Draw Shadow First
       final shadowPaint = Paint()
@@ -283,15 +290,14 @@ class ArrowsBoardPainter extends CustomPainter {
       }
 
       if (entryP == null) {
-        final triangleCenterX =
-            lineEndX + snake.headDirection.dx * (metrics.arrowHeadSize * GameConstants.arrowHeadCenterFactor);
-        final triangleCenterY =
-            lineEndY + snake.headDirection.dy * (metrics.arrowHeadSize * GameConstants.arrowHeadCenterFactor);
-
-        _drawArrowHead(
+        // Tip is exactly at tipX, tipY now.
+        // The _drawArrowHead takes centerX, centerY which is the base/center?
+        // Let's adjust _drawArrowHead to take the TIP coordinate.
+        
+        _drawArrowHeadAtTip(
           canvas,
-          triangleCenterX,
-          triangleCenterY,
+          tipX,
+          tipY,
           snake.headDirection,
           metrics.arrowHeadSize,
           snakeColor,
@@ -327,28 +333,48 @@ class ArrowsBoardPainter extends CustomPainter {
 
     switch (snake.type) {
       case SnakeType.bomb:
-        // 1. Outer Glow
-        final glowPaint = Paint()
+        // --- 1. PREMIUM NAVAL MINE STYLE BOMB ---
+        final bombRect = Rect.fromCircle(center: center, radius: unit * 0.3);
+        
+        // Glow
+        canvas.drawCircle(center, unit * 0.35, Paint()
           ..color = Colors.red.withOpacity(0.3 * alpha)
-          ..maskFilter = MaskFilter.blur(BlurStyle.normal, unit * 0.15);
-        canvas.drawCircle(center, unit * 0.3, glowPaint);
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, unit * 0.1));
 
-        // 2. Bomb Body
+        // Spikes (Mine look)
+        final spikePaint = Paint()..color = const Color(0xFF333333).withOpacity(alpha);
+        for(int i=0; i<8; i++) {
+          final angle = i * pi / 4;
+          canvas.drawLine(
+            center + Offset(cos(angle) * unit * 0.2, sin(angle) * unit * 0.2),
+            center + Offset(cos(angle) * unit * 0.35, sin(angle) * unit * 0.35),
+            spikePaint..strokeWidth = unit * 0.08..strokeCap = StrokeCap.round
+          );
+        }
+
+        // Bomb Body
         final bombPaint = Paint()
           ..shader = RadialGradient(
-            colors: [const Color(0xFFFF5252), const Color(0xFFB71C1C)],
-          ).createShader(Rect.fromCircle(center: center, radius: unit * 0.25));
-        canvas.drawCircle(center, unit * 0.22, bombPaint);
+            colors: [const Color(0xFF444444), const Color(0xFF111111)],
+            stops: const [0.2, 1.0]
+          ).createShader(bombRect);
+        canvas.drawCircle(center, unit * 0.28, bombPaint);
+        
+        // Red Pulsing Core
+        canvas.drawCircle(center, unit * 0.15, Paint()
+          ..color = const Color(0xFFFF5252).withOpacity(alpha)
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, unit * 0.05));
 
-        // 3. Countdown Text
+        // Countdown Text
         final textPainter = TextPainter(
           text: TextSpan(
             text: '${snake.bombTimer}',
             style: TextStyle(
               color: Colors.white.withOpacity(alpha),
-              fontSize: unit * 0.28,
+              fontSize: unit * 0.32,
               fontWeight: FontWeight.w900,
-              shadows: [Shadow(color: Colors.black54, offset: Offset(0, 2), blurRadius: 4)],
+              fontFamily: 'Orbitron',
+              shadows: const [Shadow(color: Colors.black, blurRadius: 4, offset: Offset(0, 1))],
             ),
           ),
           textDirection: TextDirection.ltr,
@@ -358,55 +384,41 @@ class ArrowsBoardPainter extends CustomPainter {
         break;
 
       case SnakeType.locked:
-        // 1. Lock Body
-        final bodyRect = Rect.fromCenter(center: center.translate(0, unit * 0.05), width: unit * 0.35, height: unit * 0.28);
-        final bodyPaint = Paint()
-          ..shader = const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFFE0E0E0), Color(0xFF757575), Color(0xFF424242)],
-          ).createShader(bodyRect);
-        canvas.drawRRect(RRect.fromRectAndRadius(bodyRect, Radius.circular(unit * 0.05)), bodyPaint);
-
-        // 2. Shackle
-        final shacklePaint = Paint()
+        // --- 2. DYNAMIC IRON CHAIN WRAP ---
+        // The painter already has the full body path in _drawSnakeBodyInternal
+        // But for specific links, we can draw them here or in body draw.
+        // Let's add the Master Lock icon at the head.
+        
+        final lockBase = Rect.fromCenter(center: center.translate(0, unit * 0.08), width: unit * 0.4, height: unit * 0.3);
+        
+        // Metallic Body
+        canvas.drawRRect(RRect.fromRectAndRadius(lockBase, Radius.circular(unit * 0.05)), Paint()
+          ..shader = const LinearGradient(colors: [Color(0xFFE0E0E0), Color(0xFF616161)]).createShader(lockBase));
+        
+        // Shackle
+        final shackleRect = Rect.fromCenter(center: center.translate(0, -unit * 0.05), width: unit * 0.25, height: unit * 0.3);
+        canvas.drawArc(shackleRect, pi, pi, false, Paint()
           ..color = const Color(0xFFBDBDBD).withOpacity(alpha)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = unit * 0.06
-          ..strokeCap = StrokeCap.round;
-        final shackleRect = Rect.fromCenter(center: center.translate(0, -unit * 0.05), width: unit * 0.22, height: unit * 0.25);
-        canvas.drawArc(shackleRect, pi, pi, false, shacklePaint);
-
-        // 3. Keyhole
-        final keyholePaint = Paint()..color = Colors.black.withOpacity(0.7 * alpha);
-        canvas.drawCircle(center.translate(0, unit * 0.05), unit * 0.04, keyholePaint);
+          ..style = PaintingStyle.stroke..strokeWidth = unit * 0.08..strokeCap = StrokeCap.round);
+        
+        // Keyhole
+        canvas.drawCircle(center.translate(0, unit * 0.08), unit * 0.05, Paint()..color = Colors.black87);
         break;
 
       case SnakeType.key:
-        // Golden Metallic Gradient
+        // --- 3. PREMIUM GOLDEN KEY ---
         final keyPaint = Paint()
           ..shader = const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFFFFD54F), Color(0xFFF9A825), Color(0xFFFFD54F)],
-          ).createShader(Rect.fromCircle(center: center, radius: unit * 0.3));
+            colors: [Color(0xFFFFD700), Color(0xFFDAA520), Color(0xFFFFD700)],
+          ).createShader(Rect.fromCircle(center: center, radius: unit * 0.35));
 
-        // 1. Key Handle (Ring)
-        canvas.drawCircle(center.translate(-unit * 0.15, 0), unit * 0.12, keyPaint);
-        canvas.drawCircle(center.translate(-unit * 0.15, 0), unit * 0.06, Paint()..blendMode = BlendMode.clear);
-
-        // 2. Key Stem
-        canvas.drawRRect(
-          RRect.fromRectAndRadius(
-            Rect.fromLTWH(center.dx - unit * 0.05, center.dy - unit * 0.03, unit * 0.35, unit * 0.06),
-            Radius.circular(unit * 0.03),
-          ),
-          keyPaint,
-        );
-
-        // 3. Key Bits
-        canvas.drawRect(Rect.fromLTWH(center.dx + unit * 0.15, center.dy, unit * 0.05, unit * 0.1), keyPaint);
-        canvas.drawRect(Rect.fromLTWH(center.dx + unit * 0.25, center.dy, unit * 0.05, unit * 0.07), keyPaint);
+        canvas.drawCircle(center.translate(-unit * 0.2, 0), unit * 0.15, keyPaint);
+        canvas.drawCircle(center.translate(-unit * 0.2, 0), unit * 0.08, Paint()..blendMode = BlendMode.clear);
+        canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(center.dx - unit * 0.1, center.dy - unit * 0.04, unit * 0.45, unit * 0.08), Radius.circular(unit * 0.04)), keyPaint);
+        canvas.drawRect(Rect.fromLTWH(center.dx + unit * 0.2, center.dy, unit * 0.06, unit * 0.12), keyPaint);
+        canvas.drawRect(Rect.fromLTWH(center.dx + unit * 0.32, center.dy, unit * 0.06, unit * 0.08), keyPaint);
         break;
       default:
         break;
@@ -471,6 +483,36 @@ class ArrowsBoardPainter extends CustomPainter {
     }
 
     canvas.drawPath(path, paint);
+
+    // --- ADDED: DRAW CHAINS ON LOCKED SNAKES ---
+    if (snake.type == SnakeType.locked) {
+      final chainPaint = Paint()
+        ..color = const Color(0xFFBDBDBD).withOpacity(paint.color.opacity)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = metrics.strokeWidth * 0.4
+        ..strokeCap = StrokeCap.round;
+
+      final pathMetrics = path.computeMetrics();
+      for (final metric in pathMetrics) {
+        final length = metric.length;
+        const step = 15.0; // Distance between links
+        for (double d = 0; d < length; d += step) {
+          final tangent = metric.getTangentForOffset(d);
+          if (tangent != null) {
+            final pos = tangent.position;
+            final angle = tangent.angle;
+            
+            canvas.save();
+            canvas.translate(pos.dx, pos.dy);
+            canvas.rotate(angle + pi / 2);
+            // Draw link
+            final linkRect = Rect.fromCenter(center: Offset.zero, width: metrics.strokeWidth * 0.6, height: metrics.strokeWidth * 0.3);
+            canvas.drawRRect(RRect.fromRectAndRadius(linkRect, Radius.circular(metrics.strokeWidth * 0.1)), chainPaint);
+            canvas.restore();
+          }
+        }
+      }
+    }
   }
 
   Offset _calculateTailTipOffset(
@@ -518,10 +560,10 @@ class ArrowsBoardPainter extends CustomPainter {
     );
   }
 
-  void _drawArrowHead(
+  void _drawArrowHeadAtTip(
     Canvas canvas,
-    double centerX,
-    double centerY,
+    double tipX,
+    double tipY,
     game_dir.Direction direction,
     double arrowHeadSize,
     Color color,
@@ -534,18 +576,26 @@ class ArrowsBoardPainter extends CustomPainter {
     };
     final angle = angleDeg * GameConstants.degToRad;
 
+    // The tip is at (tipX, tipY). 
+    // The base of the triangle is 'arrowHeadSize' back from the tip.
     final path = Path();
-    path.moveTo(
-      centerX + arrowHeadSize * cos(angle),
-      centerY + arrowHeadSize * sin(angle),
+    path.moveTo(tipX, tipY); // Tip
+    
+    // Calculate the two base corners
+    final baseCenterX = tipX - arrowHeadSize * cos(angle);
+    final baseCenterY = tipY - arrowHeadSize * sin(angle);
+    
+    // Perpendicular direction for width
+    final perpAngle = angle + pi / 2;
+    final halfWidth = arrowHeadSize * 0.7; // Aspect ratio of arrow head
+
+    path.lineTo(
+      baseCenterX + halfWidth * cos(perpAngle),
+      baseCenterY + halfWidth * sin(perpAngle),
     );
     path.lineTo(
-      centerX + arrowHeadSize * cos(angle + GameConstants.angleTriangleOffset),
-      centerY + arrowHeadSize * sin(angle + GameConstants.angleTriangleOffset),
-    );
-    path.lineTo(
-      centerX + arrowHeadSize * cos(angle - GameConstants.angleTriangleOffset),
-      centerY + arrowHeadSize * sin(angle - GameConstants.angleTriangleOffset),
+      baseCenterX - halfWidth * cos(perpAngle),
+      baseCenterY - halfWidth * sin(perpAngle),
     );
     path.close();
 

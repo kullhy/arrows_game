@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import '../../application/models/game_level.dart';
+import '../../application/models/board_point.dart';
 
 sealed class GameState extends Equatable {
   const GameState();
@@ -24,12 +25,12 @@ class GamePlaying extends GameState {
   final int maxLives;
   final int totalSnakes;
   final Map<int, double> removalProgress;
-  final Map<int, double> entryProgress; // Snake entry animation (0.0 → 1.0)
+  final Map<int, double> entryProgress; 
   final int? flashingSnakeId;
   final double guidanceAlpha;
   final int themeIndex;
-  final bool cameraShake; // Triggers shake effect on wrong tap
-  final int score; // Points accumulated
+  final bool cameraShake; 
+  final int score; 
 
   const GamePlaying({
     this.levelNumber = 1,
@@ -104,8 +105,15 @@ class GameWon extends GameState {
 
 class GameOver extends GameState {
   final int score;
-  const GameOver({this.score = 0});
+  final bool isBombExplosion;
+  final BoardPoint? explodingBombPos;
+  
+  const GameOver({
+    this.score = 0, 
+    this.isBombExplosion = false,
+    this.explodingBombPos,
+  });
 
   @override
-  List<Object?> get props => [score];
+  List<Object?> get props => [score, isBombExplosion, explodingBombPos];
 }

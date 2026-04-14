@@ -86,4 +86,11 @@ class GamePreferences {
 
   bool get dailyChallengeCompleted => _prefs.getBool(_keyDailyCompleted) ?? false;
   set dailyChallengeCompleted(bool v) => _prefs.setBool(_keyDailyCompleted, v);
+
+  // === TUTORIAL STATES ===
+  bool get hasSeenBombIntro => _prefs.getBool('seen_bomb_intro') ?? false;
+  set hasSeenBombIntro(bool v) => _prefs.setBool('seen_bomb_intro', v);
+
+  bool get hasSeenLockIntro => _prefs.getBool('seen_lock_intro') ?? false;
+  set hasSeenLockIntro(bool v) => _prefs.setBool('seen_lock_intro', v);
 }

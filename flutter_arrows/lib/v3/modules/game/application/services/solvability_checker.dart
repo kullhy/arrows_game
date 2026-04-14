@@ -103,6 +103,18 @@ class SolvabilityChecker {
     return false;
   }
 
+  static bool isObstructedBy(GameLevel level, Snake target, Snake blocker) {
+    final head = target.body.first;
+    final direction = target.headDirection;
+    var current = head + direction;
+
+    while (_isInside(current, level.width, level.height)) {
+      if (blocker.body.contains(current)) return true;
+      current += direction;
+    }
+    return false;
+  }
+
   static List<List<int>> _createGrid(GameLevel level, {Set<int> ignoreIds = const {}}) {
     final grid = List.generate(level.width, (_) => List.filled(level.height, 0));
     for (final s in level.snakes) {

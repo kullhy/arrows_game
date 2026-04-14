@@ -76,8 +76,17 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
           if (state is GamePlaying) themeIdx = state.themeIndex;
           final currentTheme = ThemeColors.allThemes[themeIdx];
 
-          final showIntro = state is GamePlaying && !_introDismissed && 
-              state.level.snakes.any((s) => s.type != SnakeType.normal);
+          final prefs = sl<GamePreferences>();
+          final hasBomb = state is GamePlaying && state.level.snakes.any((s) => s.type == SnakeType.bomb);
+          final hasLock = state is GamePlaying && state.level.snakes.any((s) => s.type == SnakeType.locked);
+          
+          final showBombIntro = hasBomb && !prefs.hasSeenBombIntro;
+          final showLockIntro = hasLock && !prefs.hasSeenLockIntro;
+
+          final isPlaying = state is GamePlaying;
+          final isShaking = isPlaying ? (state as GamePlaying).cameraShake : false;
+          
+          final showIntro = !isShaking && (showBombIntro || showLockIntro) && !_introDismissed;
 
           return AnimatedBuilder(
             animation: _shakeAnimation,
@@ -158,10 +167,20 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                   // === OVERLAYS ===
                   if (state is GameLoading) _buildLoadingOverlay(currentTheme, state.progress),
                   if (state is GameWon) _buildWinOverlay(currentTheme, state.score, blocContext),
-                  if (state is GameOver) _buildGameOverOverlay(currentTheme, state.score, blocContext),
+                  if (state is GameOver) ...[
+                    _buildGameOverOverlay(currentTheme, state.score, blocContext),
+                    if (state.isBombExplosion) _buildExplosionFlash(state),
+                  ],
                   
                   // NEW: Level Intro/Tutorial Overlay
-                  if (showIntro) _buildLevelIntroOverlay(state.level.snakes, () => setState(() => _introDismissed = true)),
+                  if (showIntro) _buildLevelIntroOverlay(
+                    state.level.snakes, 
+                    () {
+                      if (hasBomb) prefs.hasSeenBombIntro = true;
+                      if (hasLock) prefs.hasSeenLockIntro = true;
+                      setState(() => _introDismissed = true);
+                    }
+                  ),
 
                   // === CONFETTI ===
                   Align(
@@ -247,8 +266,9 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   }
 
   Widget _buildLevelIntroOverlay(List<Snake> snakes, VoidCallback onDismiss) {
-    final hasBomb = snakes.any((s) => s.type == SnakeType.bomb);
-    final hasLock = snakes.any((s) => s.type == SnakeType.locked);
+    final prefs = sl<GamePreferences>();
+    final showBomb = snakes.any((s) => s.type == SnakeType.bomb) && !prefs.hasSeenBombIntro;
+    final showLock = snakes.any((s) => s.type == SnakeType.locked) && !prefs.hasSeenLockIntro;
 
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -272,8 +292,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                 const Text("NEW CHALLENGE!", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900)),
                 const SizedBox(height: 24),
                 
-                if (hasBomb) _buildIntroRow(Icons.timer_rounded, Colors.redAccent, "BOMB ALERT!", "Clear these snakes before the timer hits ZERO, or it's Game Over!"),
-                if (hasLock) _buildIntroRow(Icons.lock_rounded, Colors.orangeAccent, "LOCKED PATHS", "Find and clear the KEY snake first to unlock the chains!"),
+                if (showBomb) _buildIntroRow(Icons.timer_rounded, Colors.redAccent, "BOMB ALERT!", "Clear these snakes before the timer hits ZERO, or it's Game Over!"),
+                if (showLock) _buildIntroRow(Icons.lock_rounded, Colors.orangeAccent, "LOCKED PATHS", "Find and clear the KEY snake first to unlock the chains!"),
                 
                 const SizedBox(height: 32),
                 ElevatedButton(
@@ -421,36 +441,50 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   }
 
   Widget _buildGameOverOverlay(ThemeColors theme, int score, BuildContext context) {
-    return Container(
-      color: Colors.black87,
-      child: Center(
-        child: Container(
-          padding: const EdgeInsets.all(40),
-          decoration: BoxDecoration(
-            color: const Color(0xFF2E1B1B),
-            borderRadius: BorderRadius.circular(40),
-            border: Border.all(color: Colors.white12),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.heart_broken_rounded, color: Colors.redAccent, size: 100),
-              const SizedBox(height: 16),
-              const Text("GAME OVER", style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900)),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: () => context.read<GameCubit>().restartLevel(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.redAccent,
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+    final state = context.watch<GameCubit>().state;
+    final isExplosion = state is GameOver && state.isBombExplosion;
+
+    return FutureBuilder(
+      future: Future.delayed(Duration(milliseconds: isExplosion ? 800 : 0)),
+      builder: (context, snapshot) {
+        final showContent = snapshot.connectionState == ConnectionState.done || !isExplosion;
+        
+        return Container(
+          color: Colors.black.withOpacity(showContent ? 0.85 : 0.0),
+          child: Center(
+            child: AnimatedOpacity(
+              opacity: showContent ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 400),
+              child: Container(
+                padding: const EdgeInsets.all(40),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2E1B1B),
+                  borderRadius: BorderRadius.circular(40),
+                  border: Border.all(color: Colors.white12),
                 ),
-                child: const Text("TRY AGAIN", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.heart_broken_rounded, color: Colors.redAccent, size: 100),
+                    const SizedBox(height: 16),
+                    const Text("GAME OVER", style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900)),
+                    const SizedBox(height: 32),
+                    ElevatedButton(
+                      onPressed: () => context.read<GameCubit>().restartLevel(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.redAccent,
+                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                      ),
+                      child: const Text("TRY AGAIN", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    ),
+                  ],
+                ),
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      }
     );
   }
 
@@ -470,6 +504,35 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildExplosionFlash(GameOver state) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 800),
+      builder: (context, value, child) {
+        return IgnorePointer(
+          child: Opacity(
+            opacity: (1.0 - value).clamp(0.0, 1.0),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: state.explodingBombPos != null 
+                    ? Alignment(
+                        (state.explodingBombPos!.x / 4.0) - 1.0, 
+                        (state.explodingBombPos!.y / 4.0) - 1.0, 
+                      )
+                    : Alignment.center,
+                  radius: 2.5 * value,
+                  colors: const [Colors.white, Colors.orange, Colors.red, Colors.transparent],
+                  stops: const [0.0, 0.2, 0.5, 1.0],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

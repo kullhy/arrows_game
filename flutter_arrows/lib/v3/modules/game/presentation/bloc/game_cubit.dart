@@ -47,6 +47,7 @@ class GameCubit extends Cubit<GameState> {
     final config = LevelProgression.calculateLevelConfiguration(levelNum: _currentLevel);
 
     final params = GenerationParams(
+      levelNumber: _currentLevel,
       width: config.width,
       height: config.height,
       maxSnakeLength: config.maxSnakeLength,
@@ -75,6 +76,7 @@ class GameCubit extends Cubit<GameState> {
     await Future.delayed(const Duration(milliseconds: 50));
 
     final params = GenerationParams(
+      levelNumber: 0, // 0 enables all mechanics for custom
       width: size,
       height: size,
       maxSnakeLength: GameConstants.minSnakeLengthMax,
@@ -114,6 +116,7 @@ class GameCubit extends Cubit<GameState> {
     final config = LevelProgression.calculateLevelConfiguration(levelNum: 50); // Harder
 
     final params = GenerationParams(
+      levelNumber: 50, // High level for daily challenge
       width: config.width,
       height: config.height,
       maxSnakeLength: config.maxSnakeLength,
@@ -135,30 +138,37 @@ class GameCubit extends Cubit<GameState> {
     _animateSnakeEntry(playing);
   }
 
-  /// Animate snakes appearing one by one with stagger
+  /// Animate snakes appearing with a smooth staggered batch update to avoid flickering
   Future<void> _animateSnakeEntry(GamePlaying initialState) async {
     final snakeIds = initialState.level.snakes.map((s) => s.id).toList();
-    final totalFrames = 15; // frames per snake
+    final snakeCount = snakeIds.length;
+    final startTime = DateTime.now();
+    const durationMs = 800; // Total animation duration
 
-    for (int sIdx = 0; sIdx < snakeIds.length; sIdx++) {
-      for (int frame = 0; frame <= totalFrames; frame++) {
-        if (isClosed) return;
-        await Future.delayed(const Duration(milliseconds: 8));
-        final current = state;
-        if (current is! GamePlaying) return;
+    while (true) {
+      if (isClosed) return;
+      await Future.delayed(const Duration(milliseconds: 16)); // ~60 FPS capping
+      
+      final elapsed = DateTime.now().difference(startTime).inMilliseconds;
+      final globalT = (elapsed / durationMs).clamp(0.0, 1.0);
+      
+      final current = state;
+      if (current is! GamePlaying) return;
 
-        final newEntry = Map<int, double>.from(current.entryProgress);
-        newEntry[snakeIds[sIdx]] = frame / totalFrames;
-        emit(current.copyWith(entryProgress: newEntry));
+      final newEntry = <int, double>{};
+      for (int i = 0; i < snakeCount; i++) {
+        // Individual snake stagger: each snake starts after a delay and animates for 40% of total time
+        final staggerStart = (i / snakeCount) * 0.6; 
+        final snakeT = ((globalT - staggerStart) / 0.4).clamp(0.0, 1.0);
+        newEntry[snakeIds[i]] = snakeT;
       }
 
-      // Stagger: wait a tiny bit before next snake starts
-      if (sIdx < snakeIds.length - 1) {
-        await Future.delayed(const Duration(milliseconds: 20));
-      }
+      emit(current.copyWith(entryProgress: newEntry));
+      
+      if (globalT >= 1.0) break;
     }
 
-    // Clear entry progress once all done
+    // Final cleanup to ensure state is clean
     if (state is GamePlaying) {
       emit((state as GamePlaying).copyWith(entryProgress: const {}));
     }
@@ -295,7 +305,17 @@ class GameCubit extends Cubit<GameState> {
       if (bombExploded) {
         _soundService.playWrong();
         HapticFeedback.vibrate();
-        emit(GameOver(score: newScore));
+        // Find the bomb that exploded (search in updatedSnakes where timers were decremented)
+        final explodingBomb = updatedSnakes.firstWhere(
+          (s) => s.type == SnakeType.bomb && s.bombTimer <= 0,
+          orElse: () => updatedSnakes.firstWhere((s) => s.type == SnakeType.bomb),
+        );
+        
+        emit(GameOver(
+          score: newScore, 
+          isBombExplosion: true, 
+          explodingBombPos: explodingBomb.body.first
+        ));
         return;
       }
 
