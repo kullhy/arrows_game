@@ -23,51 +23,58 @@ class LevelProgression {
     // 0 is for custom/daily
     if (levelNum == 0) {
       return const LevelConfiguration(
-        width: 7, height: 9, 
-        targetSnakeCount: 16, 
+        width: 8, height: 10, 
+        targetSnakeCount: 45, // Extreme
         maxSnakeLength: 6,
-        bombProbability: 0.25, lockCount: 2, minDependencyDepth: 3,
+        bombProbability: 0.4, lockCount: 4, minDependencyDepth: 5,
       );
     }
 
-    // Board Size Scaling: Grow slowly from 4x5 to 8x10
-    int width = (4 + (levelNum / 25)).floor().clamp(4, 8);
-    int height = (5 + (levelNum / 20)).floor().clamp(5, 10);
+    // --- CASE 1: INTRO (L1 - L3) ---
+    // Keep intro simple but slightly tighter
+    if (levelNum <= 3) {
+      return LevelConfiguration(
+        width: 4, height: 5,
+        targetSnakeCount: (5 + levelNum * 2), 
+        maxSnakeLength: 4,
+        bombProbability: 0.0,
+        lockCount: 0,
+        minDependencyDepth: 1,
+      );
+    }
 
-    // Density Scaling: 
-    // Start with 5 snakes (Level 1)
-    // Add 1 snake every 4 levels
-    int targetSnakes = (5 + (levelNum / 4)).floor().clamp(5, 35);
+    // --- CASE 2: BOSS LEVELS (Every 4th level) ---
+    final isBossLevel = levelNum % 4 == 0;
     
-    // Snake Length
-    int maxLen = levelNum < 15 ? 4 : 6;
+    // Extreme Base Progression after L3
+    // We jump to 7x9 or 8x10 very quickly
+    int baseWidth = (6 + (levelNum / 15)).floor().clamp(6, 8);
+    int baseHeight = (8 + (levelNum / 10)).floor().clamp(8, 10);
+    // Double the snake density
+    int baseSnakes = (25 + (levelNum / 1.5)).floor().clamp(25, 60);
 
-    // Challenge Scaling
-    double bombProb = 0.0;
-    if (levelNum >= 10) {
-      // 10% chance at lvl 10, up to 40% at lvl 100
-      bombProb = (0.1 + (levelNum - 10) * 0.0035).clamp(0.1, 0.4);
+    if (isBossLevel) {
+      // Boss levels are 8x10 instantly if level > 12
+      return LevelConfiguration(
+        width: (levelNum > 12 ? 8 : baseWidth + 1).clamp(6, 8),
+        height: (levelNum > 12 ? 10 : baseHeight + 1).clamp(8, 10),
+        targetSnakeCount: (baseSnakes * 1.6).floor().clamp(35, 75),
+        maxSnakeLength: 6,
+        bombProbability: (0.3 + (levelNum / 80)).clamp(0.3, 0.6),
+        lockCount: (3 + (levelNum / 20)).floor().clamp(3, 6),
+        minDependencyDepth: (levelNum < 12 ? 4 : 5), 
+      );
     }
 
-    int locks = 0;
-    if (levelNum > 20) {
-      // 1 lock at lvl 21, up to 4 locks at lvl 100
-      locks = (1 + (levelNum - 20) ~/ 20).clamp(1, 4);
-    }
-
-    // Dependency Depth: How many mandatory moves to solve the core puzzle
-    int minDepth = 2; // User requested at least 2
-    if (levelNum > 40) minDepth = 3;
-    if (levelNum > 80) minDepth = 4;
-
+    // --- CASE 3: STANDARD LEVELS (L5, L6, L7, L9...) ---
     return LevelConfiguration(
-      width: width,
-      height: height,
-      targetSnakeCount: targetSnakes,
-      maxSnakeLength: maxLen,
-      bombProbability: bombProb,
-      lockCount: locks,
-      minDependencyDepth: minDepth,
+      width: baseWidth,
+      height: baseHeight,
+      targetSnakeCount: baseSnakes,
+      maxSnakeLength: 6,
+      bombProbability: (0.2 + (levelNum / 150)).clamp(0.2, 0.5),
+      lockCount: (levelNum > 10 ? 2 : 1), // At least 1 lock after L3
+      minDependencyDepth: (levelNum < 30 ? 3 : 4),
     );
   }
 }
