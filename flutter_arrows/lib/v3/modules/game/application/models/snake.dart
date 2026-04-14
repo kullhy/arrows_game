@@ -31,15 +31,21 @@ class Snake extends Equatable {
   List<Object?> get props => [id, body, headDirection, type, bombTimer, lockParentId];
 
   Snake copyWith({
+    int? id,
+    List<BoardPoint>? body,
+    Direction? headDirection,
+    SnakeType? type,
     int? bombTimer,
+    int? lockParentId,
+    bool clearLockParent = false,
   }) {
     return Snake(
-      id: id,
-      body: body,
-      headDirection: headDirection,
-      type: type,
+      id: id ?? this.id,
+      body: body ?? this.body,
+      headDirection: headDirection ?? this.headDirection,
+      type: type ?? this.type,
       bombTimer: bombTimer ?? this.bombTimer,
-      lockParentId: lockParentId,
+      lockParentId: clearLockParent ? null : (lockParentId ?? this.lockParentId),
     );
   }
 }

@@ -384,41 +384,59 @@ class ArrowsBoardPainter extends CustomPainter {
         break;
 
       case SnakeType.locked:
-        // --- 2. DYNAMIC IRON CHAIN WRAP ---
-        // The painter already has the full body path in _drawSnakeBodyInternal
-        // But for specific links, we can draw them here or in body draw.
-        // Let's add the Master Lock icon at the head.
+        // --- 2. REFINED MASTER LOCK ---
+        final lockScale = 0.8;
+        final lockBase = Rect.fromCenter(
+          center: center.translate(0, unit * 0.05 * lockScale), 
+          width: unit * 0.35 * lockScale, 
+          height: unit * 0.25 * lockScale
+        );
         
-        final lockBase = Rect.fromCenter(center: center.translate(0, unit * 0.08), width: unit * 0.4, height: unit * 0.3);
+        // Polished Metallic Body (Gunmetal Steel)
+        canvas.drawRRect(RRect.fromRectAndRadius(lockBase, Radius.circular(unit * 0.04)), Paint()
+          ..shader = const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFFB0BEC5), Color(0xFF455A64)]
+          ).createShader(lockBase));
         
-        // Metallic Body
-        canvas.drawRRect(RRect.fromRectAndRadius(lockBase, Radius.circular(unit * 0.05)), Paint()
-          ..shader = const LinearGradient(colors: [Color(0xFFE0E0E0), Color(0xFF616161)]).createShader(lockBase));
+        // Shackle (Rounded and thick)
+        final shacklePath = Path()
+          ..addArc(Rect.fromCenter(center: center.translate(0, -unit * 0.05 * lockScale), width: unit * 0.22 * lockScale, height: unit * 0.25 * lockScale), pi, pi);
+        canvas.drawPath(shacklePath, Paint()
+          ..color = const Color(0xFF78909C)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = unit * 0.06
+          ..strokeCap = StrokeCap.round);
         
-        // Shackle
-        final shackleRect = Rect.fromCenter(center: center.translate(0, -unit * 0.05), width: unit * 0.25, height: unit * 0.3);
-        canvas.drawArc(shackleRect, pi, pi, false, Paint()
-          ..color = const Color(0xFFBDBDBD).withOpacity(alpha)
-          ..style = PaintingStyle.stroke..strokeWidth = unit * 0.08..strokeCap = StrokeCap.round);
-        
-        // Keyhole
-        canvas.drawCircle(center.translate(0, unit * 0.08), unit * 0.05, Paint()..color = Colors.black87);
+        // Subtle Keyhole
+        canvas.drawCircle(center.translate(0, unit * 0.05 * lockScale), unit * 0.035, Paint()..color = Colors.black45);
         break;
 
       case SnakeType.key:
-        // --- 3. PREMIUM GOLDEN KEY ---
+        // --- 3. REFINED JEWEL KEY ---
+        final keyScale = 0.7;
         final keyPaint = Paint()
           ..shader = const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFFFFD700), Color(0xFFDAA520), Color(0xFFFFD700)],
-          ).createShader(Rect.fromCircle(center: center, radius: unit * 0.35));
+            colors: [Color(0xFFFFE082), Color(0xFFFFA000), Color(0xFFFFD54F)],
+          ).createShader(Rect.fromCircle(center: center, radius: unit * 0.3));
 
-        canvas.drawCircle(center.translate(-unit * 0.2, 0), unit * 0.15, keyPaint);
-        canvas.drawCircle(center.translate(-unit * 0.2, 0), unit * 0.08, Paint()..blendMode = BlendMode.clear);
-        canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(center.dx - unit * 0.1, center.dy - unit * 0.04, unit * 0.45, unit * 0.08), Radius.circular(unit * 0.04)), keyPaint);
-        canvas.drawRect(Rect.fromLTWH(center.dx + unit * 0.2, center.dy, unit * 0.06, unit * 0.12), keyPaint);
-        canvas.drawRect(Rect.fromLTWH(center.dx + unit * 0.32, center.dy, unit * 0.06, unit * 0.08), keyPaint);
+        // Key bow (Ring)
+        final bowCenter = center.translate(-unit * 0.15 * keyScale, 0);
+        canvas.drawCircle(bowCenter, unit * 0.14 * keyScale, keyPaint);
+        // Interior of bow (Using a circle with background color instead of clear)
+        canvas.drawCircle(bowCenter, unit * 0.07 * keyScale, Paint()..color = const Color(0xFF1B2E1B)); // Match snake board tint
+        
+        // Key shaft
+        canvas.drawRRect(RRect.fromRectAndRadius(
+          Rect.fromLTWH(center.dx - unit * 0.05 * keyScale, center.dy - unit * 0.03 * keyScale, unit * 0.4 * keyScale, unit * 0.06 * keyScale), 
+          Radius.circular(unit * 0.03)), keyPaint);
+        
+        // Key bits (the teeth)
+        canvas.drawRect(Rect.fromLTWH(center.dx + unit * 0.15 * keyScale, center.dy, unit * 0.05 * keyScale, unit * 0.09 * keyScale), keyPaint);
+        canvas.drawRect(Rect.fromLTWH(center.dx + unit * 0.25 * keyScale, center.dy, unit * 0.05 * keyScale, unit * 0.06 * keyScale), keyPaint);
         break;
       default:
         break;

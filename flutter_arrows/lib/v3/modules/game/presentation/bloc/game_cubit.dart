@@ -298,11 +298,15 @@ class GameCubit extends Cubit<GameState> {
       
       // Update bombs
       bool bombExploded = false;
-      final updatedSnakes = remainingSnakes.map((s) {
+      final updatedSnakes = remainingSnakes.map<Snake>((s) {
         if (s.type == SnakeType.bomb) {
           final newTimer = s.bombTimer - 1;
           if (newTimer <= 0) bombExploded = true;
           return s.copyWith(bombTimer: newTimer);
+        }
+        // AUTO UNLOCK: If this was a key, unlock its children instantly
+        if (s.type == SnakeType.locked && s.lockParentId == snakeId) {
+          return s.copyWith(type: SnakeType.normal, clearLockParent: true);
         }
         return s;
       }).toList();
