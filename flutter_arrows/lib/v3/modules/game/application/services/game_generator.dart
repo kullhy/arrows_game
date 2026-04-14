@@ -1,5 +1,5 @@
 import 'dart:math';
-
+import 'level_progression.dart';
 import '../models/board_point.dart';
 import '../models/direction.dart';
 import '../models/game_constants.dart';
@@ -16,20 +16,15 @@ abstract class BoardShape {
 
 class GenerationParams {
   final int levelNumber;
-  final int width;
-  final int height;
-  final int maxSnakeLength;
+  final LevelConfiguration config;
   final bool fillTheBoard;
   final BoardShape? boardShape;
   final Function(double)? onProgress;
-
   final int? seed;
   
   const GenerationParams({
     required this.levelNumber,
-    required this.width,
-    required this.height,
-    required this.maxSnakeLength,
+    required this.config,
     this.fillTheBoard = true,
     this.boardShape,
     this.onProgress,
@@ -52,8 +47,8 @@ class GameGenerator {
   }
 
   GameLevel generateSolvableLevel(GenerationParams params) {
-    final width = params.width;
-    final height = params.height;
+    final width = params.config.width;
+    final height = params.config.height;
 
     final walls = params.boardShape?.getWalls(width, height) ??
         List.generate(width, (_) => List.filled(height, false));
@@ -61,7 +56,7 @@ class GameGenerator {
     final config = GameGeneratorConfig(
       width: width,
       height: height,
-      maxSnakeLength: params.maxSnakeLength,
+      maxSnakeLength: params.config.maxSnakeLength,
       fillTheBoard: params.fillTheBoard,
       walls: walls,
     );
@@ -85,13 +80,14 @@ class GameGenerator {
       _fillRemainingBoard(context, totalCells, params.onProgress);
     }
 
-    // POST-PROCESS: Add specialized puzzle mechanics based on level progression
+    // POST-PROCESS: Add specialized puzzle mechanics based on level configuration
     final postProcessedSnakes = _strategicPostProcess(
       context.snakes, 
       params.seed, 
       width, 
       height, 
-      params.levelNumber
+      params.levelNumber,
+      params.config,
     );
 
     final levelId = params.seed ?? DateTime.now().millisecondsSinceEpoch;
@@ -108,13 +104,14 @@ class GameGenerator {
     );
   }
 
-  List<Snake> _strategicPostProcess(List<Snake> snakes, int? seed, int w, int h, int levelNum) {
+  List<Snake> _strategicPostProcess(
+    List<Snake> snakes, int? seed, int w, int h, int levelNum, LevelConfiguration config) {
     if (snakes.isEmpty) return snakes;
     final rand = seed != null ? Random(seed) : Random();
     final result = List<Snake>.from(snakes);
 
-    // 1. MILESTONE CHECK: Level 1-10 are vanilla pure puzzles
-    if (levelNum <= 10 && levelNum != 0 /* not custom */) {
+    // 1. VANILLA CHECK: Level 1-9 are vanilla pure puzzles
+    if (levelNum > 0 && levelNum < 10) {
       return result;
     }
 
@@ -123,11 +120,11 @@ class GameGenerator {
     final sortedByBottleneck = List<int>.generate(result.length, (i) => i);
     sortedByBottleneck.sort((a, b) => dependencies[b].length.compareTo(dependencies[a].length));
 
-    // 3. PLACE LOCKS (Unlock at level 21+)
-    bool allowLocks = levelNum > 20 || levelNum == 0;
-    if (allowLocks) {
-      int lockCount = max(1, snakes.length ~/ 8);
-      for (int l = 0; l < lockCount; l++) {
+    // 3. PLACE LOCKS (based on lockCount)
+    if (config.lockCount > 0) {
+      int actualLocks = min(config.lockCount, snakes.length ~/ 3);
+      for (int l = 0; l < actualLocks; l++) {
+        if (l >= sortedByBottleneck.length) break;
         int bossIdx = sortedByBottleneck[l];
         if (dependencies[bossIdx].isNotEmpty) {
           int keyId = dependencies[bossIdx].last; 
@@ -151,25 +148,21 @@ class GameGenerator {
       }
     }
 
-    // 4. PLACE BOMBS (Unlock at level 11+)
-    bool allowBombs = levelNum > 10 || levelNum == 0;
-    if (allowBombs) {
+    // 4. PLACE BOMBS (based on bombProbability)
+    if (config.bombProbability > 0 || levelNum >= 10) {
       // Create a map for quick lookup of recursive dependencies
       final transitiveDeps = _calculateTransitiveDependencies(dependencies, snakes.map((s) => s.id).toList());
 
       for (int i = 0; i < result.length; i++) {
-        // Probability increases with level
-        double bombProb = 0.12 + (min(levelNum, 100) / 1000.0); 
-        
         // CONDITION: Must be a normal snake, meet probability, 
-        // AND have at least 2 dependencies (must clear 2 others first)
+        // AND have at least the required depth from config
         final requiredMoves = transitiveDeps[i].length;
-        if (result[i].type == SnakeType.normal && rand.nextDouble() < bombProb && requiredMoves > 2) {
+        if (result[i].type == SnakeType.normal && rand.nextDouble() < config.bombProbability && requiredMoves >= config.minDependencyDepth) {
           
           // Difficulty scale:
-          int bonus = 3;
-          if (levelNum > 30) bonus = 1;
-          if (levelNum > 60) bonus = 0;
+          int bonus = 2;
+          if (levelNum > 40) bonus = 1;
+          if (levelNum > 80) bonus = 0;
           
           int finalTimer = max(2, requiredMoves + bonus);
 
@@ -179,6 +172,32 @@ class GameGenerator {
             headDirection: result[i].headDirection,
             type: SnakeType.bomb,
             bombTimer: finalTimer,
+          );
+        }
+      }
+
+      // MANDATORY CHECK: If level >= 10 and still no bomb, force at least one!
+      int bombCount = result.where((s) => s.type == SnakeType.bomb).length;
+      if (bombCount == 0 && levelNum >= 10) {
+        int bestIdx = -1;
+        int maxD = -1;
+        for (int i = 0; i < result.length; i++) {
+          if (result[i].type == SnakeType.normal) {
+            final d = transitiveDeps[i].length;
+            if (d > maxD) {
+              maxD = d;
+              bestIdx = i;
+            }
+          }
+        }
+        if (bestIdx != -1 && maxD >= config.minDependencyDepth) {
+          int bonus = (levelNum > 40) ? 1 : 2;
+          result[bestIdx] = Snake(
+            id: result[bestIdx].id,
+            body: result[bestIdx].body,
+            headDirection: result[bestIdx].headDirection,
+            type: SnakeType.bomb,
+            bombTimer: maxD + bonus,
           );
         }
       }

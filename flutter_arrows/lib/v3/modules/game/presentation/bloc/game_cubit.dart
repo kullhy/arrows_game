@@ -48,9 +48,8 @@ class GameCubit extends Cubit<GameState> {
 
     final params = GenerationParams(
       levelNumber: _currentLevel,
-      width: config.width,
-      height: config.height,
-      maxSnakeLength: config.maxSnakeLength,
+      config: config,
+      seed: _currentLevel, // Deterministic seed per level
       onProgress: (p) => emit(GameLoading(p)),
     );
 
@@ -75,11 +74,19 @@ class GameCubit extends Cubit<GameState> {
     _undoStack.clear();
     await Future.delayed(const Duration(milliseconds: 50));
 
-    final params = GenerationParams(
-      levelNumber: 0, // 0 enables all mechanics for custom
+    final config = LevelConfiguration(
       width: size,
       height: size,
-      maxSnakeLength: GameConstants.minSnakeLengthMax,
+      targetSnakeCount: (size * size / 4).floor(),
+      maxSnakeLength: 6,
+      bombProbability: 0.15,
+      lockCount: 1,
+      minDependencyDepth: 2,
+    );
+
+    final params = GenerationParams(
+      levelNumber: 0, // 0 enables mechanics
+      config: config,
       fillTheBoard: fillBoard,
       boardShape: boardShape,
       onProgress: (p) => emit(GameLoading(p)),
@@ -113,13 +120,11 @@ class GameCubit extends Cubit<GameState> {
       // Show already done? For now just let them play but maybe don't award much.
     }
 
-    final config = LevelProgression.calculateLevelConfiguration(levelNum: 50); // Harder
+    final config = LevelProgression.calculateLevelConfiguration(levelNum: 0); // Special pro config for daily
 
     final params = GenerationParams(
-      levelNumber: 50, // High level for daily challenge
-      width: config.width,
-      height: config.height,
-      maxSnakeLength: config.maxSnakeLength,
+      levelNumber: 0,
+      config: config,
       seed: seed,
       onProgress: (p) => emit(GameLoading(p)),
     );
